@@ -1,3 +1,10 @@
+# Created by https://www.toptal.com/developers/gitignore/api/dotenv
+# Edit at https://www.toptal.com/developers/gitignore?templates=dotenv
+
+### dotenv ###
+.env
+
+# End of https://www.toptal.com/developers/gitignore/api/dotenv
 # Created by https://www.toptal.com/developers/gitignore/api/windows,macos,intellij,visualstudiocode,node
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,intellij,visualstudiocode,node
 
