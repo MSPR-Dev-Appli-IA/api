@@ -24,9 +24,13 @@ export interface  IUser extends Document {
 }
 
 export interface UserForm {
+    username: string,
+    firstname:string,
+    lastname:string,
     email:string,
     password:string
 }
+
 
 
 export interface UserjwtToken {

@@ -11,6 +11,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 
+import "./config/jwt.config";
 
 app.use(router);
 
