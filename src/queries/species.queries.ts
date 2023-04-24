@@ -23,7 +23,7 @@ export const findLimitedSpecies = async (limit:number=1,skip:number=0, order:1|-
 
 
   export const findOneSpecies = async (speciedId:String ) => {
-    return Species.findOne({ _id: speciedId }).exec();
+    return Species.findOne({ _id: speciedId }).populate("images.path").exec();
  };
 
  export const updateSpecieWithSpeciesId = async (speciesId:String,name:String ,generalAdvices:GeneralAdvice[]|null=null ) => {
