@@ -16,3 +16,6 @@ export const notRequireAuth = (req:Request, res:Response, next:NextFunction) => 
   }
 };
 
+
+
+
