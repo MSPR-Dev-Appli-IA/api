@@ -4,13 +4,13 @@ import upload from '../config/image.config'
 
 const router = Router();
 
-import  {requireAuth} from "../middleware/AuthMiddleware";
+import  {requireAuth,isItBotanist} from "../middleware/AuthMiddleware";
 
 router.get("/",  requireAuth, getSpecies);
 router.get("/:speciesId",  requireAuth, getOneSpecies);
-router.post("/",  requireAuth,upload.array("files"), newSpecies);
-router.post("/:speciesId",  requireAuth,upload.array("files"), updateSpecies);
-router.post("/addImages/:speciesId",upload.array("files"),addImagesFromSpecies)
-router.delete("/deleteImage/:speciedId/:imageId",  requireAuth, removeImageFromSpecies);
-router.delete("/:speciedId",  requireAuth, removeSpecies);
+router.post("/",  requireAuth,isItBotanist,upload.array("files"), newSpecies);
+router.post("/:speciesId",requireAuth,isItBotanist,  requireAuth,upload.array("files"), updateSpecies);
+router.post("/addImages/:speciesId",requireAuth,isItBotanist,upload.array("files"),addImagesFromSpecies)
+router.delete("/deleteImage/:speciedId/:imageId",  requireAuth,isItBotanist, removeImageFromSpecies);
+router.delete("/:speciedId",  requireAuth,isItBotanist, removeSpecies);
 export default router;
