@@ -2,6 +2,7 @@ import  { findUserPerEmail, createUser } from "../queries/user.queries";
 import  {userSignupValidation} from "../database/validation/user.validation";
 import { NextFunction, Request, Response } from "express";
 import  { ValidationError } from "joi";
+import {getDefaultRole} from "../queries/role.queries";
 
 
 export const login = async (req:Request, res:Response, _:NextFunction) => {
@@ -53,7 +54,8 @@ export const signup = async (req:Request, res:Response, _:NextFunction) => {
     try {
     await userSignupValidation.validateAsync(req.body, { abortEarly: false });
     const body = req.body;
-    const user = await createUser(body);
+    const role = await getDefaultRole();
+    const user = await createUser(body, role);
     req.login(user);
     res.json(user)
     } catch (e) {
