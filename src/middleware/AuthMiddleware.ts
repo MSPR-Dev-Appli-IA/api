@@ -16,3 +16,15 @@ export const notRequireAuth = (req:Request, res:Response, next:NextFunction) => 
   }
 };
 
+
+
+export const isItBotanist = (req:Request, res:Response, next:NextFunction) => {
+  if (req.user.role.name =="Botanist" || req.user.role.name =="Admin") {
+    next();
+  } else {
+    res.status(404).send( "Your are not allowed " );
+  }
+};
+
+
+

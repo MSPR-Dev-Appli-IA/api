@@ -6,7 +6,7 @@ export const findUserPerEmail = (email:string) => {
 };
 
 export const findUserPerId = (id:string) => {
-  return User.findById(id).exec();
+  return User.findById(id).populate("role").exec();
 };
 
 export const createUser= async (user :UserForm) => {
