@@ -15,7 +15,7 @@ export const login = async (req:Request, res:Response, _:NextFunction) => {
       const match =  user.comparePassword(password);
       if (match) {
         req.login(user);
-        res.json(user);
+        res.status(200).json(user);
       } else {
         res.status(404).json( [{ field: "password", message: "Mauvais identifiants" }] );
       }
@@ -53,12 +53,16 @@ export const signup = async (req:Request, res:Response, _:NextFunction) => {
 
     try {
     await userSignupValidation.validateAsync(req.body, { abortEarly: false });
+
     const body = req.body;
+
     const role = await getDefaultRole();
     const user = await createUser(body, role);
+
     req.login(user);
     res.json(user)
     } catch (e) {
+    console.log(e,"voila mon errerur")
     const errors = [];
     if (e instanceof ValidationError) {
       e.details.map((error) => {
@@ -67,6 +71,6 @@ export const signup = async (req:Request, res:Response, _:NextFunction) => {
     } else {
         errors.push({ field: "error", message: e })
     }
-    res.status(400).send(errors);
+    res.status(404).send(errors);
   }
 };

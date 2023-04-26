@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema<IUser,UserModel>({
     lastname: { type: String, required: true },
     created_at: {type: Date,require: true,default: Date.now()},
     deleted_at: {type: Date,require: false},
-    role: { type: schema.Types.ObjectId, ref: "role", required: true },
+    role: { type: schema.Types.ObjectId, ref: "Role", required: true },
     local: {
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
