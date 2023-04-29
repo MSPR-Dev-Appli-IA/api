@@ -13,6 +13,7 @@ beforeAll(async () => {
 
 
 afterAll(async () => {
+  console.log("ok on clean la database")
   closeDatabase()
 }
 );

@@ -34,8 +34,7 @@ export const getSpecies  = async (req:Request, res:Response, _:NextFunction) => 
   export const updateSpecies = async (req:Request, res:Response, _:NextFunction) => {
     try {
       const speciesId = req.params.speciesId;
-      const { name, generalAdvices } = req.body;
-      const species = await updateSpecieWithSpeciesId(speciesId,name,generalAdvices);
+      const species = await updateSpecieWithSpeciesId(speciesId,req.body);
       res.status(200).json( species );
     } catch (e) {
       res.status(404).send("error");
@@ -49,12 +48,12 @@ export const getSpecies  = async (req:Request, res:Response, _:NextFunction) => 
     try {
       await speciesValidation.validateAsync(req.body, { abortEarly: false });
       const files = req.files as Express.Multer.File[]
-      const { name, generalAdvices } = req.body;
+
       let  imageArray:IImage[] = []
       if (files){
         imageArray = await  newImages(files)
       }
-      const species = await createSpecies(imageArray,generalAdvices,name);
+      const species = await createSpecies(imageArray,req.body);
       res.status(200).send(species);
     } catch (e) {
       const errors = [];

@@ -4,10 +4,19 @@ import { Document  } from "mongoose";
 export interface ISpecies extends Document{
     name : String
     images : String[]
-    generalAdvices : GeneralAdvice[]
+    description: String|null,
+    sunExposure: String|null,
+    watering: String|null,
+    optimalTemperature: String|null,
 }
 
 
-export interface GeneralAdvice {
-    description : String
+export interface SpeciesForm{
+    name : String
+    description: String|null,
+    sunExposure: String|null,
+    watering: String|null,
+    optimalTemperature: String|null,
 }
+
+

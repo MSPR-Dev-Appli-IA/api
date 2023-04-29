@@ -2,7 +2,7 @@ import  { findUserPerEmail, createUser } from "../queries/user.queries";
 import  {userSignupValidation} from "../database/validation/user.validation";
 import { NextFunction, Request, Response } from "express";
 import  { ValidationError } from "joi";
-import {getDefaultRole} from "../queries/role.queries";
+import {getDefaultRole,getBotanistRole} from "../queries/role.queries";
 
 
 export const login = async (req:Request, res:Response, _:NextFunction) => {
@@ -72,4 +72,14 @@ export const signup = async (req:Request, res:Response, _:NextFunction) => {
     }
     res.status(404).send(errors);
   }
+};
+
+export const createAccountWithBotanistRight = async () => {
+  try {
+  const body = {"username":"defaultBotanist","firstname":"John","lastname":"doe","email":"botanist@email.fr","password":"123456"};
+  const role = await getBotanistRole();
+  await createUser(body, role)
+  } catch (e) {
+  throw(e)
+}
 };

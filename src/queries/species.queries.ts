@@ -1,6 +1,6 @@
 import {Species} from "../database/models/species.model"
 import { PipelineStage } from "mongoose";
-import {GeneralAdvice,IImage} from "../interfaces/index"
+import {SpeciesForm,IImage} from "../interfaces/index"
 
 
 export const findLimitedSpecies = async (limit:number=1,skip:number=0, order:1|-1=-1, search:String|null ) => {
@@ -26,20 +26,26 @@ export const findLimitedSpecies = async (limit:number=1,skip:number=0, order:1|-
     return Species.findOne({ _id: speciedId }).populate("images.path").exec();
  };
 
- export const updateSpecieWithSpeciesId = async (speciesId:String,name:String ,generalAdvices:GeneralAdvice[]|null=null ) => {
+ export const updateSpecieWithSpeciesId = async (speciesId:String,species:SpeciesForm ) => {
   return await Species.findByIdAndUpdate(speciesId, {
-    name: name,
-    generalAdvices:generalAdvices
+    name: species.name,
+    description: species.description,
+    sunExposure: species.sunExposure,
+    watering: species.watering,
+    optimalTemperature: species.optimalTemperature,
   },
     {new: true})
 };
   
 
-  export const createSpecies = async (images:IImage[]|null=null,generalAdvices:GeneralAdvice[]|null=null,name:String) => {
+  export const createSpecies = async (images:IImage[]|null=null,species:SpeciesForm) => {
       const newSpecies  = new Species({
-        name: name,
+        name: species.name,
         images:images,
-        generalAdvices:generalAdvices
+        description: species.description,
+        sunExposure: species.sunExposure,
+        watering: species.watering,
+        optimalTemperature: species.optimalTemperature,
       });
       return await newSpecies.save();
 
