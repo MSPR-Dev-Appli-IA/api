@@ -15,7 +15,7 @@ export const login = async (req:Request, res:Response, _:NextFunction) => {
       const match =  user.comparePassword(password);
       if (match) {
         req.login(user);
-        res.status(200).json(user);
+        res.status(200).json(user.set("local.password",null));
       } else {
         res.status(404).json( [{ field: "password", message: "Mauvais identifiants" }] );
       }
@@ -30,7 +30,7 @@ export const login = async (req:Request, res:Response, _:NextFunction) => {
 export const me = async (req:Request, res:Response) => {
   try {
     if (req.user) {
-      res.json(req.user);
+      res.json(req.user.set("local.password",null));
     } else {
       res.json(null);
     }
@@ -42,7 +42,7 @@ export const me = async (req:Request, res:Response) => {
 export const signout = async (req:Request, res:Response, _:NextFunction) => {
   try {
     req.logout();
-    res.status(204).send();
+    res.status(200).send();
   } catch (error) {
     res.status(404).json( "error" );
   }
@@ -57,12 +57,11 @@ export const signup = async (req:Request, res:Response, _:NextFunction) => {
     const body = req.body;
 
     const role = await getDefaultRole();
-    const user = await createUser(body, role);
+    const user = (await createUser(body, role)).set("local.password",null);
 
     req.login(user);
     res.json(user)
     } catch (e) {
-    console.log(e,"voila mon errerur")
     const errors = [];
     if (e instanceof ValidationError) {
       e.details.map((error) => {
