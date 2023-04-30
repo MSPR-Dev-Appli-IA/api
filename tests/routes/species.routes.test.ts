@@ -6,7 +6,6 @@ import { createAccountWithBotanistRight } from "../../src/controllers/auth.contr
 let cookieJWTBotanist: string[]
 let cookieJWTUser: string[]
 beforeAll(async () => {
-    console.log("le before alll des species ")
     await createAccountWithBotanistRight()
     const respBotanist = await request(app).post("/api/auth/login")
         .set('Content-type', 'application/json')
@@ -28,7 +27,7 @@ afterAll(async () => {
 
 describe("create species", () => {
 
-    test("create species without image ", async () => {
+    test("create species ", async () => {
   
       const resp = await request(app).post("/api/species")
         .set('Content-type', 'application/json')
@@ -49,12 +48,27 @@ describe("create species", () => {
    }))
     });
 
+    test("create species with the same name ", async () => {
+  
+        const resp = await request(app).post("/api/species")
+          .set('Content-type', 'application/json')
+          .set('Cookie', cookieJWTBotanist)
+          .send({ "name":"rosa",
+          "description":"Voila ma deszcription",
+          "sunExposure":"A lombre en vrai",
+          "watering":"l'eau dans 20 30 ans yen aura plus",
+          "optimalTemperature":"50"
+       })
+        expect(resp.statusCode).toBe(404)
+      
+      });
+
     test("create species without botanist account ", async () => {
   
         const resp = await request(app).post("/api/species")
           .set('Content-type', 'application/json')
           .set('Cookie', cookieJWTUser)
-          .send({ "name":"rosa",
+          .send({ "name":"rosa78",
           "description":"Voila ma deszcription",
           "sunExposure":"A lombre en vrai",
           "watering":"l'eau dans 20 30 ans yen aura plus",

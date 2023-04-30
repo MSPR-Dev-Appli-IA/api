@@ -5,7 +5,7 @@ const schema = mongoose.Schema;
 
 
 const speciesSchema = new mongoose.Schema<ISpecies>({
-    name: { type: String, required: true },
+    name: { type: String, required: true ,unique:true},
     images : [{ type: schema.Types.ObjectId, ref: "image" }],
     description: { type: String, required: false ,default:null},
     sunExposure: { type: String, required: false,default:null },

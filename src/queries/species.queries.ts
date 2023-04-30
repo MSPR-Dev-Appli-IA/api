@@ -38,10 +38,10 @@ export const findLimitedSpecies = async (limit:number=1,skip:number=0, order:1|-
 };
   
 
-  export const createSpecies = async (images:IImage[]|null=null,species:SpeciesForm) => {
+  export const createSpecies = async (species:SpeciesForm) => {
       const newSpecies  = new Species({
         name: species.name,
-        images:images,
+        images:[],
         description: species.description,
         sunExposure: species.sunExposure,
         watering: species.watering,

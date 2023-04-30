@@ -3,6 +3,7 @@ import {join} from 'path';
 import  cookieParser from 'cookie-parser';
 import  router from './routes';
 import * as dotenv from "dotenv";
+import path from "path"
 dotenv.config();
 
 import './database';
@@ -15,6 +16,8 @@ app.use(cookieParser());
 
 import "./config/jwt.config";
 
+
+app.use(express.static(path.join(__dirname, "public")));
 app.use(router);
 
 app.get('*', (_:Request, res:Response) => {
