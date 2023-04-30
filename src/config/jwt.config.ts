@@ -1,11 +1,10 @@
 import  jwt,{JwtPayload}  from "jsonwebtoken";
 import  {findUserPerId} from "../queries/user.queries";
-import  {key} from '../env/keys';
 import  {app} from "../index";
 import { IUser,UserjwtToken } from "../interfaces";
 import { NextFunction, Request, Response } from "express";
 
-
+const key = process.env.JWTKEY
 const createJwtToken = ({ user, id }:UserjwtToken) => {
   
   const jwtToken = jwt.sign(

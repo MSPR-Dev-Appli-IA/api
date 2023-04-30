@@ -2,6 +2,8 @@ import express ,{Application,  Request, Response} from "express";
 import {join} from 'path';
 import  cookieParser from 'cookie-parser';
 import  router from './routes';
+import * as dotenv from "dotenv";
+dotenv.config();
 
 import './database';
 
@@ -19,4 +21,6 @@ app.get('*', (_:Request, res:Response) => {
     res.sendFile(join(__dirname, '../index.html'));
 })
 
-app.listen(8000);
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(process.env.PORT);
+}
