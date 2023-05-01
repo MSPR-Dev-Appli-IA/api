@@ -27,5 +27,6 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: mkdir -p env/keys/ && echo "export const key= '${{ secrets.API_KEY }}'" >> env/keys/index.ts
+    - run: cat env/keys/index.ts
     - run: npm run build --if-present
     - run: npm test
