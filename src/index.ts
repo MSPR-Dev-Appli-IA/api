@@ -9,6 +9,9 @@ dotenv.config();
 import './database';
 
 export const app:Application = express();
+const compression = require("compression");
+
+app.use(compression()); // Compress all routes
 
 app.use(express.json());
 app.use(cookieParser());
