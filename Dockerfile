@@ -5,7 +5,7 @@ LABEL maintainer="Calendz. <https://calendz.app/>"
 
 # add some required packages
 RUN apk update && apk upgrade && \
-    apk add --no-cache bash git python make g++
+    apk add --no-cache bash git python3 make g++
 
 # creates a directory for the app
 RUN mkdir -p /usr/src/app
