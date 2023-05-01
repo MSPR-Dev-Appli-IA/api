@@ -4,8 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+
     "start": "cross-env NODE_ENV=dev tsc-watch --onSuccess \"node ./build/index.js\"",
-    "test": "cross-env NODE_ENV=test jest --coverage --forceExit --detectOpenHandles  --watchAll --maxWorkers=1"
+    "test": "cross-env NODE_ENV=test jest --coverage --forceExit --detectOpenHandles  --watchAll --maxWorkers=1",
+    "build": "tsc -p . "
+
   },
   "repository": {
     "type": "git",
