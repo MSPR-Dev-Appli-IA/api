@@ -1,7 +1,8 @@
 import {Species} from "../database/models/species.model"
+import {Image} from "../database/models/image.model"
 import { PipelineStage } from "mongoose";
 import {SpeciesForm,IImage} from "../interfaces/index"
-
+import  mongoose from 'mongoose';
 
 export const findLimitedSpecies = async (limit:number=1,skip:number=0, order:1|-1=-1, search:String|null ) => {
      const  aggregateArray:PipelineStage[] = [
@@ -23,7 +24,8 @@ export const findLimitedSpecies = async (limit:number=1,skip:number=0, order:1|-
 
 
   export const findOneSpecies = async (speciedId:String ) => {
-    return Species.findOne({ _id: speciedId }).populate("images.path").exec();
+
+    return Species.findOne({ _id: new  mongoose.Types.ObjectId(speciedId.trim()) }).populate({path:"images",model:Image}).exec();
  };
 
  export const updateSpecieWithSpeciesId = async (speciesId:String,species:SpeciesForm ) => {
@@ -52,10 +54,10 @@ export const findLimitedSpecies = async (limit:number=1,skip:number=0, order:1|-
  };
  
 
- export  const addImageWithSpeciesId = async  (images:IImage[],speciesId:String) => {
+ export  const addImageWithSpeciesId = async  (image:IImage,speciesId:String) => {
   return await Species.updateOne(
     { _id: speciesId }, 
-    { $push: { images: images } },
+    { $push: { images: image } },
     { returnDocument: 'after' }
      );
  

@@ -3,8 +3,7 @@ import {findLimitedSpecies,findOneSpecies,createSpecies,updateSpecieWithSpeciesI
 import { deleteImage } from "../queries/image.queries";
 import {speciesValidation} from "../database/validation/species.validation"
 import  { ValidationError } from "joi";
-import { newImages } from "./image.controller";
-import {  IImage } from "../interfaces";
+import { newImage } from "./image.controller";
 
 const limit:number = 5
 
@@ -47,12 +46,6 @@ export const getSpecies  = async (req:Request, res:Response, _:NextFunction) => 
   export const newSpecies = async (req:Request, res:Response, _:NextFunction) => {
     try {
       await speciesValidation.validateAsync(req.body, { abortEarly: false });
-      // const files = req.files as Express.Multer.File[]
-
-      // let  imageArray:IImage[] = []
-      // if (files){
-      //   imageArray = await  newImages(files)
-      // }
       const species = await createSpecies(req.body);
       res.status(200).send(species);
     } catch (e) {
@@ -75,17 +68,17 @@ export const getSpecies  = async (req:Request, res:Response, _:NextFunction) => 
 
 
 
-  export const addImagesFromSpecies = async (req:Request, res:Response, _:NextFunction) => {
+  export const addImageFromSpecies = async (req:Request, res:Response, _:NextFunction) => {
     try {
-      const files = req.files as Express.Multer.File[]
+      const file = req.file as Express.Multer.File
       const speciesId = req.params.speciesId;
-      let  imageArray:IImage[] = []
-      if (files){
-        imageArray = await  newImages(files)
-        const newSpecies = await addImageWithSpeciesId(imageArray,speciesId)
+
+      if (file){
+        const imageSpecies = await  newImage(file)
+        const newSpecies = await addImageWithSpeciesId(imageSpecies,speciesId)
         res.status(200).send(newSpecies);
       }else{
-        res.status(404).send("No files");
+        res.status(404).send("No file");
       }
     } catch (e) {
       res.status(404).send("error");
