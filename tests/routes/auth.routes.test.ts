@@ -6,7 +6,6 @@ import { app } from "../../src/index";
 let cookieJWT: string[]
 
 beforeAll(async () => {
-  console.log("le before alll des auth ")
 
   const resp = await request(app).post("/api/auth/signup")
     .set('Content-type', 'application/json')
@@ -16,7 +15,7 @@ beforeAll(async () => {
 
 
 afterAll(async () => {
-  console.log("ok on clean la database auth ")
+
   closeDatabase()
   
 }
