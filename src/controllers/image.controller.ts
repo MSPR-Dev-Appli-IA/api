@@ -1,19 +1,12 @@
-import { IImage } from "../interfaces";
 import { createImage } from "../queries/image.queries";
 
+export const newImage = async (file:Express.Multer.File) => {
 
-
-export const newImages = async (files:Express.Multer.File[]) => {
-    const imageArray:IImage[] = []
     try {
-        for (const file of files) {
-            const  newImage = await createImage({path:file.filename})
-            imageArray.push(newImage)
-        }
+        const  newImage = await createImage({path:file.filename})   
+        return newImage
     } catch (e) {
         throw e
-    }finally{
-        return imageArray
     }
     
   };

@@ -1,7 +1,8 @@
 import {Species} from "../database/models/species.model"
+import {Image} from "../database/models/image.model"
 import { PipelineStage } from "mongoose";
-import {GeneralAdvice,IImage} from "../interfaces/index"
-
+import {SpeciesForm,IImage} from "../interfaces/index"
+import  mongoose from 'mongoose';
 
 export const findLimitedSpecies = async (limit:number=1,skip:number=0, order:1|-1=-1, search:String|null ) => {
      const  aggregateArray:PipelineStage[] = [
@@ -23,47 +24,54 @@ export const findLimitedSpecies = async (limit:number=1,skip:number=0, order:1|-
 
 
   export const findOneSpecies = async (speciedId:String ) => {
-    return Species.findOne({ _id: speciedId }).populate("images.path").exec();
+
+    return Species.findOne({ _id: new  mongoose.Types.ObjectId(speciedId.trim()) }).populate({path:"images",model:Image}).exec();
  };
 
- export const updateSpecieWithSpeciesId = async (speciesId:String,name:String ,generalAdvices:GeneralAdvice[]|null=null ) => {
-  return await Species.findByIdAndUpdate(speciesId, {
-    name: name,
-    generalAdvices:generalAdvices
+ export const updateSpecieWithSpeciesId = async (speciesId:String,species:SpeciesForm ) => {
+  return await Species.findByIdAndUpdate(new  mongoose.Types.ObjectId(speciesId.trim()), {
+    name: species.name,
+    description: species.description,
+    sunExposure: species.sunExposure,
+    watering: species.watering,
+    optimalTemperature: species.optimalTemperature,
   },
     {new: true})
 };
   
 
-  export const createSpecies = async (images:IImage[]|null=null,generalAdvices:GeneralAdvice[]|null=null,name:String) => {
+  export const createSpecies = async (species:SpeciesForm) => {
       const newSpecies  = new Species({
-        name: name,
-        images:images,
-        generalAdvices:generalAdvices
+        name: species.name,
+        images:[],
+        description: species.description,
+        sunExposure: species.sunExposure,
+        watering: species.watering,
+        optimalTemperature: species.optimalTemperature,
       });
       return await newSpecies.save();
 
  };
  
 
- export  const addImageWithSpeciesId = async  (images:IImage[],speciesId:String) => {
-  return await Species.updateOne(
+ export  const addImageWithSpeciesId = async  (image:IImage,speciesId:String) => {
+  return await Species.findByIdAndUpdate(
     { _id: speciesId }, 
-    { $push: { images: images } },
+    { $push: { images: image } },
     { returnDocument: 'after' }
-     );
+     ).populate({path:"images",model:Image});
  
  }
 
  export  const deleteImageWithSpeciesId = async  (imageId:String,speciesId:String) => {
-  return await Species.updateOne(
+  return await Species.findByIdAndUpdate(
     { _id: speciesId }, 
-    { $pull: { images: { _id: imageId } } },
+    { $pull: { images:  new  mongoose.Types.ObjectId(imageId.trim())  }},
     { returnDocument: 'after' }
-     );
+     ).populate({path:"images",model:Image});
  
  }
 
  export  const deleteSpeciesWithSpeciesId= async  (speciesId:String) => {
-    Species.findByIdAndDelete(speciesId).exec();
+   await  Species.findByIdAndDelete(speciesId).exec();
  }

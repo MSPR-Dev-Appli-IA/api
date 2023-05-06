@@ -4,7 +4,9 @@ import { extractCookies } from "../utils/extract-cookie";
 import { app } from "../../src/index";
 
 let cookieJWT: string[]
+
 beforeAll(async () => {
+
   const resp = await request(app).post("/api/auth/signup")
     .set('Content-type', 'application/json')
     .send({ "username": "testjwt", "firstname": "tesjwt", "lastname": "teurff", "email": "jwttoken@hotmail.com", "password": "123456" });
@@ -13,7 +15,9 @@ beforeAll(async () => {
 
 
 afterAll(async () => {
+
   closeDatabase()
+  
 }
 );
 

@@ -22,7 +22,7 @@ export const isItBotanist = (req:Request, res:Response, next:NextFunction) => {
   if (req.user.role.name =="Botanist" || req.user.role.name =="Admin") {
     next();
   } else {
-    res.status(404).send( "Your are not allowed " );
+    res.status(404).send( { message: "Your are not allowed" });
   }
 };
 
