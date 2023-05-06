@@ -2,7 +2,8 @@ import {Species} from "../database/models/species.model"
 import {Image} from "../database/models/image.model"
 import { PipelineStage } from "mongoose";
 import {SpeciesForm,IImage} from "../interfaces/index"
-import  mongoose from 'mongoose';
+import { Types } from 'mongoose';
+
 
 export const findLimitedSpecies = async (limit:number=1,skip:number=0, order:1|-1=-1, search:String|null ) => {
      const  aggregateArray:PipelineStage[] = [
@@ -23,13 +24,13 @@ export const findLimitedSpecies = async (limit:number=1,skip:number=0, order:1|-
   };
 
 
-  export const findOneSpecies = async (speciedId:String ) => {
+  export const findOneSpecies = async (speciedId:Types.ObjectId ) => {
 
-    return Species.findOne({ _id: new  mongoose.Types.ObjectId(speciedId.trim()) }).populate({path:"images",model:Image}).exec();
+    return Species.findOne({ _id: speciedId }).populate({path:"images",model:Image}).exec();
  };
 
- export const updateSpecieWithSpeciesId = async (speciesId:String,species:SpeciesForm ) => {
-  return await Species.findByIdAndUpdate(new  mongoose.Types.ObjectId(speciesId.trim()), {
+ export const updateSpecieWithSpeciesId = async (speciesId:Types.ObjectId,species:SpeciesForm ) => {
+  return await Species.findByIdAndUpdate( speciesId, {
     name: species.name,
     description: species.description,
     sunExposure: species.sunExposure,
@@ -54,8 +55,8 @@ export const findLimitedSpecies = async (limit:number=1,skip:number=0, order:1|-
  };
  
 
- export  const addImageWithSpeciesId = async  (image:IImage,speciesId:String) => {
-  return await Species.findByIdAndUpdate(
+ export  const addImageWithSpeciesId = async  (image:IImage,speciesId:Types.ObjectId) => {
+  return await Species.findOneAndUpdate(
     { _id: speciesId }, 
     { $push: { images: image } },
     { returnDocument: 'after' }
@@ -63,15 +64,15 @@ export const findLimitedSpecies = async (limit:number=1,skip:number=0, order:1|-
  
  }
 
- export  const deleteImageWithSpeciesId = async  (imageId:String,speciesId:String) => {
-  return await Species.findByIdAndUpdate(
+ export  const deleteImageWithSpeciesId = async  (imageId:Types.ObjectId,speciesId:Types.ObjectId) => {
+  return await Species.findOneAndUpdate(
     { _id: speciesId }, 
-    { $pull: { images:  new  mongoose.Types.ObjectId(imageId.trim())  }},
+    { $pull: { images: imageId  }},
     { returnDocument: 'after' }
      ).populate({path:"images",model:Image});
  
  }
 
- export  const deleteSpeciesWithSpeciesId= async  (speciesId:String) => {
-   await  Species.findByIdAndDelete(speciesId).exec();
+ export  const deleteSpeciesWithSpeciesId= async  (speciesId:Types.ObjectId) => {
+   await  Species.findOneAndDelete(speciesId).exec();
  }

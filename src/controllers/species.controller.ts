@@ -4,6 +4,7 @@ import { deleteImage ,getImageById} from "../queries/image.queries";
 import {speciesValidation} from "../database/validation/species.validation"
 import  { ValidationError } from "joi";
 import { newImage } from "./image.controller";
+import  mongoose from 'mongoose';
 import * as fs from 'fs';
 
 const limit:number = 5
@@ -16,21 +17,21 @@ export const getSpecies  = async (req:Request, res:Response, _:NextFunction) => 
     const species = await findLimitedSpecies(limit,skip,order,search)
     res.status(200).json( species );
   } catch (e) {
-    res.status(404).json( "error" );
+    res.status(404).send({ message: "Erreur" });
   }
   };
 
   export const getOneSpecies = async (req:Request, res:Response, _:NextFunction) => {
     try {
       const speciesId = req.params.speciesId;
-      const species = await findOneSpecies(speciesId)
+      const species = await findOneSpecies(new  mongoose.Types.ObjectId(speciesId.trim()))
       if(species){
         res.status(200).json( species );
       }else{
-      res.status(404).send("Cette espece de plante n'existe pas ");
+      res.status(404).send({ message: "Cette espece de plante n'existe pas" });
       }
     } catch (e) {
-      res.status(404).send("error");
+      res.status(404).send({ message: "Erreur" });
     }
     
   };
@@ -39,11 +40,19 @@ export const getSpecies  = async (req:Request, res:Response, _:NextFunction) => 
     try {
       const speciesId = req.params.speciesId;
       await speciesValidation.validateAsync(req.body, { abortEarly: false });
-      const species = await updateSpecieWithSpeciesId(speciesId,req.body);
+      const species = await updateSpecieWithSpeciesId(new  mongoose.Types.ObjectId(speciesId.trim()),req.body);
       res.status(200).json( species );
  
     } catch (e) {
-      res.status(404).send("error");
+      const errors = [];
+      if (e instanceof ValidationError) {
+        e.details.map((error) => {
+          errors.push({ field: error.path[0], message: error.message });
+        });
+      }else {
+        errors.push({ field: "error", message: e })
+    }
+      res.status(404).send({  errors });
     }
     
   };
@@ -82,7 +91,7 @@ export const getSpecies  = async (req:Request, res:Response, _:NextFunction) => 
 
       if (file){
         const imageSpecies = await  newImage(file)
-        const newSpecies = await addImageWithSpeciesId(imageSpecies,speciesId)
+        const newSpecies = await addImageWithSpeciesId(imageSpecies,new  mongoose.Types.ObjectId(speciesId.trim()))
         res.status(200).send(newSpecies);
       }else{
         res.status(404).send("No file");
@@ -92,6 +101,9 @@ export const getSpecies  = async (req:Request, res:Response, _:NextFunction) => 
     }
     
   };
+
+
+
   //  add transaction for this one 
   export const removeImageFromSpecies = async (req:Request, res:Response, _:NextFunction) => {
     try {
@@ -99,7 +111,7 @@ export const getSpecies  = async (req:Request, res:Response, _:NextFunction) => 
       const imageId = req.params.imageId
       const image = await  getImageById(imageId)
       if(image){
-      const newSpecies = await deleteImageWithSpeciesId(imageId,speciesId)
+      const newSpecies = await deleteImageWithSpeciesId(image._id,new  mongoose.Types.ObjectId(speciesId.trim()))
       fs.unlinkSync("src/public/image/" + image.path);
       await deleteImage(imageId)
       res.status(200).send(newSpecies);
@@ -117,13 +129,13 @@ export const getSpecies  = async (req:Request, res:Response, _:NextFunction) => 
   export const removeSpecies = async (req:Request, res:Response, _:NextFunction) => {
     try {
       const speciesId = req.params.speciedId
-      const species = await findOneSpecies(speciesId)
+      const species = await findOneSpecies(new  mongoose.Types.ObjectId(speciesId.trim()))
       if (species){
         species.images.forEach(async(image) => {
           fs.unlinkSync("src/public/image/" + image.path);
           await deleteImage(image._id)
         });
-      await deleteSpeciesWithSpeciesId(speciesId)
+      await deleteSpeciesWithSpeciesId(new  mongoose.Types.ObjectId(speciesId.trim()))
       res.status(200).send()
       }
       else{
