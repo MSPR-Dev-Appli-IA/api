@@ -29,7 +29,7 @@ export const findLimitedSpecies = async (limit:number=1,skip:number=0, order:1|-
  };
 
  export const updateSpecieWithSpeciesId = async (speciesId:String,species:SpeciesForm ) => {
-  return await Species.findByIdAndUpdate(speciesId, {
+  return await Species.findByIdAndUpdate(new  mongoose.Types.ObjectId(speciesId.trim()), {
     name: species.name,
     description: species.description,
     sunExposure: species.sunExposure,
@@ -55,23 +55,23 @@ export const findLimitedSpecies = async (limit:number=1,skip:number=0, order:1|-
  
 
  export  const addImageWithSpeciesId = async  (image:IImage,speciesId:String) => {
-  return await Species.updateOne(
+  return await Species.findByIdAndUpdate(
     { _id: speciesId }, 
     { $push: { images: image } },
     { returnDocument: 'after' }
-     );
+     ).populate({path:"images",model:Image});
  
  }
 
  export  const deleteImageWithSpeciesId = async  (imageId:String,speciesId:String) => {
-  return await Species.updateOne(
+  return await Species.findByIdAndUpdate(
     { _id: speciesId }, 
-    { $pull: { images: { _id: imageId } } },
+    { $pull: { images:  new  mongoose.Types.ObjectId(imageId.trim())  }},
     { returnDocument: 'after' }
-     );
+     ).populate({path:"images",model:Image});
  
  }
 
  export  const deleteSpeciesWithSpeciesId= async  (speciesId:String) => {
-    Species.findByIdAndDelete(speciesId).exec();
+   await  Species.findByIdAndDelete(speciesId).exec();
  }

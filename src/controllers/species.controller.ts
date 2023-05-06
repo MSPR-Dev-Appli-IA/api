@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import {findLimitedSpecies,findOneSpecies,createSpecies,updateSpecieWithSpeciesId,addImageWithSpeciesId,deleteImageWithSpeciesId,deleteSpeciesWithSpeciesId} from "../queries/species.queries"
-import { deleteImage } from "../queries/image.queries";
+import { deleteImage ,getImageById} from "../queries/image.queries";
 import {speciesValidation} from "../database/validation/species.validation"
 import  { ValidationError } from "joi";
 import { newImage } from "./image.controller";
+import * as fs from 'fs';
 
 const limit:number = 5
 
@@ -23,7 +24,11 @@ export const getSpecies  = async (req:Request, res:Response, _:NextFunction) => 
     try {
       const speciesId = req.params.speciesId;
       const species = await findOneSpecies(speciesId)
-      res.status(200).json( species );
+      if(species){
+        res.status(200).json( species );
+      }else{
+      res.status(404).send("Cette espece de plante n'existe pas ");
+      }
     } catch (e) {
       res.status(404).send("error");
     }
@@ -33,8 +38,10 @@ export const getSpecies  = async (req:Request, res:Response, _:NextFunction) => 
   export const updateSpecies = async (req:Request, res:Response, _:NextFunction) => {
     try {
       const speciesId = req.params.speciesId;
+      await speciesValidation.validateAsync(req.body, { abortEarly: false });
       const species = await updateSpecieWithSpeciesId(speciesId,req.body);
       res.status(200).json( species );
+ 
     } catch (e) {
       res.status(404).send("error");
     }
@@ -90,9 +97,16 @@ export const getSpecies  = async (req:Request, res:Response, _:NextFunction) => 
     try {
       const speciesId = req.params.speciedId
       const imageId = req.params.imageId
-      await deleteImageWithSpeciesId(imageId,speciesId)
+      const image = await  getImageById(imageId)
+      if(image){
+      const newSpecies = await deleteImageWithSpeciesId(imageId,speciesId)
+      fs.unlinkSync("src/public/image/" + image.path);
       await deleteImage(imageId)
-
+      res.status(200).send(newSpecies);
+      }else{
+        res.status(404).send("Cet image n'existe pas");
+      }
+      
 
     } catch (e) {
       res.status(404).send("error");
@@ -102,8 +116,19 @@ export const getSpecies  = async (req:Request, res:Response, _:NextFunction) => 
 
   export const removeSpecies = async (req:Request, res:Response, _:NextFunction) => {
     try {
-      const speciedId = req.params.speciedId
-      await deleteSpeciesWithSpeciesId(speciedId)
+      const speciesId = req.params.speciedId
+      const species = await findOneSpecies(speciesId)
+      if (species){
+        species.images.forEach(async(image) => {
+          fs.unlinkSync("src/public/image/" + image.path);
+          await deleteImage(image._id)
+        });
+      await deleteSpeciesWithSpeciesId(speciesId)
+      res.status(200).send()
+      }
+      else{
+        res.status(404).send("Cet espece de plante n'existe pas  n'existe pas");
+      }
 
     } catch (e) {
       res.status(404).send("error");
