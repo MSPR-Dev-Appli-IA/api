@@ -1,78 +1,68 @@
-import {Species} from "../database/models/species.model"
-import {Image} from "../database/models/image.model"
-import { PipelineStage } from "mongoose";
-import {SpeciesForm,IImage} from "../interfaces/index"
+import { Species } from "../database/models/species.model"
+import { Image } from "../database/models/image.model"
+
+import { SpeciesForm, IImage } from "../interfaces/index"
 import { Types } from 'mongoose';
 
 
-export const findLimitedSpecies = async (limit:number=1,skip:number=0, order:1|-1=-1, search:String|null ) => {
-     const  aggregateArray:PipelineStage[] = [
-    {
-      $lookup: {
-        from: "image",
-        localField: "images",
-        foreignField: "_id",
-        as: "images",
-      },
-    },
-    { $sort: { name: order } },
-  ];
-  if (search) {
-      aggregateArray.push({ $match: { name: { $regex: search } } });
+export const findLimitedSpecies = async (limit: number = 1, skip: number = 0, order: 1 | -1 = -1, search: String | null) => {
+
+  return await Species.find({
+    name: search ? { $regex: search } : /.*/
   }
-    return Species.aggregate(aggregateArray).skip(skip).limit(limit);
-  };
+  ).sort({ name: order }).skip(skip).limit(limit).exec()
+};
 
 
-  export const findOneSpecies = async (speciedId:Types.ObjectId ) => {
+export const findOneSpecies = async (speciedId: Types.ObjectId) => {
 
-    return Species.findOne({ _id: speciedId }).populate({path:"images",model:Image}).exec();
- };
+  return Species.findOne({ _id: speciedId }).populate({ path: "images", model: Image }).exec();
+};
 
- export const updateSpecieWithSpeciesId = async (speciesId:Types.ObjectId,species:SpeciesForm ) => {
-  return await Species.findByIdAndUpdate( speciesId, {
+export const updateSpecieWithSpeciesId = async (speciesId: Types.ObjectId, species: SpeciesForm) => {
+  return await Species.findByIdAndUpdate(speciesId, {
     name: species.name,
     description: species.description,
     sunExposure: species.sunExposure,
     watering: species.watering,
     optimalTemperature: species.optimalTemperature,
   },
-    {new: true})
+    { new: true })
 };
-  
 
-  export const createSpecies = async (species:SpeciesForm) => {
-      const newSpecies  = new Species({
-        name: species.name,
-        images:[],
-        description: species.description,
-        sunExposure: species.sunExposure,
-        watering: species.watering,
-        optimalTemperature: species.optimalTemperature,
-      });
-      return await newSpecies.save();
 
- };
- 
+export const createSpecies = async (species: SpeciesForm) => {
+  const newSpecies = new Species({
+    name: species.name,
+    images: [],
+    description: species.description,
+    sunExposure: species.sunExposure,
+    watering: species.watering,
+    optimalTemperature: species.optimalTemperature,
+  });
+  return await newSpecies.save();
 
- export  const addImageWithSpeciesId = async  (image:IImage,speciesId:Types.ObjectId) => {
+};
+
+
+export const addImageWithSpeciesId = async (image: IImage, speciesId: Types.ObjectId) => {
   return await Species.findOneAndUpdate(
-    { _id: speciesId }, 
+    { _id: speciesId },
     { $push: { images: image } },
     { returnDocument: 'after' }
-     ).populate({path:"images",model:Image});
- 
- }
+  ).populate({ path: "images", model: Image });
 
- export  const deleteImageWithSpeciesId = async  (imageId:Types.ObjectId,speciesId:Types.ObjectId) => {
+}
+
+export const deleteImageWithSpeciesId = async (imageId: Types.ObjectId, speciesId: Types.ObjectId) => {
   return await Species.findOneAndUpdate(
-    { _id: speciesId }, 
-    { $pull: { images: imageId  }},
+    { _id: speciesId },
+    { $pull: { images: imageId } },
     { returnDocument: 'after' }
-     ).populate({path:"images",model:Image});
- 
- }
+  ).populate({ path: "images", model: Image });
 
- export  const deleteSpeciesWithSpeciesId= async  (speciesId:Types.ObjectId) => {
-   await  Species.findOneAndDelete(speciesId).exec();
- }
+}
+
+export const deleteSpeciesWithSpeciesId = async (speciesId: Types.ObjectId) => {
+  await Species.findOneAndDelete(speciesId).exec();
+}

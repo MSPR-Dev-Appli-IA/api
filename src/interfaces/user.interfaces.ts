@@ -2,7 +2,7 @@
 
 import { Document ,Model } from "mongoose";
 import { Types } from 'mongoose';
-import { IPlant } from "./plant.interface";
+
 
 export interface IUserLocal{
     email:string;
@@ -19,7 +19,6 @@ export interface  IUser extends Document {
     created_at:Date,
     deleted_at:null|Date
     local: IUserLocal
-    plants : IPlant[]
 
     comparePassword(password:string):boolean
     
