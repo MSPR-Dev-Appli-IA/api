@@ -9,6 +9,18 @@ dotenv.config();
 import './database';
 
 export const app:Application = express();
+const compression = require("compression");
+
+const RateLimit = require("express-rate-limit");
+const limiter = RateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 20,
+});
+
+app.use(compression()); // Compress all routes
+
+// Apply rate limiter to all requests
+app.use(limiter);
 
 app.use(express.json());
 app.use(cookieParser());
