@@ -37,5 +37,5 @@ app.get('*', (_:Request, res:Response) => {
 })
 
 if (process.env.NODE_ENV !== 'test') {
-    app.listen(process.env.PORT);
+    app.listen(8000);
 }
