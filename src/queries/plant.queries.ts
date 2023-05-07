@@ -13,7 +13,7 @@ export const getOnePlantById = async (plantId: Types.ObjectId): Promise<IPlant |
 
 
 
-export const findLimitedPlantsByUserIdAndSpeciesId = async (userId: Types.ObjectId, speciesId: Types.ObjectId | null = null, limit: number = 1, skip: number = 0, order: 1 | -1 = -1) => {
+export const findLimitedPlantsByUserIdAndSpeciesId = async (userId: String, speciesId: String| null = null, limit: number = 1, skip: number = 0, order: 1 | -1 = -1) => {
     return await Plant.find({
         user: userId,
         species: speciesId ? speciesId : /.*/
@@ -24,8 +24,8 @@ export const findLimitedPlantsByUserIdAndSpeciesId = async (userId: Types.Object
         .exec()
 };
 
-export const findOnePlant = async (speciedId: Types.ObjectId) => {
-    return Plant.findOne({ _id: speciedId })
+export const findOnePlant = async (plantId: Types.ObjectId) => {
+    return Plant.findOne({ _id: plantId })
         .populate({ path: "images", model: Image })
         .populate({ path: "species", model: Species })
         .exec();
