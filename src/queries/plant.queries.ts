@@ -5,6 +5,10 @@ import {IPlant} from "../interfaces";
 import { Types } from 'mongoose';
 
 
+
 export const getOnePlantById = async (plantId:Types.ObjectId ) : Promise<IPlant|null> => {
     return await Plant.findOne({ _id: plantId }).populate({path:"images",model:Image}).populate({path:"user",model:User}).exec();
 };
+
+
+

@@ -20,7 +20,8 @@ export const createUser= async (user :UserForm, role :IRole) => {
         email: user.email,
         password: hashedPassword,
       },
-      role: role
+      role: role,
+      plants: []
     });
     return await newUser.save();
   } catch (e) {
