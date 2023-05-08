@@ -5,27 +5,27 @@ name: Node.js CI PR
 
 on:
   pull_request_target:
-    branches: ["stage"]
+    branches: [ "stage" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [16.14.2]
+        node-version: [ 16.14.2 ]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - name: Install Npm dependencies
-      run: npm ci
-    - name: Export Secrets
-      run: export API_KEY="${{ secrets.API_KEY }}" && export DB_HOST="${{ secrets.DB_HOST }}" && export DB_PORT="${{ secrets.DB_PORT }}" && export DB_USER="${{ secrets.DB_USER }}" && export DB_PASSWD="${{ secrets.DB_PASSWD }}"
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - name: Install Npm dependencies
+        run: npm ci
+      - name: Export Secrets
+        run: export API_KEY="${{ secrets.API_KEY }}" && export DB_HOST="${{ secrets.DB_HOST }}" && export DB_PORT="${{ secrets.DB_PORT }}" && export DB_USER="${{ secrets.DB_USER }}" && export DB_PASSWD="${{ secrets.DB_PASSWD }}"
 
   coverage:
     name: Test with Node.js ${{ matrix.node-version }}
@@ -39,14 +39,14 @@ jobs:
     name: Build and Push Image On Harbor
     runs-on: ubuntu-latest
     steps:
-    - uses: docker/login-action@v1
-      with:
-        registry: ${{ secrets.REGISTRY_URL }}
-        username: ${{ secrets.REGISTRY_USER }}
-        password: ${{ secrets.REGISTRY_PASSWD }}
+      - uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.REGISTRY_URL }}
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASSWD }}
 
-    - uses: actions/checkout@v3
-        - name: BuildAndPushImageOnHarbor
-          run: |
-            docker build ./ -t ${{ secrets.REGISTRY_URL }}:${{ secrets.REGISTRY_PORT }}/arosaje-backend/arosaje-api-stage:${{ github.run_number }}
-            docker push ${{ secrets.REGISTRY_URL }}:${{ secrets.REGISTRY_PORT }}/arosaje-backend/arosaje-api-stage:${{ github.run_number }}
+      - uses: actions/checkout@v3
+        name: BuildAndPushImageOnHarbor
+        run: |
+          docker build ./ -t ${{ secrets.REGISTRY_URL }}:${{ secrets.REGISTRY_PORT }}/arosaje-backend/arosaje-api-stage:${{ github.run_number }}
+          docker push ${{ secrets.REGISTRY_URL }}:${{ secrets.REGISTRY_PORT }}/arosaje-backend/arosaje-api-stage:${{ github.run_number }}
