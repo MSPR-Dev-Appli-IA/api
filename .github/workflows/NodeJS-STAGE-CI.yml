@@ -50,3 +50,33 @@ jobs:
         run: |
           docker build ./ -t ${{ secrets.REGISTRY_URL }}:${{ secrets.REGISTRY_PORT }}/arosaje-backend/arosaje-api-stage:${{ github.run_number }}
           docker push ${{ secrets.REGISTRY_URL }}:${{ secrets.REGISTRY_PORT }}/arosaje-backend/arosaje-api-stage:${{ github.run_number }}
+  release:
+    name: Generate or Update CHANGELOG.md
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Update CHANGELOG
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ github.token }}
+          tag: ${{ github.ref_name }}
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1.12.0
+        with:
+          allowUpdates: true
+          draft: false
+          makeLatest: true
+          name: ${{ github.ref_name }}
+          body: ${{ steps.changelog.outputs.changes }}
+          token: ${{ github.token }}
+
+      - name: Commit CHANGELOG.md
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: ${{ github.ref_name }}
+          commit_message: 'docs: update CHANGELOG.md for ${{ github.ref_name }} [skip ci]'
+          file_pattern: CHANGELOG.md
