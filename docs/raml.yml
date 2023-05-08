@@ -1,0 +1,111 @@
+#%RAML 1.0
+---
+title: Arosaje API
+baseUri: https://api.arosaje-stage.locascio.fr/{version}
+mediaType: application/json
+version: v1
+
+/auth:
+  /login:
+    post:
+      description: Allows to login
+      body:
+        application/json:
+          type: UserLocal
+      responses:
+        200:
+          body:
+            application/json:
+              type: UserResponse
+  /logout:
+    get:
+      description: Allows to logout
+      securedBy: [cookie-auth]
+      responses:
+        204:
+        401:
+          body:
+            application/json:
+              type: UnauthorizedResponse
+  /me:
+    get:
+      description: Allows to get user info
+      securedBy: [cookie-auth]
+      responses:
+        200:
+          body:
+            application/json:
+              type: UserResponse
+        401:
+          body:
+            application/json:
+              type: UnauthorizedResponse
+
+  /signup:
+    post:
+      description: Allows to create account
+      body:
+        application/json:
+          type: UserForm
+      response:
+        200:
+
+types:
+  UserForm:
+    type: object
+    properties:
+      username: string
+      firstname: string
+      lastname: string
+      email: string
+      password: string
+    example:
+      email: "test@test.com"
+      username: "Test"
+      firstname: "Test"
+      lastname: "Test"
+      password: "Azerty"
+  UserLocal:
+    type: object
+    properties:
+      email: string
+      password: string
+    example:
+      email: "test@test.com"
+      password: "Azerty"
+  IUser:
+    type: object
+    properties:
+      username: string
+      firstname: string
+      lastname: string
+      role: string
+      created_at: datetime
+      deleted_at: datetime?
+      local: UserLocal[]
+  UserResponse:
+    type: object
+    properties:
+      data: IUser[]
+      message: array
+  UnauthorizedResponse:
+    type: object
+    properties:
+      data: object
+      message: string
+    example:
+      "data": { }
+      "message": "Unauthorized: You must to login before"
+
+securitySchemes:
+  cookie-auth:
+    description: |
+      Custom authentication scheme for jwt cookie.
+    type:
+      x-custom
+    describedBy:
+      headers:
+        Cookie:
+          description: |
+            jwt
+          type: string
