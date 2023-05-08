@@ -4,7 +4,7 @@
 name: Node.js CI PR
 
 on:
-  pull_request_target:
+  pull_request:
     branches: [ "stage" ]
 
 jobs:
