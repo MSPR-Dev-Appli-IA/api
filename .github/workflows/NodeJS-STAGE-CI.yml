@@ -46,7 +46,7 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWD }}
 
       - uses: actions/checkout@v3
-        name: BuildAndPushImageOnHarbor
+      - name: BuildAndPushImageOnHarbor
         run: |
           docker build ./ -t ${{ secrets.REGISTRY_URL }}:${{ secrets.REGISTRY_PORT }}/arosaje-backend/arosaje-api-stage:${{ github.run_number }}
           docker push ${{ secrets.REGISTRY_URL }}:${{ secrets.REGISTRY_PORT }}/arosaje-backend/arosaje-api-stage:${{ github.run_number }}
