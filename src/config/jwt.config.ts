@@ -4,7 +4,7 @@ import  {app} from "../index";
 import { IUser,UserjwtToken } from "../interfaces";
 import { NextFunction, Request, Response } from "express";
 
-const key = process.env.API_KEY
+const key = process.env.API_KEY ? process.env.API_KEY : ""
 const createJwtToken = ({ user, id }:UserjwtToken) => {
   
   const jwtToken = jwt.sign(
