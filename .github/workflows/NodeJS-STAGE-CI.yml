@@ -25,7 +25,9 @@ jobs:
       - name: Install Npm dependencies
         run: npm ci
       - name: Export Secrets
-        run: export API_KEY="${{ secrets.API_KEY }}" && export DB_HOST="${{ secrets.DB_HOST }}" && export DB_PORT="${{ secrets.DB_PORT }}" && export DB_USER="${{ secrets.DB_USER }}" && export DB_PASSWD="${{ secrets.DB_PASSWD }}"
+        run: export API_KEY="${{ secrets.API_KEY }}" && export DB_HOST="${{ secrets.DB_HOST }}" && export DB_PORT="${{ secrets.DB_PORT_STAGE }}" && export DB_USER="${{ secrets.DB_USER_STAGE }}" && export DB_PASSWD="${{ secrets.DB_PASSWD_STAGE }}"
+      - name: Create .env for test
+        run: echo "JWTKEY=$API_KEY" >> .env && echo "DATABASE_URL=\"mongodb://$DB_USER:$DB_PASSWD@$DB_HOST:$DB_PORT_STAGE/?authMechanism=DEFAULT\"" >> .env
 
   coverage:
     name: Test with Node.js ${{ matrix.node-version }}
