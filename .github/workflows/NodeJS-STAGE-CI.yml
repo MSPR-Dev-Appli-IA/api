@@ -25,13 +25,15 @@ jobs:
       - name: Install Npm dependencies
         run: npm ci
       - name: Export Secrets
-        run: export API_KEY="${{ secrets.API_KEY }}" && export DB_HOST="${{ secrets.DB_HOST }}" && export DB_PORT="${{ secrets.DB_PORT_STAGE }}" && export DB_USER="${{ secrets.DB_USER_STAGE }}" && export DB_PASSWD="${{ secrets.DB_PASSWD_STAGE }}"
+        run: export API_KEY="${{ secrets.API_KEY }}" && eexport DATABASE_URL=\"mongodb://${{ secrets.DB_USER_STAGE }}:${{ secrets.DB_PASSWD_STAGE }}@${{ secrets.DB_HOST }}:${{ secrets.DB_PORT_STAGE }}/?authMechanism=DEFAULT\"
       - name: Create .env for test
-        run: echo "JWTKEY=$API_KEY" >> .env && echo "DATABASE_URL=\"mongodb://$DB_USER:$DB_PASSWD@$DB_HOST:$DB_PORT_STAGE/?authMechanism=DEFAULT\"" >> .env
+        run: echo "JWTKEY=$API_KEY" >> .env && echo "" >> .env
 
   coverage:
     name: Test with Node.js ${{ matrix.node-version }}
     runs-on: ubuntu-latest
+    env:
+      NODE_ENV: ${{ secrets.NODE_ENV }}
     steps:
       - uses: actions/checkout@v3
       - uses:
