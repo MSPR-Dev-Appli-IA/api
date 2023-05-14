@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {getMyPlants,getOneOfMyPlant,newPlant,addImageFromPlant,removeImageFromPlant,removePlant} from "../controllers/plant.controller"
+import {getMyPlants,getOneOfMyPlant,newPlant,addImageFromPlant,removeImageFromPlant,removePlant,updatePlant} from "../controllers/plant.controller"
 import upload from '../config/image.config'
 
 const router = Router();
@@ -11,6 +11,7 @@ import  {areyouThePlantOwner} from "../middleware/PlantMiddleware";
 router.get("/",  requireAuth, getMyPlants);
 router.get("/:plantId",  requireAuth,areyouThePlantOwner, getOneOfMyPlant);
 router.post("/",  requireAuth, newPlant);
+router.post("/:plantId",  requireAuth,areyouThePlantOwner, updatePlant);
 router.post("/addImage/:plantId",requireAuth,areyouThePlantOwner,upload.single("file"),addImageFromPlant)
 router.delete("/deleteImage/:plantId/:imageId",  requireAuth,areyouThePlantOwner, removeImageFromPlant);
 router.delete("/:plantId",  requireAuth,areyouThePlantOwner, removePlant);

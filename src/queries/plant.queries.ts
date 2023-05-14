@@ -4,7 +4,7 @@ import { User } from "../database/models/user.model";
 import { IPlant } from "../interfaces";
 import { Types } from 'mongoose';
 import { Species } from "../database/models/species.model";
-import { IImage } from "../interfaces/index"
+import { IImage,PlantForm } from "../interfaces/index"
 
 
 export const getOnePlantById = async (plantId: Types.ObjectId): Promise<IPlant | null> => {
@@ -13,10 +13,12 @@ export const getOnePlantById = async (plantId: Types.ObjectId): Promise<IPlant |
 
 
 
-export const findLimitedPlantsByUserIdAndSpeciesId = async (userId: String, speciesId: String| null = null, limit: number = 1, skip: number = 0, order: 1 | -1 = -1) => {
+export const findLimitedPlantsByUserIdAndSpeciesId = async (userId: String, speciesId: String| null = null, limit: number = 1, skip: number = 0, order: 1 | -1 = -1,search: String | null) => {
     return await Plant.find({
         user: userId,
-        species: speciesId ? speciesId : /.*/
+        name: search ? { $regex: search } : /.*/,
+        ...speciesId ? { species:  speciesId } : {},
+
     })
         .populate({ path: "images", model: Image })
         .populate({ path: "species", model: Species })
@@ -31,11 +33,12 @@ export const findOnePlant = async (plantId: Types.ObjectId) => {
         .exec();
 };
 
-export const createPlant = async (speciesId:Types.ObjectId,userId:Types.ObjectId,) => {
+export const createPlant = async (speciesId:Types.ObjectId,userId:Types.ObjectId,name:String) => {
     const newPlant = new Plant({
       images: [],
       species:speciesId,
-      user:userId
+      user:userId,
+      name:name
     });
     return await newPlant.save();
   };
@@ -67,3 +70,10 @@ export const createPlant = async (speciesId:Types.ObjectId,userId:Types.ObjectId
     await Plant.findOneAndDelete(plantId).exec();
   }
   
+
+  export const updatePlantWithPlantId = async (plantId: Types.ObjectId, plant:PlantForm) => {
+    return await Plant.findByIdAndUpdate(plantId, {
+      name: plant.name, 
+    },
+      { new: true })
+  };

@@ -112,7 +112,7 @@ export const getSpecies  = async (req:Request, res:Response, _:NextFunction) => 
       const image = await  getImageById(imageId)
       if(image){
       const newSpecies = await deleteImageWithSpeciesId(image._id,new  mongoose.Types.ObjectId(speciesId.trim()))
-      fs.unlinkSync("src/public/image/" + image.path);
+      fs.unlinkSync("public/image/" + image.path);
       await deleteImage(imageId)
       res.status(200).send(newSpecies);
       }else{
@@ -132,7 +132,7 @@ export const getSpecies  = async (req:Request, res:Response, _:NextFunction) => 
       const species = await findOneSpecies(new  mongoose.Types.ObjectId(speciesId.trim()))
       if (species){
         species.images.forEach(async(image) => {
-          fs.unlinkSync("src/public/image/" + image.path);
+          fs.unlinkSync("public/image/" + image.path);
           await deleteImage(image._id)
         });
       await deleteSpeciesWithSpeciesId(new  mongoose.Types.ObjectId(speciesId.trim()))

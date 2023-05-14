@@ -7,12 +7,19 @@ export const areyouThePlantOwner = async (req: Request, res: Response, next: Nex
         const plantId = req.params.plantId
         const plant = await getOnePlantById(new mongoose.Types.ObjectId(plantId.trim()))
         if (plant) {
-            if (req.user._id == plant.user._id) {
+            console.log(req.user)
+            console.log(plant.user)
+            console.log(req.user._id,"dant la requeueueue")
+            console.log(plant.user._id,"hooororor")
+            if (req.user._id.equals(plant.user._id)) {
+                console.log("passe ton icicicic")
                 next()
             } else {
+                console.log("pappapapapapap pkpkpkp")
                 res.status(404).send({ message: "Your are not allowed" });
             }
         } else {
+
             res.status(404).send({ message: "Erreur" });
         }
 
