@@ -15,8 +15,10 @@ beforeAll(async () => {
 
 
 afterAll(async () => {
+
   await closeDatabase()
 });
+
 
 describe("Signup", () => {
 

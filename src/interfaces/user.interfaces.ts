@@ -3,6 +3,7 @@
 import { Document ,Model } from "mongoose";
 import { Types } from 'mongoose';
 
+
 export interface IUserLocal{
     email:string;
     password:string

@@ -452,4 +452,4 @@ dist
 .tern-port
  
 # public image
-/src/public
+/public/image

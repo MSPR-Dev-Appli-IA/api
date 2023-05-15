@@ -236,11 +236,11 @@ describe("create species", () => {
         const resp = await request(app).post("/api/species/addImage/"+speciesIdToGet)
           .set('Content-Type','multipart/form-data')
           .set('Cookie', cookieJWTBotanist)
-          .attach('file', `src/public/testImage/rosa1.jpeg`) 
+          .attach('file', `public/testImage/rosa.jpg`) 
           expect(resp.statusCode).toBe(200)
           expect(resp.body.name).toEqual("test_image")
           expect(resp.body.images.length).toEqual(1)
-          expect(fs.existsSync("src/public/image/" + resp.body.images[0].path)).toBeTruthy()
+          expect(fs.existsSync("public/image/" + resp.body.images[0].path)).toBeTruthy()
           arrayPathImage.push(resp.body.images[0])
       });
 
@@ -248,7 +248,7 @@ describe("create species", () => {
         const resp = await request(app).post("/api/species/addImage/"+speciesIdToGet)
           .set('Content-Type','multipart/form-data')
           .set('Cookie', cookieJWTUser)
-          .attach('file', `src/public/testImage/rosa1.jpeg`) 
+          .attach('file', `public/testImage/rosa.jpg`) 
           expect(resp.statusCode).toBe(404)
 
       });
@@ -259,11 +259,11 @@ describe("create species", () => {
         const resp = await request(app).post("/api/species/addImage/"+speciesIdToGet)
           .set('Content-Type','multipart/form-data')
           .set('Cookie', cookieJWTBotanist)
-          .attach('file', `src/public/testImage/rosa1.jpeg`) 
+          .attach('file', `public/testImage/rosa.jpg`) 
           expect(resp.statusCode).toBe(200)
           expect(resp.body.name).toEqual("test_image")
           expect(resp.body.images.length).toEqual(2)
-          expect(fs.existsSync("src/public/image/" + resp.body.images[1].path)).toBeTruthy()
+          expect(fs.existsSync("public/image/" + resp.body.images[1].path)).toBeTruthy()
           arrayPathImage.push(resp.body.images[1])
       });
 
@@ -271,11 +271,11 @@ describe("create species", () => {
         const resp = await request(app).post("/api/species/addImage/"+speciesIdToGet)
           .set('Content-Type','multipart/form-data')
           .set('Cookie', cookieJWTBotanist)
-          .attach('file', `src/public/testImage/rosa1.jpeg`) 
+          .attach('file', `public/testImage/rosa.jpg`) 
           expect(resp.statusCode).toBe(200)
           expect(resp.body.name).toEqual("test_image")
           expect(resp.body.images.length).toEqual(3)
-          expect(fs.existsSync("src/public/image/" + resp.body.images[2].path)).toBeTruthy()
+          expect(fs.existsSync("public/image/" + resp.body.images[2].path)).toBeTruthy()
           arrayPathImage.push(resp.body.images[2])
       });
 
@@ -286,7 +286,7 @@ describe("create species", () => {
           expect(resp.statusCode).toBe(200)
           expect(resp.body.name).toEqual("test_image")
           expect(resp.body.images.length).toEqual(2)
-          expect(fs.existsSync("src/public/image/" + arrayPathImage[0].path)).toBeFalsy()
+          expect(fs.existsSync("public/image/" + arrayPathImage[0].path)).toBeFalsy()
       });
 
       test(" delete one image to a species without botanist account ", async () => {
@@ -302,7 +302,7 @@ describe("create species", () => {
           expect(resp.statusCode).toBe(200)
           expect(resp.body.name).toEqual("test_image")
           expect(resp.body.images.length).toEqual(1)
-          expect(fs.existsSync("src/public/image/" + arrayPathImage[1].path)).toBeFalsy()
+          expect(fs.existsSync("public/image/" + arrayPathImage[1].path)).toBeFalsy()
       });
 
 
@@ -319,7 +319,7 @@ describe("create species", () => {
         const resp = await request(app).delete("/api/species/"+speciesIdToGet)
           .set('Cookie', cookieJWTBotanist)
           expect(resp.statusCode).toBe(200)
-          expect(fs.existsSync("src/public/image/" + arrayPathImage[2].path)).toBeFalsy()
+          expect(fs.existsSync("public/image/" + arrayPathImage[2].path)).toBeFalsy()
       });
 
       test("get one species deleted", async () => {
