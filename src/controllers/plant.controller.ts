@@ -13,7 +13,6 @@ const limit:number = 5
 export const getMyPlants = async (req: Request, res: Response, _: NextFunction) => {
     try {
         let { page=1, order,search,speciesId } = req.body;
-        console.log(speciesId,"searchhhhhest la oui")
         order = order == "ASC" ? 1 :-1
         const skip:number =  limit * page - limit;
         const plants = await findLimitedPlantsByUserIdAndSpeciesId(req.user._id,speciesId,limit,skip,order,search)
@@ -80,6 +79,7 @@ export const updatePlant = async (req: Request, res: Response, _: NextFunction) 
 
 export const addImageFromPlant = async (req: Request, res: Response, _: NextFunction) => {
     try {
+      
         const file = req.file as Express.Multer.File
         const plantId = req.params.plantId;
   
@@ -97,12 +97,14 @@ export const addImageFromPlant = async (req: Request, res: Response, _: NextFunc
 };
 export const removeImageFromPlant= async (req: Request, res: Response, _: NextFunction) => {
     try {
+      console.log("on passessse loooa")
         const plantId = req.params.plantId
         const imageId = req.params.imageId
         const image = await  getImageById(imageId)
+        console.log(image,"voila limage")
         if(image){
         const newPlant = await deleteImageWithPlantId(image._id,new  mongoose.Types.ObjectId(plantId.trim()))
-        fs.unlinkSync("src/public/image/" + image.path);
+        fs.unlinkSync("public/image/" + image.path);
         await deleteImage(imageId)
         res.status(200).send(newPlant);
         }else{
@@ -121,7 +123,7 @@ export const removePlant = async (req: Request,res: Response, _: NextFunction) =
     const plant = await findOnePlant(new  mongoose.Types.ObjectId(plantId.trim()))
     if (plant){
       plant.images.forEach(async(image) => {
-        fs.unlinkSync("src/public/image/" + image.path);
+        fs.unlinkSync("public/image/" + image.path);
         await deleteImage(image._id)
       });
     await deletePlantsWithPlantsId(new  mongoose.Types.ObjectId(plantId.trim()))

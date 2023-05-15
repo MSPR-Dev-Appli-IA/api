@@ -45,7 +45,7 @@ export const createPlant = async (speciesId:Types.ObjectId,userId:Types.ObjectId
 
 
   export const addImageWithPlantId = async (image: IImage, plantId: Types.ObjectId) => {
-    return await Species.findOneAndUpdate(
+    return await Plant.findOneAndUpdate(
       { _id: plantId },
       { $push: { images: image } },
       { returnDocument: 'after' }

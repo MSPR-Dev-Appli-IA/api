@@ -3,7 +3,8 @@ import { closeDatabase } from '../utils/db-handler'
 import { app } from "../../src/index";
 import { dataSpecies } from "../data/species.data";
 import { createAccountWithBotanistRight } from "../../src/controllers/auth.controller";
-
+import * as fs from 'fs';
+import { IImage } from "../../src/interfaces";
 
 
 
@@ -230,7 +231,6 @@ describe("get plants  ", () => {
         const resp = await request(app).get("/api/plant/"+plantsUsersId[1])
           .set('Content-type', 'application/json')
           .set('Cookie', cookieJWTUser)
-          console.log(resp.body,"okokokokokok")
           expect(resp.statusCode).toBe(200)
           expect(resp.body.name).toEqual("Ma plante ( Paulownia vilarri )")
     
@@ -258,3 +258,194 @@ describe("get plants  ", () => {
 
 
 })
+
+
+describe("plants and image ", () => {
+    let plantIdToGet:String|null = null
+    let arrayPathImage:IImage[]= []
+    beforeAll(async()=>{
+     
+       const resp = await request(app).post("/api/plant")
+        .set('Content-type', 'application/json')
+        .set('Cookie', cookieJWTUser)
+        .send({ 
+        "speciesId": mySpeciesId[0],
+     })
+     
+     plantIdToGet = resp.body._id
+     
+     
+      });
+
+
+      test("add image to a plant ", async () => {
+
+        const resp = await request(app).post("/api/plant/addImage/"+plantIdToGet)
+          .set('Content-Type','multipart/form-data')
+          .set('Cookie', cookieJWTUser)
+          .attach('file', `public/testImage/rosa.jpg`) 
+          expect(resp.statusCode).toBe(200)
+          expect(resp.body.name).toEqual("Ma plante ( Ocimum diffusus )")
+          expect(resp.body.images.length).toEqual(1)
+          expect(fs.existsSync("public/image/" + resp.body.images[0].path)).toBeTruthy()
+          arrayPathImage.push(resp.body.images[0])
+      });
+
+      test("add image to a plant with wrong  botanist account ", async () => {
+        const resp = await request(app).post("/api/plant/addImage/"+plantIdToGet)
+          .set('Content-Type','multipart/form-data')
+          .set('Cookie', cookieJWTBotanist)
+          .attach('file', `public/testImage/rosa.jpg`) 
+          expect(resp.statusCode).toBe(404)
+
+      });
+
+
+
+      test("add another image to a plant ", async () => {
+        const resp = await request(app).post("/api/plant/addImage/"+plantIdToGet)
+          .set('Content-Type','multipart/form-data')
+          .set('Cookie', cookieJWTUser)
+          .attach('file', `public/testImage/rosa.jpg`) 
+          expect(resp.statusCode).toBe(200)
+          expect(resp.body.name).toEqual("Ma plante ( Ocimum diffusus )")
+          expect(resp.body.images.length).toEqual(2)
+          expect(fs.existsSync("public/image/" + resp.body.images[1].path)).toBeTruthy()
+          arrayPathImage.push(resp.body.images[1])
+      });
+
+      test("add another image to a plant ", async () => {
+        const resp = await request(app).post("/api/plant/addImage/"+plantIdToGet)
+          .set('Content-Type','multipart/form-data')
+          .set('Cookie', cookieJWTUser)
+          .attach('file', `public/testImage/rosa.jpg`) 
+          expect(resp.statusCode).toBe(200)
+          expect(resp.body.name).toEqual("Ma plante ( Ocimum diffusus )")
+          expect(resp.body.images.length).toEqual(3)
+          expect(fs.existsSync("public/image/" + resp.body.images[2].path)).toBeTruthy()
+          arrayPathImage.push(resp.body.images[2])
+      });
+
+
+      test(" delete one image to a plant ", async () => {
+        const resp = await request(app).delete("/api/plant/deleteImage/"+plantIdToGet+"/"+arrayPathImage[0]._id)
+          .set('Cookie', cookieJWTUser)
+          console.log(resp.body,"le deletetetetetet")
+          expect(resp.statusCode).toBe(200)
+          expect(resp.body.name).toEqual("Ma plante ( Ocimum diffusus )")
+          expect(resp.body.images.length).toEqual(2)
+          expect(fs.existsSync("public/image/" + arrayPathImage[0].path)).toBeFalsy()
+      });
+
+      test(" delete one image to a plant without botanist account ", async () => {
+        const resp = await request(app).delete("/api/plant/deleteImage/"+plantIdToGet+"/"+arrayPathImage[0]._id)
+          .set('Cookie', cookieJWTUser)
+          expect(resp.statusCode).toBe(404)
+
+      });
+
+      test(" delete one image to a plant ", async () => {
+        const resp = await request(app).delete("/api/plant/deleteImage/"+plantIdToGet+"/"+arrayPathImage[1]._id)
+          .set('Cookie', cookieJWTUser)
+          expect(resp.statusCode).toBe(200)
+          expect(resp.body.name).toEqual("Ma plante ( Ocimum diffusus )")
+          expect(resp.body.images.length).toEqual(1)
+          expect(fs.existsSync("public/image/" + arrayPathImage[1].path)).toBeFalsy()
+      });
+
+
+      test(" delete one plant with wrong token ", async () => {
+
+        const resp = await request(app).delete("/api/plant/"+plantIdToGet)
+          .set('Cookie', cookieJWTBotanist)
+          expect(resp.statusCode).toBe(404)
+
+      });
+
+      test(" delete one plant ", async () => {
+
+        const resp = await request(app).delete("/api/plant/"+plantIdToGet)
+          .set('Cookie', cookieJWTUser)
+          expect(resp.statusCode).toBe(200)
+          expect(fs.existsSync("public/image/" + arrayPathImage[2].path)).toBeFalsy()
+      });
+
+      test("get one plant deleted", async () => {
+
+        const resp = await request(app).get("/api/plant/"+plantIdToGet)
+          .set('Content-type', 'application/json')
+          .set('Cookie', cookieJWTUser)
+          expect(resp.statusCode).toBe(404)
+    
+  
+      });
+  
+
+      
+
+    })
+
+
+
+    // describe("update species  ", () => {
+    //   let speciesIdToGet:String|null = null
+    //   beforeAll(async()=>{
+    //      const resp = await request(app).post("/api/species")
+    //       .set('Content-type', 'application/json')
+    //       .set('Cookie', cookieJWTBotanist)
+    //       .send({ "name":"test_update",
+    //       "description":"desscription test update ",
+    //       "sunExposure":"sun exposure test update",
+    //       "watering":"watering test update ",
+    //       "optimalTemperature":"optimal temperature test update "
+    //    })
+       
+    //    speciesIdToGet = resp.body._id
+       
+    //     });
+  
+    //     const upload_payload ={ "name":"test_update_after",
+    //     "description":"desscription test update ",
+    //     "sunExposure":"sun exposure test update after ",
+    //     "watering":"watering test update ",
+    //     "optimalTemperature":"optimal temperature test update "
+    //  }
+     
+    //     test("update species  ", async () => {
+    //       const resp = await request(app).post("/api/species/"+speciesIdToGet)
+    //        .set('Content-type', 'application/json')
+    //         .set('Cookie', cookieJWTBotanist)
+    //         .send(upload_payload)
+    //         expect(resp.statusCode).toBe(200)
+    //         expect(resp.body).toEqual(expect.objectContaining(upload_payload))
+
+    //     });
+
+    //     test("update species with same name   ", async () => {
+    //       const resp = await request(app).post("/api/species/"+speciesIdToGet)
+    //        .set('Content-type', 'application/json')
+    //         .set('Cookie', cookieJWTBotanist)
+    //         .send({ "name":"Rosa",
+    //         "description":"desscription test update ",
+    //         "sunExposure":"sun exposure test update after ",
+    //         "watering":"watering test update ",
+    //         "optimalTemperature":"optimal temperature test update "
+    //      })
+    //         expect(resp.statusCode).toBe(404)
+
+    //     });
+  
+    //     test("update species without botanist account", async () => {
+    //       const resp = await request(app).post("/api/species/"+speciesIdToGet)
+    //       .set('Content-type', 'application/json')
+    //         .set('Cookie', cookieJWTUser)
+    //         .send(upload_payload)
+    //         expect(resp.statusCode).toBe(404)
+  
+    //     });
+  
+  
+  
+        
+  
+    //   })
