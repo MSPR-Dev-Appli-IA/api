@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { userPasswordValidation,userInfoValidation } from "../database/validation/user.validation";
-import {updateUserWithUserId,UpdateUserPasswordWithUserId,UpdateUserAvatarWithUserId} from "../queries/user.queries"
+import {updateUserWithUserId,UpdateUserPasswordWithUserId,UpdateUserAvatarWithUserId,deleteImageWithUserId} from "../queries/user.queries"
 import  { ValidationError } from "joi";
 import { newImage } from "./image.controller";
 import { deleteImage } from "../queries/image.queries";
@@ -8,10 +8,13 @@ import * as fs from 'fs';
 
 export const updateUser = async (req:Request, res:Response, _:NextFunction) => {
     try {
+
       await userInfoValidation.validateAsync(req.body, { abortEarly: false });
+      console.log(req.body,"voila le bodyyy")
       const newUser = await updateUserWithUserId(req.user._id,req.body);
       res.status(200).json( newUser?.set("local.password",null) );
     } catch (e) {
+    console.log(e)
       const errors = [];
       if (e instanceof ValidationError) {
         e.details.map((error) => {
@@ -68,3 +71,23 @@ export const updateUser = async (req:Request, res:Response, _:NextFunction) => {
 
 
 
+ //  add transaction for this one 
+ export const deleteUserAvatar = async (req:Request, res:Response, _:NextFunction) => {
+    try {
+
+      const image = req.user.image
+      if(image){
+      const newUser = await deleteImageWithUserId(req.user._id)
+      fs.unlinkSync("public/image/" + image.path);
+      await deleteImage(image._id)
+      res.status(200).send(newUser?.set("local.password",null));
+      }else{
+        res.status(404).send("Cet image n'existe pas");
+      }
+      
+
+    } catch (e) {
+      res.status(404).send("error");
+    }
+    
+  };

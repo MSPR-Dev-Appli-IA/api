@@ -38,7 +38,7 @@ export const updateUserWithUserId = async (userId: Types.ObjectId, user: UserInf
     firstname:user.firstname,
     lastname:user.lastname,
   },
-    { new: true })
+    { new: true }).populate("image")
 };
 
 
@@ -57,10 +57,16 @@ export const UpdateUserAvatarWithUserId = async (userId: Types.ObjectId, image: 
   return await User.findByIdAndUpdate(userId, {
     image: image
   },
-    { new: true })
+    { new: true }).populate("image")
 
 };
 
 
 
 
+export const deleteImageWithUserId= async (userId: string) => {
+  return await User.findByIdAndUpdate(userId, {
+    image:null,
+  },
+    { new: true }).populate("image")
+}
