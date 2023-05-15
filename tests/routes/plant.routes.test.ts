@@ -330,7 +330,6 @@ describe("plants and image ", () => {
       test(" delete one image to a plant ", async () => {
         const resp = await request(app).delete("/api/plant/deleteImage/"+plantIdToGet+"/"+arrayPathImage[0]._id)
           .set('Cookie', cookieJWTUser)
-          console.log(resp.body,"le deletetetetetet")
           expect(resp.statusCode).toBe(200)
           expect(resp.body.name).toEqual("Ma plante ( Ocimum diffusus )")
           expect(resp.body.images.length).toEqual(2)
@@ -387,65 +386,56 @@ describe("plants and image ", () => {
 
 
 
-    // describe("update species  ", () => {
-    //   let speciesIdToGet:String|null = null
-    //   beforeAll(async()=>{
-    //      const resp = await request(app).post("/api/species")
-    //       .set('Content-type', 'application/json')
-    //       .set('Cookie', cookieJWTBotanist)
-    //       .send({ "name":"test_update",
-    //       "description":"desscription test update ",
-    //       "sunExposure":"sun exposure test update",
-    //       "watering":"watering test update ",
-    //       "optimalTemperature":"optimal temperature test update "
-    //    })
+    describe("update plants  ", () => {
+      let plantIdToGet:String|null = null
+      beforeAll(async()=>{
+         const resp = await request(app).post("/api/plant")
+          .set('Content-type', 'application/json')
+          .set('Cookie', cookieJWTUser)
+          .send({ 
+        "name":"test_update",
+          "speciesId": mySpeciesId[0],
+       })
        
-    //    speciesIdToGet = resp.body._id
+       plantIdToGet = resp.body._id
        
-    //     });
+        });
   
-    //     const upload_payload ={ "name":"test_update_after",
-    //     "description":"desscription test update ",
-    //     "sunExposure":"sun exposure test update after ",
-    //     "watering":"watering test update ",
-    //     "optimalTemperature":"optimal temperature test update "
-    //  }
+       
      
-    //     test("update species  ", async () => {
-    //       const resp = await request(app).post("/api/species/"+speciesIdToGet)
-    //        .set('Content-type', 'application/json')
-    //         .set('Cookie', cookieJWTBotanist)
-    //         .send(upload_payload)
-    //         expect(resp.statusCode).toBe(200)
-    //         expect(resp.body).toEqual(expect.objectContaining(upload_payload))
+        test("update plant  ", async () => {
+            
 
-    //     });
+          const resp = await request(app).post("/api/plant/"+plantIdToGet)
+           .set('Content-type', 'application/json')
+            .set('Cookie', cookieJWTUser)
+            .send({ 
+                "name":"test_update_updated",
+                "speciesId": mySpeciesId[1],
+               })
+            console.log(resp.body,"bodyyy")
+            expect(resp.statusCode).toBe(200)
+            expect(resp.body.name).toBe("test_update_updated");
+            expect(resp.body.species._id).toBe(mySpeciesId[1]);
+        });
 
-    //     test("update species with same name   ", async () => {
-    //       const resp = await request(app).post("/api/species/"+speciesIdToGet)
-    //        .set('Content-type', 'application/json')
-    //         .set('Cookie', cookieJWTBotanist)
-    //         .send({ "name":"Rosa",
-    //         "description":"desscription test update ",
-    //         "sunExposure":"sun exposure test update after ",
-    //         "watering":"watering test update ",
-    //         "optimalTemperature":"optimal temperature test update "
-    //      })
-    //         expect(resp.statusCode).toBe(404)
-
-    //     });
+        
+       
   
-    //     test("update species without botanist account", async () => {
-    //       const resp = await request(app).post("/api/species/"+speciesIdToGet)
-    //       .set('Content-type', 'application/json')
-    //         .set('Cookie', cookieJWTUser)
-    //         .send(upload_payload)
-    //         expect(resp.statusCode).toBe(404)
+        test("update species without wrong jwt account", async () => {
+          const resp = await request(app).post("/api/species/"+plantIdToGet)
+          .set('Content-type', 'application/json')
+            .set('Cookie', cookieJWTBotanist)
+            .send({ 
+                "name":"test_update_updated",
+                  "speciesId": mySpeciesId[1],
+               })
+            expect(resp.statusCode).toBe(404)
   
-    //     });
+        });
   
   
   
         
   
-    //   })
+      })

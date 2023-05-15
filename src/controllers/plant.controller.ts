@@ -72,6 +72,7 @@ export const updatePlant = async (req: Request, res: Response, _: NextFunction) 
     }else {
       errors.push({ field: "error", message: e })
   }
+  console.log(e)
     res.status(404).send({  errors });
   }
     
@@ -97,11 +98,10 @@ export const addImageFromPlant = async (req: Request, res: Response, _: NextFunc
 };
 export const removeImageFromPlant= async (req: Request, res: Response, _: NextFunction) => {
     try {
-      console.log("on passessse loooa")
+     
         const plantId = req.params.plantId
         const imageId = req.params.imageId
         const image = await  getImageById(imageId)
-        console.log(image,"voila limage")
         if(image){
         const newPlant = await deleteImageWithPlantId(image._id,new  mongoose.Types.ObjectId(plantId.trim()))
         fs.unlinkSync("public/image/" + image.path);

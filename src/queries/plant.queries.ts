@@ -74,6 +74,9 @@ export const createPlant = async (speciesId:Types.ObjectId,userId:Types.ObjectId
   export const updatePlantWithPlantId = async (plantId: Types.ObjectId, plant:PlantForm) => {
     return await Plant.findByIdAndUpdate(plantId, {
       name: plant.name, 
+      species : plant.speciesId
     },
       { new: true })
+    .populate({ path: "images", model: Image })
+    .populate({ path: "species", model: Species });
   };

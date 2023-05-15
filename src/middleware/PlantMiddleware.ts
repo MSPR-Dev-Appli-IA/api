@@ -18,6 +18,7 @@ export const areyouThePlantOwner = async (req: Request, res: Response, next: Nex
         }
 
     } catch (error) {
+        
         res.status(404).send({ message: error });
     }
 };
