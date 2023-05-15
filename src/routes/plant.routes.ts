@@ -6,16 +6,16 @@ const router = Router();
 
 import  {requireAuth} from "../middleware/AuthMiddleware";
 
-import  {areyouThePlantOwner} from "../middleware/PlantMiddleware";
+import  {areYouThePlantOwner} from "../middleware/PlantMiddleware";
 
 router.get("/",  requireAuth, getMyPlants);
 router.post("/",  requireAuth, newPlant);
-router.put("/",  requireAuth, areyouThePlantOwner, updatePlant);
+router.put("/",  requireAuth, areYouThePlantOwner, updatePlant);
 
-router.get("/:plantId",  requireAuth,areyouThePlantOwner, getOneOfMyPlant);
-router.delete("/:plantId",  requireAuth,areyouThePlantOwner, removePlant);
+router.get("/:plantId",  requireAuth,areYouThePlantOwner, getOneOfMyPlant);
+router.delete("/:plantId",  requireAuth,areYouThePlantOwner, removePlant);
 
-router.post("/addImage",requireAuth,areyouThePlantOwner,upload.single("file"),addImageFromPlant)
-router.delete("/deleteImage/:plantId/:imageId",  requireAuth,areyouThePlantOwner, removeImageFromPlant);
+router.post("/addImage",requireAuth,areYouThePlantOwner,upload.single("file"),addImageFromPlant)
+router.delete("/deleteImage/:plantId/:imageId",  requireAuth,areYouThePlantOwner, removeImageFromPlant);
 
 export default router;

@@ -931,6 +931,399 @@ protocols: [HTTPS]
                 }
 
 
+
+/plantSitting:
+  /:
+    get:
+      description: Get the plant sittings not taken and not begin
+      securedBy: [ jwtUser, jwtBotanist ]
+      queryParameters:
+        search:
+          description: "Search for plant names (optional)"
+          type: string
+          required: false
+          example: "Rosa"
+        order:
+          description: "Order results per ASC or DESC (optional)"
+          type: string
+          required: false
+          example: "ASC"
+      responses:
+        200:
+          description: Get the plant sittings not taken and not begin
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "result": [
+                    {
+                      "_id": "646a0e573a625a4fe9c207bc",
+                      "plantName": "My Plant",
+                      "address": [
+                        "x": {"$numberDecimal": "44.8378"},
+                        "y": {"$numberDecimal": "-0.594"}
+                      ],
+                      "plantInfo": {
+                            "_id": "64a1a2a40f9c4ffc0b059f44",
+                            "name": "Rosa mosqueta",
+                            "images": [],
+                            "species": "64a1a2940f9c4ffc0b059f3f",
+                            "user": "64a19e0adb825d482fb32daf",
+                            "plantSittings": [],
+                            "created_at": "2023-07-02T16:15:32.366Z",
+                            "__v": 0
+                      }
+                    }
+                  ]
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": [
+                    "order"
+                  ],
+                  "message": [
+                    "\"order\" must be one of [ASC, DESC]"
+                  ]
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+    post:
+      description: Create an plant sitting.
+      securedBy: [ jwtUser, jwtBotanist ]
+      body:
+        application/json:
+          type: object
+          example: |
+            {
+              "plantId": "646a0e573a625a4fe9c207bc",
+              "description": "My first reservation",
+              "start_at": "2023-07-02T13:14:21.000+00:00",
+              "end_at": "2023-07-14T13:14:21.000+00:00",
+              "address": {
+                "x": -0.5603419619427825,
+                "y": 44.86529801733107
+              }
+            }
+      responses:
+        200:
+          description: Create an plant sitting.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "plantSittingInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/plantSitting/64a178dc08511d2f58bb0853"
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": [
+                    "plantId"
+                  ],
+                  "message": [
+                    "\"plantId\" is required"
+                  ]
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: Plant not Found
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Plant not Found"]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+
+    put:
+      description: Update of the user plant sitting.
+      securedBy: [ jwtUser, jwtBotanist ]
+      body:
+        application/json:
+          type: object
+          example: |
+            {
+              "plantSittingId": "64a1caf63ff09f7487d95265",
+              "plantId": "646a0e573a625a4fe9c207bc",
+              "description": "My first reservation",
+              "start_at": "2023-07-02T13:14:21.000+00:00",
+              "end_at": "2023-07-14T13:14:21.000+00:00",
+              "address": {
+                "x": -0.5603419619427825,
+                "y": 44.86529801733107
+              }
+            }
+      responses:
+        200:
+          description: Successful update plant sitting.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "plantSittingInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/plantSitting/64a178dc08511d2f58bb0853"
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": [
+                    "plantId"
+                  ],
+                  "message": [
+                    "\"plantId\" is required"
+                  ]
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: Plant not Found
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Plant not Found"]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+  /{plantSittingId}:
+    get:
+      description: Get one plant Sitting information's.
+      securedBy: [ jwtUser, jwtBotanist ]
+      responses:
+        200:
+          description: Get one plant Sitting information's
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "_id": "64a178dc08511d2f58bb0853",
+                  "plantInfo": {
+                    "_id": "64a1e29b926224290f4d8f05",
+                    "name": "Rosa mosqueta 2",
+                    "images": [],
+                    "species": "64a1a2940f9c4ffc0b059f3f",
+                    "user": "64a19e0adb825d482fb32daf",
+                    "plantSittings": [],
+                    "created_at": "2023-07-02T20:48:27.261Z",
+                    "__v": 0
+                  },
+                  "description": "6469ff6539ef26a6fe2709f0",
+                  "start_at": "2023-07-02T13:14:21.000+00:00",
+                  "end_at": "2023-07-14T13:14:21.000+00:00",
+                  "address": {
+                    "x": {"$numberDecimal": "44.8378"},
+                    "y": {"$numberDecimal": "-0.594"}
+                  }
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: Plant Sitting not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Plant Sitting not found"]
+                }
+        500:
+          description: An error was occurred
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+    delete:
+      description: Delete an plant Sitting.
+      securedBy: [ jwtUser, jwtBotanist ]
+      responses:
+        200:
+          description: Successful suppression
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "type": "success",
+                  "message": "Plant Sitting deleted"
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: Plant Sitting not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Plant Sitting not found"]
+                }
+        500:
+          description: An error was occurred
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+
+
+/address:
+  /:
+    post:
+      description: Get Address Coordinates
+      body:
+        application/json:
+          type: object
+          example : |
+            {
+              "label": "114 rue Lucien Faure, 33000, Bordeaux",
+              "countryCode": "FR"
+            }
+      responses:
+        200:
+          description: All addresses found
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "result": [
+                    {
+                      "address": "114 Rue Lucien Faure, 33300, Bordeaux, Gironde, Nouvelle-Aquitaine",
+                      "location": {
+                        "x": -0.5603419619427825,
+                        "y": 44.86529801733107
+                      },
+                      "score": 100
+                    },
+                    {
+                      "address": "Rue Lucien Faure, 33300, Bordeaux, Gironde, Nouvelle-Aquitaine"
+                      "location" {
+                        "x": -0.5666050038145016,
+                        "y": 44.86965501442069
+                      },
+                      "score": 98.06
+                    }
+                  ]
+                }
+
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
 /user:
   /:
     post:
