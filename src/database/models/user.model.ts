@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema<IUser,UserModel>({
     created_at: {type: Date,require: true,default: Date.now()},
     deleted_at: {type: Date,require: false},
     role: { type: schema.Types.ObjectId, ref: "Role", required: true },
+    image: { type: schema.Types.ObjectId, ref: "Image", required: false,default:null },
     local: {
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },

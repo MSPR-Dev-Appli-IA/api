@@ -1,10 +1,6 @@
 import  Joi from "joi";
 
 const userInfoValidation = Joi.object({
-  email: Joi.string().email().required().messages({
-    "string.base": "Veuillez renseignez un email valide",
-    "string.email": "Veuillez renseignez un email valide",
-  }),
   username: Joi.string().min(1).required().messages({
     "string.base": "Le  username n'est pas valide",
     "string.empty": "Vous n' avez pas de username ",

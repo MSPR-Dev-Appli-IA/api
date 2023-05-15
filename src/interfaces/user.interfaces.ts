@@ -19,6 +19,7 @@ export interface  IUser extends Document {
     created_at:Date,
     deleted_at:null|Date
     local: IUserLocal
+    image: Types.ObjectId|null;
 
     comparePassword(password:string):boolean
     
@@ -30,6 +31,12 @@ export interface UserForm {
     lastname:string,
     email:string,
     password:string
+}
+
+export interface UserInfo{
+    username: string,
+    firstname:string,
+    lastname:string,
 }
 
 
