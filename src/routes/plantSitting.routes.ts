@@ -10,5 +10,5 @@ router.get("/",  requireAuth, getPlantSitting);
 router.get("/:plantSittingId",  requireAuth, getOnePlantSitting);
 router.post("/:plantId",  requireAuth,areyouThePlantOwner, newPlantSitting);
 router.post("/:plantSittingId",requireAuth, updatePlantSitting);
-router.delete("/:plantSittingId",  requireAuth, removePlantSitting);
+router.delete("/:plantSittingId",  requireAuth,areyouThePlantOwner, removePlantSitting);
 export default router;

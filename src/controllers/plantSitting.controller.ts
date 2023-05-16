@@ -1,7 +1,10 @@
 
 import { NextFunction, Request, Response } from "express";
-import { findPlantSittingsNotTakenAndNotBegin, findOnePlantSitting, deletePlantSittingWithPlantSittingId } from "../queries/plantSitting.queries";
+import { findPlantSittingsNotTakenAndNotBegin, findOnePlantSitting, deletePlantSittingWithPlantSittingId ,createPlantSitting,updatePlantSittingWithPlantSittingsId} from "../queries/plantSitting.queries";
+import { plantSittingValidation } from "../database/validation/plantSitting.validation";
+import { getAddressFromLabel } from "./address.controller";
 import mongoose from 'mongoose';
+import  { ValidationError } from "joi";
 
 export const getPlantSitting = async (_: Request, res: Response, __: NextFunction) => {
     try {
@@ -28,17 +31,62 @@ export const getOnePlantSitting = async (req: Request, res: Response, __: NextFu
 
 
 };
-export const newPlantSitting = async (_: Request, res: Response, __: NextFunction) => {
+export const newPlantSitting = async (req: Request, res: Response, __: NextFunction) => {
 
-    res.status(404).send({ message: "Erreur" });
+    try {
+        await plantSittingValidation.validateAsync(req.body, { abortEarly: false });
+        let { title,description,start_at,end_at,address} = req.body
+        const addressObject = await getAddressFromLabel(address)
+        if (addressObject){
+          const newPlantSitting = await createPlantSitting(title,description,start_at,end_at,addressObject)
+          res.status(200).json(newPlantSitting);
+        }else{
+            res.status(404).send({ message: "Cette addresse n'existe pas " });
+        }
+       
+      } catch (e) {
+        const errors = [];
+        if (e instanceof ValidationError) {
+          e.details.map((error) => {
+            errors.push({ field: error.path[0], message: error.message });
+          });
+        }else {
+          errors.push({ field: "error", message: "Erreur" })
+      }
+        res.status(404).send({  errors });
+      }
 
 };
 
-export const updatePlantSitting = async (_: Request, res: Response, __: NextFunction) => {
+export const updatePlantSitting = async (req: Request, res: Response, __: NextFunction) => {
 
-    res.status(404).send({ message: "Erreur" });
+    try {
+        await plantSittingValidation.validateAsync(req.body, { abortEarly: false });
+        const plantSittingId = req.params.plantSittingId;
+        let { title,description,start_at,end_at,address} = req.body
+        const addressObject = await getAddressFromLabel(address)
+        if (addressObject){
+          const newPlantSitting = await updatePlantSittingWithPlantSittingsId(new  mongoose.Types.ObjectId(plantSittingId.trim()),title,description,start_at,end_at,addressObject)
+          res.status(200).json(newPlantSitting);
+        }else{
+            res.status(404).send({ message: "Cette addresse n'existe pas " });
+        }
+       
+      } catch (e) {
+        const errors = [];
+        if (e instanceof ValidationError) {
+          e.details.map((error) => {
+            errors.push({ field: error.path[0], message: error.message });
+          });
+        }else {
+          errors.push({ field: "error", message: "Erreur" })
+      }
+        res.status(404).send({  errors });
+      }
 
 };
+
+
 
 export const removePlantSitting = async (req: Request, res: Response, __: NextFunction) => {
     try {
