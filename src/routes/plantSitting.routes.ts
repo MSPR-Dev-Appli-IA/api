@@ -1,14 +1,14 @@
 import { Router } from "express";
 import {getPlantSitting,getOnePlantSitting,newPlantSitting,updatePlantSitting,removePlantSitting} from "../controllers/plantSitting.controller"
-
+import  {areyouThePlantOwner} from "../middleware/PlantMiddleware";
 
 const router = Router();
 
-import  {requireAuth,isItBotanist} from "../middleware/AuthMiddleware";
+import  {requireAuth} from "../middleware/AuthMiddleware";
 
 router.get("/",  requireAuth, getPlantSitting);
 router.get("/:plantSittingId",  requireAuth, getOnePlantSitting);
-router.post("/",  requireAuth,isItBotanist, newPlantSitting);
-router.post("/:plantSittingId",requireAuth,isItBotanist, updatePlantSitting);
-router.delete("/:plantSittingId",  requireAuth,isItBotanist, removePlantSitting);
+router.post("/:plantId",  requireAuth,areyouThePlantOwner, newPlantSitting);
+router.post("/:plantSittingId",requireAuth, updatePlantSitting);
+router.delete("/:plantSittingId",  requireAuth, removePlantSitting);
 export default router;
