@@ -1,7 +1,7 @@
 
 import { NextFunction, Request, Response } from "express";
-import { findPlantSittingsNotTakenAndNotBegin } from "../queries/plantSitting.queries";
-
+import { findPlantSittingsNotTakenAndNotBegin,findOnePlantSitting } from "../queries/plantSitting.queries";
+import  mongoose from 'mongoose';
 
 export const getPlantSitting = async (_: Request, res: Response, __: NextFunction) => {
     try {
@@ -13,9 +13,19 @@ export const getPlantSitting = async (_: Request, res: Response, __: NextFunctio
 };
 
 
-export const getOnePlantSitting = async (_: Request, res: Response, __: NextFunction) => {
-
-    res.status(404).send({ message: "Erreur" });
+export const getOnePlantSitting = async (req: Request, res: Response, __: NextFunction) => {
+    try {
+        const plantSittingId = req.params.plantSittingId;
+        const plantSitting = await findOnePlantSitting(new  mongoose.Types.ObjectId(plantSittingId.trim()))
+        if(plantSitting){
+          res.status(200).json( plantSitting );
+        }else{
+        res.status(404).send({ message: "Ce gardiennage de plante  n'existe pas" });
+        }
+      } catch (e) {
+        res.status(404).send({ message: "Erreur" });
+      }
+      
 
 };
 export const newPlantSitting = async (_: Request, res: Response, __: NextFunction) => {

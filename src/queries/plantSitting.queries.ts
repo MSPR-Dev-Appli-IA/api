@@ -21,3 +21,10 @@ export const findPlantSittingsNotTakenAndNotBegin = async () => {
     .populate({ path: "address", model: Address })
     .exec()
 };
+
+export const findOnePlantSitting = async (plantSittingId: Types.ObjectId) => {
+    return PlantSitting.findOne({ _id: plantSittingId })
+    .populate({ path: "plant", model: Plant })
+    .populate({ path: "address", model: Address })
+    .exec()
+};
