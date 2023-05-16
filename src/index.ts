@@ -4,12 +4,14 @@ import  cookieParser from 'cookie-parser';
 import  router from './routes';
 import * as dotenv from "dotenv";
 import path from "path"
+
 dotenv.config();
 
 import './database';
 
 export const app:Application = express();
 const compression = require("compression");
+
 
 
 

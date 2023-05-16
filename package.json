@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/MSPR-Dev-Appli-IA/api#readme",
   "dependencies": {
+    "@esri/arcgis-rest-geocoding": "^3.6.0",
+    "@esri/arcgis-rest-request": "^4.2.0",
     "@types/bcrypt": "^5.0.0",
     "@types/cookie-parser": "^1.4.3",
     "@types/express": "^4.17.17",
