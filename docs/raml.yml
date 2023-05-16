@@ -1,7 +1,7 @@
 #%RAML 1.0
 ---
 title: Arosaje API
-baseUri: https://api.arosaje-stage.locascio.fr/{version}
+baseUri: https://api.arosaje-stage.locascio.fr/api/{version}
 mediaType: application/json
 version: v1
 
@@ -17,20 +17,40 @@ version: v1
           body:
             application/json:
               type: UserResponse
+        403:
+          body:
+            application/json:
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Your are logged in"]
+                }
+        404:
+          body:
+            application/json:
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["L'email et/ou le mot de passe est incorrect"]
+                }
   /logout:
     get:
       description: Allows to logout
-      securedBy: [cookie-auth]
+      securedBy: [ cookie-auth ]
       responses:
-        204:
+        200:
         401:
           body:
             application/json:
-              type: UnauthorizedResponse
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Your are not logged in"]
+                }
   /me:
     get:
       description: Allows to get user info
-      securedBy: [cookie-auth]
+      securedBy: [ cookie-auth ]
       responses:
         200:
           body:
@@ -39,7 +59,11 @@ version: v1
         401:
           body:
             application/json:
-              type: UnauthorizedResponse
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Your are not logged in"]
+                }
 
   /signup:
     post:
@@ -47,8 +71,27 @@ version: v1
       body:
         application/json:
           type: UserForm
-      response:
+      responses:
         200:
+          body:
+            application/json:
+              type: UserResponse
+        403:
+          body:
+            application/json:
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Your are always logged"]
+                }
+        500:
+          body:
+            application/json:
+              example: |
+                {
+                  "field": ["email", "password"],
+                  "message": ["MongoServerError: E11000 duplicate key error collection", "Le mot de passe doit être au minimum de 6 caractères"]
+                }
 
 types:
   UserForm:
@@ -73,7 +116,7 @@ types:
     example:
       email: "test@test.com"
       password: "Azerty"
-  IUser:
+  UserResponse:
     type: object
     properties:
       username: string
@@ -83,19 +126,6 @@ types:
       created_at: datetime
       deleted_at: datetime?
       local: UserLocal[]
-  UserResponse:
-    type: object
-    properties:
-      data: IUser[]
-      message: array
-  UnauthorizedResponse:
-    type: object
-    properties:
-      data: object
-      message: string
-    example:
-      "data": { }
-      "message": "Unauthorized: You must to login before"
 
 securitySchemes:
   cookie-auth:
