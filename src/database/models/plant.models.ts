@@ -10,7 +10,9 @@ const plantSchema = new mongoose.Schema<IPlant>({
     species: { type: schema.Types.ObjectId, ref: "Species", required: true },
     user: { type: schema.Types.ObjectId, ref: "User", required: true },
     created_at : { type: Date, default: Date.now },
+    plantSittings : [{ type: schema.Types.ObjectId, ref: "PlantSitting" }],
 });
+
 
 
 
