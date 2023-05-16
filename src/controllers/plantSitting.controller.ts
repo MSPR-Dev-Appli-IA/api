@@ -1,11 +1,15 @@
 
 import { NextFunction, Request, Response } from "express";
+import { findPlantSittingsNotTakenAndNotBegin } from "../queries/plantSitting.queries";
 
 
 export const getPlantSitting = async (_: Request, res: Response, __: NextFunction) => {
-
-    res.status(404).send({ message: "Erreur" });
-
+    try {
+        const plantSitting = await findPlantSittingsNotTakenAndNotBegin()
+        res.status(200).json( plantSitting );
+      } catch (e) {
+        res.status(404).send({ message: "Error" });
+      }
 };
 
 
