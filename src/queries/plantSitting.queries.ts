@@ -28,3 +28,8 @@ export const findOnePlantSitting = async (plantSittingId: Types.ObjectId) => {
     .populate({ path: "address", model: Address })
     .exec()
 };
+
+export const deletePlantSittingWithPlantSittingId = async (plantSittingId: Types.ObjectId) => {
+    await Plant.findOneAndDelete(plantSittingId).exec();
+  }
+  
