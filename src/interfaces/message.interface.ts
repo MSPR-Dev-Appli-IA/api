@@ -2,6 +2,7 @@ import { Document  } from "mongoose";
 import { IUser } from "./user.interfaces";
 import { IRequest } from "./request.interface";
 import { IImage } from "./image.interface";
+import { IAdvice } from "./advice.interface";
 
 
 export interface IMessage extends Document{
@@ -9,7 +10,8 @@ export interface IMessage extends Document{
     sender:  IUser
     content: string|null
     image : IImage|null
-    request : IRequest
+    request : IRequest|null
+    advice:IAdvice|null
 }
 
 

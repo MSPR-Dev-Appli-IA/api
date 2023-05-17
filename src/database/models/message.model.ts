@@ -9,7 +9,8 @@ const messageSchema = new mongoose.Schema<IMessage>({
     content: { type: String,required:false,default: null },
     image: { type: schema.Types.ObjectId, ref: "Image", required: false, default: null },
     sender: { type: schema.Types.ObjectId, ref: "User" },
-    request: { type: schema.Types.ObjectId, ref: "Request" },
+    request: { type: schema.Types.ObjectId, ref: "Request",default:null },
+    advice: { type: schema.Types.ObjectId, ref: "Advice",default:null },
 });
 
 
