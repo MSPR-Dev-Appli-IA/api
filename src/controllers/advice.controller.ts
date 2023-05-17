@@ -1,9 +1,9 @@
 
 import { NextFunction, Request, Response } from "express";
-import { findLimitedAdvicesFoOnePlant, findLimitedAdvicesNotTaken,findLimitedAdvicesOfBotanist,getOneAdviceById,takeAnAdviceByAdviceId,deleteAdviceWithId,createAdviceWithPlantId,addImageWithAdviceId } from "../queries/advice.queries";
+import { findLimitedAdvicesFoOnePlant, findLimitedAdvicesNotTaken,findLimitedAdvicesOfBotanist,getOneAdviceById,takeAnAdviceByAdviceId,deleteAdviceWithId,createAdviceWithPlantId,addImageWithAdviceId,deleteImageWithAdviceId } from "../queries/advice.queries";
 import mongoose from 'mongoose';
 import * as fs from 'fs';
-import { deleteImage } from "../queries/image.queries";
+import { deleteImage, getImageById } from "../queries/image.queries";
 import { deleteMessage } from "./message.controller";
 import  { ValidationError } from "joi";
 import { adviceValidation } from "../database/validation/advice.validation";
@@ -93,9 +93,25 @@ export const updateAdvice = async (_: Request, res: Response, __: NextFunction) 
 
 };
 
-export const removeImageFromAdvice = async (_: Request, res: Response, __: NextFunction) => {
+export const removeImageFromAdvice = async (req: Request, res: Response, __: NextFunction) => {
 
-    res.status(404).send({ message: "Error" });
+    try {
+        const adviceId = req.params.adviceId
+        const imageId = req.params.imageId
+        const image = await  getImageById(new  mongoose.Types.ObjectId(imageId.trim()))
+        if(image){
+        const newAdvice = await deleteImageWithAdviceId(image._id,new  mongoose.Types.ObjectId(adviceId.trim()))
+        fs.unlinkSync("public/image/" + image.path);
+        await deleteImage(imageId)
+        res.status(200).send(newAdvice);
+        }else{
+          res.status(404).send("Cet image n'existe pas");
+        }
+        
+  
+      } catch (e) {
+        res.status(404).send("error");
+      }
 
 };
 export const addImageFromAdvice= async (req: Request, res: Response, __: NextFunction) => {
