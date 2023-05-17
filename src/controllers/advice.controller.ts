@@ -1,7 +1,10 @@
 
 import { NextFunction, Request, Response } from "express";
-import { findLimitedAdvicesFoOnePlant, findLimitedAdvicesNotTaken,findLimitedAdvicesOfBotanist,getOneAdviceById,takeAnAdviceByAdviceId  } from "../queries/advice.queries";
+import { findLimitedAdvicesFoOnePlant, findLimitedAdvicesNotTaken,findLimitedAdvicesOfBotanist,getOneAdviceById,takeAnAdviceByAdviceId,deleteAdviceWithId  } from "../queries/advice.queries";
 import mongoose from 'mongoose';
+import * as fs from 'fs';
+import { deleteImage } from "../queries/image.queries";
+import { deleteMessage } from "./message.controller";
 const limit = 5
 
 export const getAdvicesNotTaken = async (req: Request, res: Response, __: NextFunction) => {
@@ -80,8 +83,33 @@ export const takeOneAdvice = async (req: Request, res: Response, __: NextFunctio
     }
 
 };
-export const removeAdvice = async (_: Request, res: Response, __: NextFunction) => {
+export const removeAdvice = async (req: Request, res: Response, __: NextFunction) => {
 
-    res.status(404).send({ message: "Error" });
+    try {
+        const adviceId = req.params.adviceId
+        const advice = await getOneAdviceById (new mongoose.Types.ObjectId(adviceId.trim()))
+        if (advice){
+            await advice.images.reduce(async (a, image) => {
+                // Wait for the previous item to finish processing
+                await a;
+                fs.unlinkSync("public/image/" + image.path);
+                await deleteImage(image._id)
+              }, Promise.resolve());
+
+              await advice.messages.reduce(async (a, mess) => {
+                // Wait for the previous item to finish processing
+                await a;
+                await deleteMessage(mess._id)
+              }, Promise.resolve());
+              await deleteAdviceWithId(advice._id)
+              res.status(200).send()
+        } else{
+            res.status(404).send("Ce conseil  n'existe pas");
+          }
+     
+    } catch (e) {
+        res.status(404).send({ message: "Error" });
+    }
+
 
 };

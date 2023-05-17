@@ -3,7 +3,7 @@ import { IImage,IUser, IPlant, IMessage } from "./";
 
 export interface IAdvice extends Document{
     created_at:Date, 
-    image : IImage|null
+    images : IImage[]
     plant: IPlant,
     taked_by:IUser|null
     content:string
