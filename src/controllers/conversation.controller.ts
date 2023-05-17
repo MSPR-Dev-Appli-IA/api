@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import  mongoose from 'mongoose';
-import { createConversation, getOneConversationById } from "../queries/conversation.queries";
+import { createConversation, getOneConversationById, setStatutConversationToRefuse } from "../queries/conversation.queries";
 import { findOnePlantSitting } from "../queries/plantSitting.queries";
 
 export const getOneConversation = async (req: Request, res: Response, __: NextFunction) => {
@@ -49,9 +49,20 @@ export const acceptConversation = async (_: Request, res: Response, __: NextFunc
 };
 
 
-export const refuseConversation = async (_: Request, res: Response, __: NextFunction) => {
+export const refuseConversation = async (req: Request, res: Response, __: NextFunction) => {
     
-    res.status(404).send({ message: "Error" });
+  try {
+    const conversationId = req.params.conversationId;
+    const conversation = await  getOneConversationById(new  mongoose.Types.ObjectId(conversationId.trim()))
+    if(conversation){
+      const conversionUpdated = await setStatutConversationToRefuse(new  mongoose.Types.ObjectId(conversationId.trim()))
+      res.status(200).json( conversionUpdated );
+    }else{
+    res.status(404).send({ message: "Cette conversation n'existe pas" });
+    }
+  } catch (e) {
+    res.status(404).send({ message: "Erreur" });
+  }
 
 };
 
