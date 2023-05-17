@@ -76,7 +76,18 @@ export const takeAnAdviceByAdviceId = async (AdviceId: Types.ObjectId,userId :Ty
 
 
 
-
+  export const  createAdviceWithPlantId  = async (content: String,plantId:Types.ObjectId) => {
+    const newAdvice = new Advice({
+    content:content,
+      images: [],
+      plant:plantId,
+      messages:[]
+    });
+    return await newAdvice.save();
   
+  };
+  
+  
+
 
 
