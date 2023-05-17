@@ -3,12 +3,13 @@ import { NextFunction, Request, Response } from "express";
 import mongoose from 'mongoose';
 import { getOneRequestById } from "../queries/request.queries";
 import { newImage } from "./image.controller";
-import { createMessage, deleteMessageWithMessageId, findMessageById } from "../queries/message.queries";
+import { createMessageForAdvice, createMessageForRequest, deleteMessageWithMessageId, findMessageById } from "../queries/message.queries";
 import { Types } from 'mongoose';
 import { deleteImage } from "../queries/image.queries";
 import  { ValidationError } from "joi";
 import * as fs from 'fs';
 import { messageValidation } from "../database/validation/message.validation";
+import { getOneAdviceById } from "../queries/advice.queries";
 
 export const postContentMessageForRequest = async (req: Request, res: Response, __: NextFunction) => {
 
@@ -19,7 +20,7 @@ export const postContentMessageForRequest = async (req: Request, res: Response, 
         const request = await getOneRequestById(new mongoose.Types.ObjectId(requestId.trim()))
         if (request) {
        
-            const newMessage = await createMessage(null, req.user, request,content)
+            const newMessage = await createMessageForRequest(null, req.user, request,content)
             res.status(200).send(newMessage);
         } else {
             res.status(404).send("Error");
@@ -48,7 +49,7 @@ export const postImageMessageForRequest = async (req: Request, res: Response, __
         const request = await getOneRequestById(new mongoose.Types.ObjectId(requestId.trim()))
         if (file && request) {
             const imageMessage = await newImage(file)
-            const newMessage = await createMessage(imageMessage, req.user, request)
+            const newMessage = await createMessageForRequest(imageMessage, req.user, request)
             res.status(200).send(newMessage);
         } else {
             res.status(404).send("Error");
@@ -78,15 +79,51 @@ export const deleteMessage = async (messageId: Types.ObjectId) => {
 
 };
 
-export const postImageMessageForAdvice = async (_: Request, res: Response, __: NextFunction) => {
+export const postImageMessageForAdvice = async (req: Request, res: Response, __: NextFunction) => {
 
-    res.status(404).send({ message: "Error" });
+    try {
+
+        const file = req.file as Express.Multer.File
+        const adviceId = req.params.adviceId;
+        const advice = await getOneAdviceById(new mongoose.Types.ObjectId(adviceId.trim()))
+        if (file && advice) {
+            const imageMessage = await newImage(file)
+            const newMessage = await createMessageForAdvice(imageMessage, req.user, advice)
+            res.status(200).send(newMessage);
+        } else {
+            res.status(404).send("Error");
+        }
+    } catch (e) {
+        res.status(404).send("error");
+    }
+
 
 };
 
-export const postContentMessageForAdvice = async (_: Request, res: Response, __: NextFunction) => {
+export const postContentMessageForAdvice = async (req: Request, res: Response, __: NextFunction) => {
 
-    res.status(404).send({ message: "Error" });
+    try {
+        await messageValidation.validateAsync(req.body, { abortEarly: false });
+        const {content} = req.body
+        const adviceId = req.params.adviceId;
+        const advice = await getOneAdviceById(new mongoose.Types.ObjectId(adviceId.trim()))
+        if (advice) {
+            const newMessage = await createMessageForAdvice(null, req.user, advice,content)
+            res.status(200).send(newMessage);
+        } else {
+            res.status(404).send("Error");
+        }
+    } catch (e) {
+        const errors = [];
+        if (e instanceof ValidationError) {
+          e.details.map((error) => {
+            errors.push({ field: error.path[0], message: error.message });
+          });
+        } else {
+          errors.push({ field: "error", message: "Erreur" })
+        }
+        res.status(404).send({ errors });
+      }
 
 };
 
