@@ -10,7 +10,7 @@ import { Message } from "../database/models/message.model";
 export const getOneAdviceById = async (adviceId: Types.ObjectId): Promise<IAdvice | null> => {
     return await Advice.findOne({ _id: adviceId })
     .populate({ path: "plant", model: Plant })
-    .populate({ path: "image", model: Image })
+    .populate({ path: "images", model: Image })
     .populate({ path: "taked_by", model: User})
     .populate({ path: "messages", model: Message })
     .exec();
@@ -24,7 +24,7 @@ export const findLimitedAdvicesNotTaken = async ( limit: number = 1, skip: numbe
         taked_by: null,
     })
         .populate({ path: "plant", model: Plant })
-        .populate({ path: "image", model: Image })
+        .populate({ path: "images", model: Image })
         .sort({ created_at: order }).skip(skip).limit(limit)
         .exec()
 };
@@ -35,7 +35,7 @@ export const findLimitedAdvicesFoOnePlant = async ( limit: number = 1, skip: num
         plant: plantId
     })
         .populate({ path: "plant", model: Plant })
-        .populate({ path: "image", model: Image })
+        .populate({ path: "images", model: Image })
         .populate({ path: "taked_by", model: User})
         .populate({ path: "messages", model: Message })
         .sort({ created_at: order }).skip(skip).limit(limit)
@@ -49,7 +49,7 @@ export const findLimitedAdvicesOfBotanist = async ( limit: number = 1, skip: num
        
     })
         .populate({ path: "plant", model: Plant })
-        .populate({ path: "image", model: Image })
+        .populate({ path: "images", model: Image })
         .populate({ path: "messages", model: Message })
         .sort({ created_at: order }).skip(skip).limit(limit)
         .exec()
@@ -68,6 +68,15 @@ export const takeAnAdviceByAdviceId = async (AdviceId: Types.ObjectId,userId :Ty
   
   };
   
+
+  export const deleteAdviceWithId= async (adviceId: Types.ObjectId) => {
+    await Advice.findOneAndDelete(adviceId).exec();
+  }
+  
+
+
+
+
   
 
 
