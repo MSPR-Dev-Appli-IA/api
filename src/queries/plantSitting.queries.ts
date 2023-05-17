@@ -41,6 +41,17 @@ export const findOnePlantSittinWithConversation = async (plantSittingId: Types.O
   .exec()
 };
 
+export const setTakenPlantSittingTrue = async (plantSittingId: Types.ObjectId) => {
+
+  return await PlantSitting.findByIdAndUpdate(plantSittingId, {
+    $set: {
+      is_taken:true
+    },
+  },
+    { new: true })
+
+};
+
 
 
 
