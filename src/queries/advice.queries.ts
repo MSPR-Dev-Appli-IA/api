@@ -99,5 +99,15 @@ export const takeAnAdviceByAdviceId = async (AdviceId: Types.ObjectId,userId :Ty
   
   }
 
-  addImageWithAdviceId
+
+
+  export const   deleteImageWithAdviceId = async (imageId: Types.ObjectId, adviceId: Types.ObjectId) => {
+    return await Advice.findOneAndUpdate(
+      { _id: adviceId },
+      { $pull: { images: imageId } },
+      { returnDocument: 'after' }
+    ).populate({ path: "images", model: Image });
+  
+  }
+
 
