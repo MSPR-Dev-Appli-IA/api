@@ -3,6 +3,7 @@ import { IImage } from "../interfaces/index"
 import { Image } from "../database/models/image.model";
 import { Message } from "../database/models/message.model";
 import { Types } from 'mongoose';
+import { IAdvice } from "../interfaces/advice.interface";
 
 
 
@@ -12,12 +13,26 @@ import { Types } from 'mongoose';
 
 
 
-export const createMessage = async (image:IImage|null=null,user:IUser,request:IRequest,content:string|null=null) => {
+export const createMessageForRequest = async (image:IImage|null=null,user:IUser,request:IRequest,content:string|null=null) => {
     const newPlant = new Message({
       image:image,
       sender: user,
       request:request,
-      content:content
+      content:content,
+      advice:null
+      
+    });
+    return await newPlant.save();
+  };
+
+  export const createMessageForAdvice = async (image:IImage|null=null,user:IUser,advice:IAdvice,content:string|null=null) => {
+    const newPlant = new Message({
+      image:image,
+      sender: user,
+      request:null,
+      content:content,
+      advice:advice
+      
     });
     return await newPlant.save();
   };
