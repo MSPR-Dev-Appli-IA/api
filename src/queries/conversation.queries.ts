@@ -3,6 +3,7 @@ import { Types } from 'mongoose';
 import {  IConversation, IPlantSitting, IUser } from "../interfaces";
 import { Conversation } from "../database/models/conversation.model";
 import { User } from "../database/models/user.model";
+import { Message } from "../database/models/message.model";
 
 
 
@@ -10,6 +11,7 @@ export const getOneConversationById = async (conversationId: Types.ObjectId): Pr
     return await Conversation.findOne({ _id: conversationId })
     .populate({ path: "plantSitting", model: PlantSitting})
     .populate({ path: "booker", model: User})
+    .populate({ path: "message", model: Message})
     .exec();
 };
 
