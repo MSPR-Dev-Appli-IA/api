@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import  {areyouThePlantOwner} from "../middleware/PlantMiddleware";
-import {getAdvicesNotTaken,getMyAdvices,getMyAdvicesBotanist,getOneAdvice,createAdvice,takeOneAdvice,removeAdvice} from "../controllers/advice.controller"
+import {getAdvicesNotTaken,getMyAdvicesBotanist,getOneAdvice,createAdvice,takeOneAdvice,removeAdvice,getMyAdvicesForOnePlant} from "../controllers/advice.controller"
 const router = Router();
 
 import  {isItBotanist, requireAuth} from "../middleware/AuthMiddleware";
@@ -11,7 +11,7 @@ import { AreYouBotanistOrOwnerAdvice, areYouTheAdviceOwner } from "../middleware
 
 
 router.get('/',requireAuth,isItBotanist,getAdvicesNotTaken)
-router.get('/me',requireAuth,getMyAdvices)
+router.get('/me/:plantId',requireAuth,getMyAdvicesForOnePlant)
 router.get('/botanist',requireAuth,isItBotanist,getMyAdvicesBotanist)
 router.get("/:adviceId",requireAuth,AreYouBotanistOrOwnerAdvice,getOneAdvice)
 router.post("/plantId",requireAuth,areyouThePlantOwner,createAdvice)

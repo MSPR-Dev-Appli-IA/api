@@ -4,13 +4,16 @@ import { User } from "../database/models/user.model";
 import { Types } from 'mongoose';
 import { Advice } from "../database/models/advice.model";
 import { IAdvice } from "../interfaces/advice.interface";
+import { Message } from "../database/models/message.model";
 
 
 export const getOneAdviceById = async (adviceId: Types.ObjectId): Promise<IAdvice | null> => {
     return await Advice.findOne({ _id: adviceId })
     .populate({ path: "plant", model: Plant })
     .populate({ path: "image", model: Image })
-    .populate({ path: "taked_by", model: User}).exec();
+    .populate({ path: "taked_by", model: User})
+    .populate({ path: "messages", model: Message })
+    .exec();
 };
 
 
@@ -25,3 +28,18 @@ export const findLimitedAdvicesNotTaken = async ( limit: number = 1, skip: numbe
         .sort({ created_at: order }).skip(skip).limit(limit)
         .exec()
 };
+
+
+export const findLimitedAdvicesFoOnePlant = async ( limit: number = 1, skip: number = 0, order: 1 | -1 = -1,plantId: Types.ObjectId) => {
+    return await Advice.find({
+        taked_by: null,
+        plant: plantId
+    })
+        .populate({ path: "plant", model: Plant })
+        .populate({ path: "image", model: Image })
+        .populate({ path: "taked_by", model: User})
+        .populate({ path: "messages", model: Message })
+        .sort({ created_at: order }).skip(skip).limit(limit)
+        .exec()
+};
+

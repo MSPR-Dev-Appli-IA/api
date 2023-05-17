@@ -10,7 +10,7 @@ import  { ValidationError } from "joi";
 import * as fs from 'fs';
 import { messageValidation } from "../database/validation/message.validation";
 
-export const postContentMessage = async (req: Request, res: Response, __: NextFunction) => {
+export const postContentMessageForRequest = async (req: Request, res: Response, __: NextFunction) => {
 
     try {
         await messageValidation.validateAsync(req.body, { abortEarly: false });
@@ -39,7 +39,7 @@ export const postContentMessage = async (req: Request, res: Response, __: NextFu
 };
 
 
-export const postImageMessage = async (req: Request, res: Response, __: NextFunction) => {
+export const postImageMessageForRequest = async (req: Request, res: Response, __: NextFunction) => {
 
     try {
 

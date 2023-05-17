@@ -1,7 +1,7 @@
 
 import { NextFunction, Request, Response } from "express";
-import { findLimitedAdvicesNotTaken } from "../queries/advice.queries";
-
+import { findLimitedAdvicesFoOnePlant, findLimitedAdvicesNotTaken } from "../queries/advice.queries";
+import  mongoose from 'mongoose';
 const limit = 5
 
 export const getAdvicesNotTaken= async (req: Request, res: Response, __: NextFunction) => {
@@ -15,12 +15,21 @@ export const getAdvicesNotTaken= async (req: Request, res: Response, __: NextFun
       } catch (e) {
         res.status(404).send({ message: "Error" });
       }
-  
 };
 
-export const getMyAdvices = async (_: Request, res: Response, __: NextFunction) => {
 
-    res.status(404).send({ message: "Error" });
+export const getMyAdvicesForOnePlant = async (req: Request, res: Response, __: NextFunction) => {
+
+    try {
+        let { page=1, order } = req.body;
+        const plantId = req.params.plantId
+        order = order == "ASC" ? 1 :-1
+        const skip:number =  limit * page - limit;
+        const advices = await findLimitedAdvicesFoOnePlant(limit,skip,order,new  mongoose.Types.ObjectId(plantId.trim()))
+        res.status(200).json( advices );
+      } catch (e) {
+        res.status(404).send({ message: "Error" });
+      }
   
 };
 
