@@ -5,6 +5,7 @@ import { Types } from 'mongoose';
 import { Advice } from "../database/models/advice.model";
 import { IAdvice } from "../interfaces/advice.interface";
 import { Message } from "../database/models/message.model";
+import { IImage } from "../interfaces";
 
 
 export const getOneAdviceById = async (adviceId: Types.ObjectId): Promise<IAdvice | null> => {
@@ -89,5 +90,14 @@ export const takeAnAdviceByAdviceId = async (AdviceId: Types.ObjectId,userId :Ty
   
   
 
+  export const addImageWithAdviceId = async (image: IImage, adviceId: Types.ObjectId) => {
+    return await Advice.findOneAndUpdate(
+      { _id: adviceId },
+      { $push: { images: image } },
+      { returnDocument: 'after' }
+    ).populate({ path: "images", model: Image });
+  
+  }
 
+  addImageWithAdviceId
 

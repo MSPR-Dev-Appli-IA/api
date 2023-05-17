@@ -1,12 +1,13 @@
 
 import { NextFunction, Request, Response } from "express";
-import { findLimitedAdvicesFoOnePlant, findLimitedAdvicesNotTaken,findLimitedAdvicesOfBotanist,getOneAdviceById,takeAnAdviceByAdviceId,deleteAdviceWithId,createAdviceWithPlantId } from "../queries/advice.queries";
+import { findLimitedAdvicesFoOnePlant, findLimitedAdvicesNotTaken,findLimitedAdvicesOfBotanist,getOneAdviceById,takeAnAdviceByAdviceId,deleteAdviceWithId,createAdviceWithPlantId,addImageWithAdviceId } from "../queries/advice.queries";
 import mongoose from 'mongoose';
 import * as fs from 'fs';
 import { deleteImage } from "../queries/image.queries";
 import { deleteMessage } from "./message.controller";
 import  { ValidationError } from "joi";
 import { adviceValidation } from "../database/validation/advice.validation";
+import { newImage } from "./image.controller";
 const limit = 5
 
 export const getAdvicesNotTaken = async (req: Request, res: Response, __: NextFunction) => {
@@ -97,9 +98,22 @@ export const removeImageFromAdvice = async (_: Request, res: Response, __: NextF
     res.status(404).send({ message: "Error" });
 
 };
-export const addImageFromAdvice= async (_: Request, res: Response, __: NextFunction) => {
+export const addImageFromAdvice= async (req: Request, res: Response, __: NextFunction) => {
 
-    res.status(404).send({ message: "Error" });
+    try {
+        const file = req.file as Express.Multer.File
+        const adviceId = req.params.adviceId;
+  
+        if (file){
+          const imageAdvice = await  newImage(file)
+          const newSpecies = await addImageWithAdviceId(imageAdvice,new  mongoose.Types.ObjectId(adviceId.trim()))
+          res.status(200).send(newSpecies);
+        }else{
+          res.status(404).send("No file");
+        }
+      } catch (e) {
+        res.status(404).send("error");
+      }
 
 };
 
