@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import  mongoose from 'mongoose';
 import { createConversation, deleteConversationWithId, getOneConversationById, setStatutConversationToAccept, setStatutConversationToRefuse } from "../queries/conversation.queries";
 import { findOnePlantSittinWithConversation, findOnePlantSitting, setTakenPlantSittingTrue } from "../queries/plantSitting.queries";
+import { deleteMessage } from "./message.controller";
 
 export const getOneConversation = async (req: Request, res: Response, __: NextFunction) => {
     
@@ -101,6 +102,11 @@ export const removeConversation = async (req: Request, res: Response, __: NextFu
     const conversationId = req.params.conversationId
     const conversation = await  getOneConversationById(new  mongoose.Types.ObjectId(conversationId.trim()))
     if (conversation){
+      await conversation.messages.reduce(async (a, mess) => {
+        // Wait for the previous item to finish processing
+        await a;
+        await deleteMessage(mess._id)
+      }, Promise.resolve());
     await deleteConversationWithId(new  mongoose.Types.ObjectId(conversationId.trim()))
     res.status(200).send()
     }
