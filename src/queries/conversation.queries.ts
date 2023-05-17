@@ -18,7 +18,9 @@ export const getOneConversationById = async (conversationId: Types.ObjectId): Pr
 export const createConversation = async (booker:IUser,plantSitting:IPlantSitting) => {
     const newConversation = new Conversation({
      plantSitting:plantSitting,
-     booker:booker
+     booker:booker,
+     messages:[]
+
     });
     return await newConversation.save();
   };
