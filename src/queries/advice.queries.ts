@@ -32,7 +32,6 @@ export const findLimitedAdvicesNotTaken = async ( limit: number = 1, skip: numbe
 
 export const findLimitedAdvicesFoOnePlant = async ( limit: number = 1, skip: number = 0, order: 1 | -1 = -1,plantId: Types.ObjectId) => {
     return await Advice.find({
-        taked_by: null,
         plant: plantId
     })
         .populate({ path: "plant", model: Plant })
@@ -42,4 +41,19 @@ export const findLimitedAdvicesFoOnePlant = async ( limit: number = 1, skip: num
         .sort({ created_at: order }).skip(skip).limit(limit)
         .exec()
 };
+
+
+export const findLimitedAdvicesOfBotanist = async ( limit: number = 1, skip: number = 0, order: 1 | -1 = -1,userId: Types.ObjectId) => {
+    return await Advice.find({
+        taked_by: userId,
+       
+    })
+        .populate({ path: "plant", model: Plant })
+        .populate({ path: "image", model: Image })
+        .populate({ path: "messages", model: Message })
+        .sort({ created_at: order }).skip(skip).limit(limit)
+        .exec()
+};
+
+
 
