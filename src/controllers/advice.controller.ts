@@ -68,6 +68,24 @@ export const createAdvice = async (_: Request, res: Response, __: NextFunction) 
 
 };
 
+export const updateAdvice = async (_: Request, res: Response, __: NextFunction) => {
+
+    res.status(404).send({ message: "Error" });
+
+};
+
+export const removeImageFromAdvice = async (_: Request, res: Response, __: NextFunction) => {
+
+    res.status(404).send({ message: "Error" });
+
+};
+export const addImageFromAdvice= async (_: Request, res: Response, __: NextFunction) => {
+
+    res.status(404).send({ message: "Error" });
+
+};
+
+
 export const takeOneAdvice = async (req: Request, res: Response, __: NextFunction) => {
 
     try {

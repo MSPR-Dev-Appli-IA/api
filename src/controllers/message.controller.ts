@@ -78,4 +78,16 @@ export const deleteMessage = async (messageId: Types.ObjectId) => {
 
 };
 
+export const postImageMessageForAdvice = async (_: Request, res: Response, __: NextFunction) => {
+
+    res.status(404).send({ message: "Error" });
+
+};
+
+export const postContentMessageForAdvice = async (_: Request, res: Response, __: NextFunction) => {
+
+    res.status(404).send({ message: "Error" });
+
+};
+
 

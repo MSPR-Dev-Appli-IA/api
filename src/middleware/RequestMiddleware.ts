@@ -51,3 +51,24 @@ export const areyouThePlantSittingOwnerOrTheBooker= async (req: Request, res: Re
     }
 };
 
+
+export const isThisRequestTaken= async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const requestId = req.params.requestId
+        const request = await getOneRequestById(new mongoose.Types.ObjectId(requestId.trim()))
+        if (request) {
+            if (request.status== "Accepté") {
+                next()
+            } else {
+                res.status(404).send({ message: "Your are not allowed" });
+            }
+        } else {
+            res.status(404).send({ message: "Erreurs" });
+        }
+
+    } catch (error) {
+        
+        res.status(404).send({ message: error });
+    }
+};
+
