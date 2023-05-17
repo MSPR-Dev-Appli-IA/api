@@ -21,3 +21,14 @@ export const createConversation = async (booker:IUser,plantSitting:IPlantSitting
     return await newConversation.save();
   };
 
+
+  export const setStatutConversationToRefuse = async (conversationId: Types.ObjectId) => {
+
+    return await Conversation.findByIdAndUpdate(conversationId, {
+      $set: {
+        "status": "Refusé",
+      },
+    },
+      { new: true })
+  
+};
