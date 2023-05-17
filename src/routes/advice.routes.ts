@@ -5,7 +5,7 @@ import {getAdvicesNotTaken,getMyAdvicesBotanist,getOneAdvice,createAdvice,takeOn
 const router = Router();
 
 import  {isItBotanist, requireAuth} from "../middleware/AuthMiddleware";
-import { AreYouBotanistOrOwnerAdvice, areYouTheAdviceOwner } from "../middleware/adviceMiddleware";
+import { AreYouBotanistOrOwnerAdvice, areYouTheAdviceOwner ,notAlreadyTaken} from "../middleware/adviceMiddleware";
 
 
 
@@ -15,7 +15,7 @@ router.get('/me/:plantId',requireAuth,getMyAdvicesForOnePlant)
 router.get('/botanist',requireAuth,isItBotanist,getMyAdvicesBotanist)
 router.get("/:adviceId",requireAuth,AreYouBotanistOrOwnerAdvice,getOneAdvice)
 router.post("/plantId",requireAuth,areyouThePlantOwner,createAdvice)
-router.post('/take/:adviceId',requireAuth,isItBotanist,takeOneAdvice)
+router.post('/take/:adviceId',requireAuth,isItBotanist,notAlreadyTaken,takeOneAdvice)
 router.delete('/:adviceId',requireAuth,areYouTheAdviceOwner,removeAdvice)
 
 

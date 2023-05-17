@@ -57,3 +57,17 @@ export const findLimitedAdvicesOfBotanist = async ( limit: number = 1, skip: num
 
 
 
+export const takeAnAdviceByAdviceId = async (AdviceId: Types.ObjectId,userId :Types.ObjectId) => {
+
+    return await Advice.findByIdAndUpdate(AdviceId, {
+      $set: {
+        taked_by:userId
+      },
+    },
+      { new: true })
+  
+  };
+  
+  
+
+
