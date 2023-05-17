@@ -11,7 +11,7 @@ export interface IConversation extends Document{
     created_at:Date
     status : statusLabel
     plantSitting : IPlantSitting
-    booker: IUser|null
+    booker: IUser
 }
 
 

@@ -3,11 +3,16 @@ import { Plant } from "../database/models/plant.models";
 import { Types } from 'mongoose';
 import { IAddress, IPlantSitting } from "../interfaces";
 import { Address } from "../database/models/adress.model";
+import { Conversation } from "../database/models/conversation.model";
 
 
 
 export const getOnePlantSittingById = async (plantSittingId: Types.ObjectId): Promise<IPlantSitting | null> => {
-    return await PlantSitting.findOne({ _id: plantSittingId }).populate({ path: "plant", model: Plant }).populate({ path: "address", model: Address }).exec();
+    return await PlantSitting.findOne({ _id: plantSittingId })
+    .populate({ path: "plant", model: Plant })
+    .populate({ path: "address", model: Address })
+    .populate({ path: "conversations", model: Conversation })
+    .exec();
 };
 
 export const findPlantSittingsNotTakenAndNotBegin = async () => {
@@ -28,6 +33,16 @@ export const findOnePlantSitting = async (plantSittingId: Types.ObjectId) => {
     .populate({ path: "address", model: Address })
     .exec()
 };
+
+export const findOnePlantSittinWithConversation = async (plantSittingId: Types.ObjectId) => {
+  return PlantSitting.findOne({ _id: plantSittingId })
+  .populate({ path: "plant", model: Plant })
+  .populate({ path: "address", model: Address })
+  .exec()
+};
+
+
+
 
 export const createPlantSitting = async (title:string,description:string,start_at:Date,end_at:Date,address:IAddress) => {
     const newPlantSitting = new PlantSitting({

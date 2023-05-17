@@ -17,12 +17,3 @@ const conversationSchema = new mongoose.Schema<IConversation>({
 export const Conversation = mongoose.model('Conversation', conversationSchema);
 
 
-
-// export interface IConversation extends Document{
-//     created_at:Date
-//     status : boolean
-//     plantSitting : IPlantSitting|null
-//     booker: IUser
-// }
-
-

@@ -1,6 +1,6 @@
 
 import { NextFunction, Request, Response } from "express";
-import { findPlantSittingsNotTakenAndNotBegin, findOnePlantSitting, deletePlantSittingWithPlantSittingId ,createPlantSitting,updatePlantSittingWithPlantSittingsId} from "../queries/plantSitting.queries";
+import { findPlantSittingsNotTakenAndNotBegin, findOnePlantSitting,findOnePlantSittinWithConversation, deletePlantSittingWithPlantSittingId ,createPlantSitting,updatePlantSittingWithPlantSittingsId} from "../queries/plantSitting.queries";
 import { plantSittingValidation } from "../database/validation/plantSitting.validation";
 import { getAddressFromLabel } from "./address.controller";
 import mongoose from 'mongoose';
@@ -31,6 +31,25 @@ export const getOnePlantSitting = async (req: Request, res: Response, __: NextFu
 
 
 };
+
+export const getOnePlantSittingWithConversation= async (req: Request, res: Response, __: NextFunction): Promise<void> => {
+  try {
+      const plantSittingId = req.params.plantSittingId;
+      const plantSitting = await findOnePlantSittinWithConversation(new mongoose.Types.ObjectId(plantSittingId.trim()))
+      if (plantSitting) {
+          res.status(200).json(plantSitting);
+      } else {
+          res.status(404).send({ message: "Ce gardiennage de plante  n'existe pas" });
+      }
+  } catch (e) {
+      res.status(404).send({ message: "Erreur" });
+  }
+
+
+};
+
+
+
 export const newPlantSitting = async (req: Request, res: Response, __: NextFunction) => {
 
     try {
