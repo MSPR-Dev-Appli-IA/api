@@ -1,6 +1,6 @@
 import { Document  } from "mongoose";
 import { Types } from 'mongoose';
-import { IConversation } from "./conversation.interface";
+import { IRequest } from "./request.interface";
 
 export interface IPlantSitting extends Document{
     title : string
@@ -11,7 +11,7 @@ export interface IPlantSitting extends Document{
     is_taken : Boolean
     plant: Types.ObjectId
     address:Types.ObjectId
-    conversations: IConversation[]
+    requests: IRequest[]
 }
 
 

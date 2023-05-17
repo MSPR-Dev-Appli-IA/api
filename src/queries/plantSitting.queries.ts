@@ -3,7 +3,7 @@ import { Plant } from "../database/models/plant.models";
 import { Types } from 'mongoose';
 import { IAddress, IPlantSitting } from "../interfaces";
 import { Address } from "../database/models/adress.model";
-import { Conversation } from "../database/models/conversation.model";
+import { Request} from "../database/models/request.model";
 
 
 
@@ -11,7 +11,7 @@ export const getOnePlantSittingById = async (plantSittingId: Types.ObjectId): Pr
     return await PlantSitting.findOne({ _id: plantSittingId })
     .populate({ path: "plant", model: Plant })
     .populate({ path: "address", model: Address })
-    .populate({ path: "conversations", model: Conversation })
+    .populate({ path: "requests", model: Request })
     .exec();
 };
 
@@ -34,7 +34,7 @@ export const findOnePlantSitting = async (plantSittingId: Types.ObjectId) => {
     .exec()
 };
 
-export const findOnePlantSittinWithConversation = async (plantSittingId: Types.ObjectId) => {
+export const findOnePlantSittinWithRequest = async (plantSittingId: Types.ObjectId) => {
   return PlantSitting.findOne({ _id: plantSittingId })
   .populate({ path: "plant", model: Plant })
   .populate({ path: "address", model: Address })
@@ -62,7 +62,7 @@ export const createPlantSitting = async (title:string,description:string,start_a
       start_at:start_at,
       end_at:end_at,
       address:address,
-      conversations: []
+      requests: []
     });
     return await newPlantSitting.save();
   

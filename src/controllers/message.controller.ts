@@ -1,7 +1,7 @@
 
 import { NextFunction, Request, Response } from "express";
 import mongoose from 'mongoose';
-import { getOneConversationById } from "../queries/conversation.queries";
+import { getOneRequestById } from "../queries/request.queries";
 import { newImage } from "./image.controller";
 import { createMessage, deleteMessageWithMessageId, findMessageById } from "../queries/message.queries";
 import { Types } from 'mongoose';
@@ -15,11 +15,11 @@ export const postContentMessage = async (req: Request, res: Response, __: NextFu
     try {
         await messageValidation.validateAsync(req.body, { abortEarly: false });
         const {content} = req.body
-        const conversationId = req.params.conversationId;
-        const conversation = await getOneConversationById(new mongoose.Types.ObjectId(conversationId.trim()))
-        if (conversation) {
+        const requestId = req.params.requestId;
+        const request = await getOneRequestById(new mongoose.Types.ObjectId(requestId.trim()))
+        if (request) {
        
-            const newMessage = await createMessage(null, req.user, conversation,content)
+            const newMessage = await createMessage(null, req.user, request,content)
             res.status(200).send(newMessage);
         } else {
             res.status(404).send("Error");
@@ -44,11 +44,11 @@ export const postImageMessage = async (req: Request, res: Response, __: NextFunc
     try {
 
         const file = req.file as Express.Multer.File
-        const conversationId = req.params.conversationId;
-        const conversation = await getOneConversationById(new mongoose.Types.ObjectId(conversationId.trim()))
-        if (file && conversation) {
+        const requestId = req.params.requestId;
+        const request = await getOneRequestById(new mongoose.Types.ObjectId(requestId.trim()))
+        if (file && request) {
             const imageMessage = await newImage(file)
-            const newMessage = await createMessage(imageMessage, req.user, conversation)
+            const newMessage = await createMessage(imageMessage, req.user, request)
             res.status(200).send(newMessage);
         } else {
             res.status(404).send("Error");

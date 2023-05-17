@@ -13,7 +13,7 @@ const plantSittingSchema = new mongoose.Schema<IPlantSitting>({
     is_taken: { type: Boolean, required: true,default: false},
     address: { type: schema.Types.ObjectId, ref: "Address", required: true },
     plant: { type: schema.Types.ObjectId, ref: "Plant", required: true },
-    conversations : [{ type: schema.Types.ObjectId, ref: "conversation" }],
+    requests : [{ type: schema.Types.ObjectId, ref: "Request" }],
 });
 
 

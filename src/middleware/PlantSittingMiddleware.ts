@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { getOnePlantSittingById } from "../queries/plantSitting.queries";
 import { getOnePlantById } from "../queries/plant.queries";
 import mongoose from 'mongoose';
-import { getOneConversationById } from "../queries/conversation.queries";
+import { getOneRequestById } from "../queries/request.queries";
 
 export const areyouThePlantSittingOwner = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -31,11 +31,11 @@ export const areyouThePlantSittingOwner = async (req: Request, res: Response, ne
 
 
 
-export const areyouThePlantSittingOwnerFromTheConversation = async (req: Request, res: Response, next: NextFunction) => {
+export const areyouThePlantSittingOwnerFromTheRequest = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const conversationId = req.params.conversationId
-        const conversation = await getOneConversationById(new mongoose.Types.ObjectId(conversationId.trim()))
-        const plantSitting = await getOnePlantSittingById(new mongoose.Types.ObjectId(conversation?.plantSitting._id))
+        const requestId = req.params.requestId
+        const request = await getOneRequestById(new mongoose.Types.ObjectId(requestId.trim()))
+        const plantSitting = await getOnePlantSittingById(new mongoose.Types.ObjectId(request?.plantSitting._id))
         if (plantSitting) {
             const plant = await getOnePlantById(plantSitting.plant._id)
             if (plant){
@@ -80,12 +80,12 @@ export const areThePlantSittingStillAvailable = async (req: Request, res: Respon
     }
 };
 
-export const areThePlantSittingStillAvailableFromTheConversation = async (req: Request, res: Response, next: NextFunction) => {
+export const areThePlantSittingStillAvailableFromTheRequest = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const conversationId = req.params.conversationId
-        const conversation = await getOneConversationById(new mongoose.Types.ObjectId(conversationId.trim()))
-        if (conversation ) {
-            if (!conversation.plantSitting.is_taken && Date.now() < conversation.plantSitting.start_at.getDate() ){
+        const requestId = req.params.requestId
+        const request = await getOneRequestById(new mongoose.Types.ObjectId(requestId.trim()))
+        if (request ) {
+            if (!request.plantSitting.is_taken && Date.now() < request.plantSitting.start_at.getDate() ){
                 next()
             }else{
                 res.status(404).send({ message: "Erreur" });

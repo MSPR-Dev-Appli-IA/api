@@ -1,11 +1,11 @@
 
 import { NextFunction, Request, Response } from "express";
-import { findPlantSittingsNotTakenAndNotBegin, findOnePlantSitting, findOnePlantSittinWithConversation, deletePlantSittingWithPlantSittingId, createPlantSitting, updatePlantSittingWithPlantSittingsId } from "../queries/plantSitting.queries";
+import { findPlantSittingsNotTakenAndNotBegin, findOnePlantSitting, findOnePlantSittinWithRequest, deletePlantSittingWithPlantSittingId, createPlantSitting, updatePlantSittingWithPlantSittingsId } from "../queries/plantSitting.queries";
 import { plantSittingValidation } from "../database/validation/plantSitting.validation";
 import { getAddressFromLabel } from "./address.controller";
 import mongoose from 'mongoose';
 import { ValidationError } from "joi";
-import { deleteConversationWithId } from "../queries/conversation.queries";
+import { deleteRequestWithId } from "../queries/request.queries";
 
 export const getPlantSitting = async (_: Request, res: Response, __: NextFunction) => {
   try {
@@ -33,10 +33,10 @@ export const getOnePlantSitting = async (req: Request, res: Response, __: NextFu
 
 };
 
-export const getOnePlantSittingWithConversation = async (req: Request, res: Response, __: NextFunction): Promise<void> => {
+export const getOnePlantSittingWithRequest= async (req: Request, res: Response, __: NextFunction): Promise<void> => {
   try {
     const plantSittingId = req.params.plantSittingId;
-    const plantSitting = await findOnePlantSittinWithConversation(new mongoose.Types.ObjectId(plantSittingId.trim()))
+    const plantSitting = await findOnePlantSittinWithRequest(new mongoose.Types.ObjectId(plantSittingId.trim()))
     if (plantSitting) {
       res.status(200).json(plantSitting);
     } else {
@@ -113,10 +113,10 @@ export const removePlantSitting = async (req: Request, res: Response, __: NextFu
     const plantSittingId = req.params.plantSittingId;
     const plantSitting = await findOnePlantSitting(new mongoose.Types.ObjectId(plantSittingId.trim()))
     if (plantSitting) {
-      await plantSitting.conversations.reduce(async (a, conv) => {
+      await plantSitting.requests.reduce(async (a, element) => {
         // Wait for the previous item to finish processing
         await a;
-        await deleteConversationWithId(conv._id)
+        await deleteRequestWithId(element._id)
       }, Promise.resolve());
 
       await deletePlantSittingWithPlantSittingId(new mongoose.Types.ObjectId(plantSittingId.trim()))
