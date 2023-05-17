@@ -1,6 +1,6 @@
 import { PlantSitting } from "../database/models/plantSitting.model";
 import { Types } from 'mongoose';
-import {  IConversation } from "../interfaces";
+import {  IConversation, IPlantSitting, IUser } from "../interfaces";
 import { Conversation } from "../database/models/conversation.model";
 import { User } from "../database/models/user.model";
 
@@ -12,3 +12,12 @@ export const getOneConversationById = async (conversationId: Types.ObjectId): Pr
     .populate({ path: "booker", model: User})
     .exec();
 };
+
+export const createConversation = async (booker:IUser,plantSitting:IPlantSitting) => {
+    const newConversation = new Conversation({
+     plantSitting:plantSitting,
+     booker:booker
+    });
+    return await newConversation.save();
+  };
+
