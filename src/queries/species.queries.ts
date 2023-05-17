@@ -14,7 +14,7 @@ export const findLimitedSpecies = async (limit: number = 1, skip: number = 0, or
 };
 
 
-export const findOneSpecies = async (specisdId: Types.ObjectId) => {
+export const findOneSpecies = async (speciesId: Types.ObjectId) => {
 
   return Species.findOne({ _id: speciesId }).populate({ path: "images", model: Image }).exec();
 };

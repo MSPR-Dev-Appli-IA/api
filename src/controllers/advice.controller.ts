@@ -1,10 +1,12 @@
 
 import { NextFunction, Request, Response } from "express";
-import { findLimitedAdvicesFoOnePlant, findLimitedAdvicesNotTaken,findLimitedAdvicesOfBotanist,getOneAdviceById,takeAnAdviceByAdviceId,deleteAdviceWithId  } from "../queries/advice.queries";
+import { findLimitedAdvicesFoOnePlant, findLimitedAdvicesNotTaken,findLimitedAdvicesOfBotanist,getOneAdviceById,takeAnAdviceByAdviceId,deleteAdviceWithId,createAdviceWithPlantId } from "../queries/advice.queries";
 import mongoose from 'mongoose';
 import * as fs from 'fs';
 import { deleteImage } from "../queries/image.queries";
 import { deleteMessage } from "./message.controller";
+import  { ValidationError } from "joi";
+import { adviceValidation } from "../database/validation/advice.validation";
 const limit = 5
 
 export const getAdvicesNotTaken = async (req: Request, res: Response, __: NextFunction) => {
@@ -62,9 +64,25 @@ export const getOneAdvice = async (req: Request, res: Response, __: NextFunction
 
 };
 
-export const createAdvice = async (_: Request, res: Response, __: NextFunction) => {
+export const createAdvice = async (req: Request, res: Response, __: NextFunction) => {
 
-    res.status(404).send({ message: "Error" });
+    try {
+        await adviceValidation.validateAsync(req.body, { abortEarly: false });
+        const {content } = req.body
+        const plantId = req.params.plantId
+        const advice = await createAdviceWithPlantId(content,new mongoose.Types.ObjectId(plantId.trim()));
+        res.status(200).send(advice);
+      } catch (e) {
+        const errors = [];
+        if (e instanceof ValidationError) {
+          e.details.map((error) => {
+            errors.push({ field: error.path[0], message: error.message });
+          });
+        }else {
+          errors.push({ field: "error", message: e })
+      }
+        res.status(404).send({  errors });
+      }
 
 };
 
