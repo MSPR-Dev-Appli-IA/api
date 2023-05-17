@@ -35,7 +35,8 @@ export const createPlantSitting = async (title:string,description:string,start_a
       description:description,
       start_at:start_at,
       end_at:end_at,
-      address:address
+      address:address,
+      conversations: []
     });
     return await newPlantSitting.save();
   
