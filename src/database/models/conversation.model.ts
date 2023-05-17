@@ -9,7 +9,7 @@ const conversationSchema = new mongoose.Schema<IConversation>({
     status: { type: String, required: true,default: "En attente"},
     plantSitting: { type: schema.Types.ObjectId, ref: "PlantSitting", required: true },
     booker:{ type: schema.Types.ObjectId, ref: "User" },
-
+    messages : [{ type: schema.Types.ObjectId, ref: "message" }],
 });
 
 
