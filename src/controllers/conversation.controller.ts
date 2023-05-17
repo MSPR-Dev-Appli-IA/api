@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import  mongoose from 'mongoose';
-import { createConversation, deleteConversationWithId, getOneConversationById, setStatutConversationToRefuse } from "../queries/conversation.queries";
-import { findOnePlantSitting } from "../queries/plantSitting.queries";
+import { createConversation, deleteConversationWithId, getOneConversationById, setStatutConversationToAccept, setStatutConversationToRefuse } from "../queries/conversation.queries";
+import { findOnePlantSittinWithConversation, findOnePlantSitting, setTakenPlantSittingTrue } from "../queries/plantSitting.queries";
 
 export const getOneConversation = async (req: Request, res: Response, __: NextFunction) => {
     
@@ -42,9 +42,37 @@ export const newConversation= async (req: Request, res: Response, __: NextFuncti
 };
 
 
-export const acceptConversation = async (_: Request, res: Response, __: NextFunction) => {
-    
-    res.status(404).send({ message: "Error" });
+export const acceptConversation = async (req: Request, res: Response, __: NextFunction) => {
+  try {
+    const conversationId = req.params.conversationId;
+    const conversation = await  getOneConversationById(new  mongoose.Types.ObjectId(conversationId.trim()))
+    if(conversation){
+      const plantSitting = await findOnePlantSittinWithConversation(new mongoose.Types.ObjectId(conversation.plantSitting._id.trim()))
+      if (plantSitting){
+        await plantSitting.conversations.reduce(async (a, conv) => {
+          // Wait for the previous item to finish processing
+          await a;
+          if (!conv._id.equals(conversation._id)){
+            await setStatutConversationToRefuse(new  mongoose.Types.ObjectId(conv._id.trim()))
+          }
+          
+        }, Promise.resolve());
+        await setStatutConversationToAccept(new mongoose.Types.ObjectId(conversation._id.trim()))
+        await setTakenPlantSittingTrue(new mongoose.Types.ObjectId(plantSitting._id.trim()))
+        res.status(200).json( conversation);
+      }else{
+        res.status(404).send({ message: "Erreur" });
+      }
+
+
+      
+    }else{
+    res.status(404).send({ message: "Cette conversation n'existe pas" });
+    }
+  } catch (e) {
+    res.status(404).send({ message: "Erreur" });
+  }
+   
 
 };
 

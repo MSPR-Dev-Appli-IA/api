@@ -32,7 +32,16 @@ export const createConversation = async (booker:IUser,plantSitting:IPlantSitting
       { new: true })
   
 };
+export const setStatutConversationToAccept = async (conversationId: Types.ObjectId) => {
 
+    return await Conversation.findByIdAndUpdate(conversationId, {
+      $set: {
+        "status": "Accepté",
+      },
+    },
+      { new: true })
+  
+};
 
 export const deleteConversationWithId = async (conversationId: Types.ObjectId) => {
     await Conversation.findOneAndDelete(conversationId).exec();
