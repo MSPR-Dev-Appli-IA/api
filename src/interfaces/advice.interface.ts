@@ -1,5 +1,5 @@
 import { Document  } from "mongoose";
-import { IImage,IUser, IPlant } from "./";
+import { IImage,IUser, IPlant, IMessage } from "./";
 
 export interface IAdvice extends Document{
     created_at:Date, 
@@ -7,6 +7,7 @@ export interface IAdvice extends Document{
     plant: IPlant,
     taked_by:IUser|null
     content:string
+    messages: IMessage[]
 }
 
 export interface AdviceForm {
