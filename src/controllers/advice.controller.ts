@@ -1,6 +1,6 @@
 
 import { NextFunction, Request, Response } from "express";
-import { findLimitedAdvicesFoOnePlant, findLimitedAdvicesNotTaken,findLimitedAdvicesOfBotanist } from "../queries/advice.queries";
+import { findLimitedAdvicesFoOnePlant, findLimitedAdvicesNotTaken,findLimitedAdvicesOfBotanist,getOneAdviceById  } from "../queries/advice.queries";
 import mongoose from 'mongoose';
 const limit = 5
 
@@ -47,9 +47,15 @@ export const getMyAdvicesBotanist = async (req: Request, res: Response, __: Next
 
 
 };
-export const getOneAdvice = async (_: Request, res: Response, __: NextFunction) => {
+export const getOneAdvice = async (req: Request, res: Response, __: NextFunction) => {
 
-    res.status(404).send({ message: "Error" });
+    try {
+        const adviceId = req.params.adviceId
+        const advice = await getOneAdviceById (new mongoose.Types.ObjectId(adviceId.trim()))
+        res.status(200).json(advice);
+    } catch (e) {
+        res.status(404).send({ message: "Error" });
+    }
 
 };
 
