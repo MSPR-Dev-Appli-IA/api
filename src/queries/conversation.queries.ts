@@ -32,3 +32,11 @@ export const createConversation = async (booker:IUser,plantSitting:IPlantSitting
       { new: true })
   
 };
+
+
+export const deleteConversationWithId = async (conversationId: Types.ObjectId) => {
+    await Conversation.findOneAndDelete(conversationId).exec();
+  }
+  
+
+
