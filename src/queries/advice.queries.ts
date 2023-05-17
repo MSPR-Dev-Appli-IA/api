@@ -3,7 +3,7 @@ import { Image } from "../database/models/image.model"
 import { User } from "../database/models/user.model";
 import { Types } from 'mongoose';
 import { Advice } from "../database/models/advice.model";
-import { IAdvice } from "../interfaces/advice.interface";
+import { AdviceForm, IAdvice } from "../interfaces/advice.interface";
 import { Message } from "../database/models/message.model";
 import { IImage } from "../interfaces";
 
@@ -111,3 +111,12 @@ export const takeAnAdviceByAdviceId = async (AdviceId: Types.ObjectId,userId :Ty
   }
 
 
+  export const updateAdviceIthAdviceId = async (adviceId: Types.ObjectId, advice: AdviceForm) => {
+    return await Advice.findByIdAndUpdate(adviceId, {
+      content:advice.content
+    },
+      { new: true })
+
+  };
+  
+  

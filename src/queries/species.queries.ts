@@ -28,6 +28,7 @@ export const updateSpecieWithSpeciesId = async (speciesId: Types.ObjectId, speci
     optimalTemperature: species.optimalTemperature,
   },
     { new: true })
+
 };
 
 
