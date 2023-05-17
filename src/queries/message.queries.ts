@@ -1,4 +1,4 @@
-import { IConversation,   IUser } from "../interfaces";
+import { IRequest,   IUser } from "../interfaces";
 import { IImage } from "../interfaces/index"
 import { Image } from "../database/models/image.model";
 import { Message } from "../database/models/message.model";
@@ -12,11 +12,11 @@ import { Types } from 'mongoose';
 
 
 
-export const createMessage = async (image:IImage|null=null,user:IUser,conversation:IConversation,content:string|null=null) => {
+export const createMessage = async (image:IImage|null=null,user:IUser,request:IRequest,content:string|null=null) => {
     const newPlant = new Message({
       image:image,
       sender: user,
-      conversation:conversation,
+      request:request,
       content:content
     });
     return await newPlant.save();

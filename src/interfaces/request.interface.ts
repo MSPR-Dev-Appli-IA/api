@@ -8,7 +8,7 @@ export type statusLabel = "En attente"| "Accepté"|"Refusé"
 
 
 
-export interface IConversation extends Document{
+export interface IRequest extends Document{
     created_at:Date
     status : statusLabel
     plantSitting : IPlantSitting

@@ -1,15 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import { getOnePlantById } from "../queries/plant.queries";
 import mongoose from 'mongoose';
-import { getOneConversationById } from "../queries/conversation.queries";
+import { getOneRequestById } from "../queries/request.queries"
 import { getOnePlantSittingById } from "../queries/plantSitting.queries";
 
-export const areyouTheConversationOwner= async (req: Request, res: Response, next: NextFunction) => {
+export const areyouTheRequestOwner= async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const conversationId = req.params.conversationId
-        const conversation = await getOneConversationById(new mongoose.Types.ObjectId(conversationId.trim()))
-        if (conversation) {
-            if (req.user._id.equals(conversation.booker?._id)) {
+        const requestId = req.params.requestId
+        const request = await getOneRequestById(new mongoose.Types.ObjectId(requestId.trim()))
+        if (request) {
+            if (req.user._id.equals(request.booker?._id)) {
                 next()
             } else {
                 res.status(404).send({ message: "Your are not allowed" });
@@ -27,13 +27,13 @@ export const areyouTheConversationOwner= async (req: Request, res: Response, nex
 
 export const areyouThePlantSittingOwnerOrTheBooker= async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const conversationId = req.params.conversationId
-        const conversation = await getOneConversationById(new mongoose.Types.ObjectId(conversationId.trim()))
-        const plantSitting = await getOnePlantSittingById(new mongoose.Types.ObjectId(conversation?.plantSitting._id))
+        const requestId = req.params.requestId
+        const request = await getOneRequestById(new mongoose.Types.ObjectId(requestId.trim()))
+        const plantSitting = await getOnePlantSittingById(new mongoose.Types.ObjectId(request?.plantSitting._id))
         if (plantSitting) {
             const plant = await getOnePlantById(plantSitting.plant._id)
             if (plant){
-                if (req.user._id.equals(plant.user._id)||req.user._id.equals(conversation?.booker._id) ) {
+                if (req.user._id.equals(plant.user._id)||req.user._id.equals(request?.booker._id) ) {
                     next()
                 } else {
                     res.status(404).send({ message: "Your are not allowed" });

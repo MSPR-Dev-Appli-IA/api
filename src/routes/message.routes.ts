@@ -5,10 +5,10 @@ import upload from '../config/image.config'
 const router = Router();
 
 import  {requireAuth} from "../middleware/AuthMiddleware";
-import { areyouThePlantSittingOwnerOrTheBooker } from "../middleware/ConversationMiddleware";
+import { areyouThePlantSittingOwnerOrTheBooker } from "../middleware/RequestMiddleware";
 
 
-router.post("/plantSitting/image/:conversationId",  requireAuth,areyouThePlantSittingOwnerOrTheBooker,upload.single("file"), postImageMessage);
-router.post("/plantSitting/:conversationId",  requireAuth,areyouThePlantSittingOwnerOrTheBooker, postContentMessage);
+router.post("/plantSitting/image/:requestId",  requireAuth,areyouThePlantSittingOwnerOrTheBooker,upload.single("file"), postImageMessage);
+router.post("/plantSitting/:requestId",  requireAuth,areyouThePlantSittingOwnerOrTheBooker, postContentMessage);
 
 export default router;
