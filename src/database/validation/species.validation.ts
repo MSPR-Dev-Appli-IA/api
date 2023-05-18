@@ -12,17 +12,17 @@ const speciesValidation = Joi.object({
   }),
 
   description: Joi.string().min(5).messages({
-    "string.min": "Le champs description au soleil est invalide  ",
+    "string.min": "Le champs description au soleil est trop court  ",
 }),
   sunExposure: Joi.string().min(2).messages({
-    "string.min": "Le champs exposition au soleil est invalide  ",
+    "string.min": "Le champs exposition au soleil est trop court  ",
 
   }),
   watering: Joi.string().min(2).messages({
-    "string.min": "Le champs arrosage   n'est pas valide",
+    "string.min": "Le champs arrosage est trop court",
   }),
   optimalTemperature: Joi.string().min(2).messages({
-    "string.min": "Le champs temperature optimal n'est pas valide",
+    "string.min": "Le champs temperature optimal est trop court",
   }),
 
 

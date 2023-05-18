@@ -67,28 +67,27 @@ export const getSpecies = async (req: Request, res: Response, _: NextFunction) =
       await speciesValidation.validateAsync(req.body, { abortEarly: false });
       const species = await createSpecies(req.body);
       res.status(200).send(species);
+      return ;
     } catch (e) {
-      const errors = [];
-      const validationError = [];
+      const field: any[] = [];
+      const message: any[] = [];
       if (e instanceof ValidationError) {
         e.details.forEach(item => {
-          validationError.push({
-            field: item.path[0],
-            message: item.message
-          })
+          field.push(item.path[0])
+          message.push(item.message)
         });
-        e.details.map((error) => {
-          res.status(400).send({ field: error.path[0], message: error.message });
-        });
-      }else {
-        errors.push({ field: "error", message: e })
 
+        res.status(400).send({
+          field: field,
+          message: message
+        });
+        return;
+      }else {
         res.status(500).send({
           field: ["error"],
           message: ["An error was occurred. Please contact us"]
         });
-    }
-
+      }
     }
     
   };
