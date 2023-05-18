@@ -15,6 +15,6 @@ router.delete("/:speciedId",  requireAuth,isItBotanist, removeSpecies);
 
 router.post("/addImage/",requireAuth,isItBotanist,upload.single("file"),addImageFromSpecies)
 
-router.delete("/deleteImage/:speciedId/:imageId",  requireAuth,isItBotanist, removeImageFromSpecies);
+router.delete("/:speciedId/:imageId",  requireAuth,isItBotanist, removeImageFromSpecies);
 
 export default router;

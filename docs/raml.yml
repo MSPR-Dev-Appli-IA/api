@@ -404,7 +404,7 @@ protocols: [HTTPS]
                   "message": ["An error was occurred. Please contact us"]
                 }
 
-  /deleteImage/{speciesId}/{imageId}:
+  /{speciesId}/{imageId}:
     delete:
       description: Delete the image of a species
       securedBy: [ jwtBotanist ]
