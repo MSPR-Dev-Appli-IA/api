@@ -4,7 +4,7 @@ import  {app} from "../index";
 import { IUser,UserjwtToken } from "../interfaces";
 import { NextFunction, Request, Response } from "express";
 
-const key = process.env.API_KEY ? process.env.API_KEY : ""
+const key = process.env.JWTKEY ? process.env.JWTKEY : ""
 const createJwtToken = ({ user, id }:UserjwtToken) => {
   
   const jwtToken = jwt.sign(
@@ -33,37 +33,44 @@ const checkExpirationToken = (token:JwtPayload, res:Response) => {
     return token;
   } else if (nowInSec > tokenExp && nowInSec - tokenExp < 60 * 60 * 24) {
     const refreshedToken = createJwtToken({user: null,id: token.sub });
-    res.cookie("jwt", refreshedToken);
+    res.cookie("jwt", refreshedToken, { sameSite: 'none', secure: true});
     return jwt.verify(refreshedToken, key);
   } else {
-    throw new Error("token expired");
+    res.clearCookie("jwt");
+    res.status(401).send({
+      field: ["error"],
+      message: ["Token expired."]
+    })
   }
 }
 return;
 };
 
-const extractUserFromToken = async (req:Request, res:Response, next:NextFunction) => {
+const extractUserFromToken = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies.jwt;
   if (token) {
     try {
-      const  decodedToken   = jwt.verify(token, key, { ignoreExpiration: true }) as JwtPayload ;
-      const decodedTokenCheck = checkExpirationToken(decodedToken  , res);
-      if (decodedTokenCheck){
-      const user = await findUserPerId(decodedTokenCheck.sub as string);
-      if (user) {
-        req.user = user;
-        next();
-      } else {
-        res.clearCookie("jwt");
-        res.json(null)
-      }
-      }else{
-        res.clearCookie("jwt");
-        res.json(null)
+      const decodedToken = jwt.verify(token, key, {ignoreExpiration: true}) as JwtPayload;
+      const decodedTokenCheck = checkExpirationToken(decodedToken, res);
+      if (decodedTokenCheck) {
+        const user = await findUserPerId(decodedTokenCheck.sub as string);
+        if (user) {
+          req.user = user;
+          next();
+        } else {
+          res.clearCookie("jwt");
+          res.status(404).send({
+            field: ["error"],
+            message: ["User not Found. Please contact us."]
+          })
+        }
       }
     } catch (e) {
       res.clearCookie("jwt");
-      res.json(null)
+      res.status(500).send({
+        field: ["error"],
+        message: ["An error was occurred. Please contact us"]
+      })
     }
   } else {
     next();

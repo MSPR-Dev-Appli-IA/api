@@ -66,14 +66,26 @@ export const getSpecies  = async (req:Request, res:Response, _:NextFunction) => 
       res.status(200).send(species);
     } catch (e) {
       const errors = [];
+      const validationError = [];
       if (e instanceof ValidationError) {
+        e.details.forEach(item => {
+          validationError.push({
+            field: item.path[0],
+            message: item.message
+          })
+        });
         e.details.map((error) => {
-          errors.push({ field: error.path[0], message: error.message });
+          res.status(400).send({ field: error.path[0], message: error.message });
         });
       }else {
         errors.push({ field: "error", message: e })
+
+        res.status(500).send({
+          field: ["error"],
+          message: ["An error was occurred. Please contact us"]
+        });
     }
-      res.status(404).send({  errors });
+
     }
     
   };
@@ -99,7 +111,6 @@ export const getSpecies  = async (req:Request, res:Response, _:NextFunction) => 
     } catch (e) {
       res.status(404).send("error");
     }
-    
   };
 
 
