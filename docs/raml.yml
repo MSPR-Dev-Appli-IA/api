@@ -48,47 +48,6 @@ protocols: [HTTPS]
                   "field": ["error"],
                   "message": ["L'email et/ou le mot de passe est incorrect"]
                 }
-  /logout:
-    get:
-      description: Log out a user using it's JWT.
-      securedBy: [ jwt ]
-      responses:
-        204:
-  /me:
-    get:
-      description: Get user informations.
-      securedBy: [ jwt ]
-      responses:
-        200:
-          description: User informations.
-          body:
-            application/json:
-              type: object
-              example: |
-                {
-                  "username": "Test",
-                  "firstname": "Test",
-                  "lastname": "Test",
-                  "role": "6465d4ab9cf91b1420a3f83c",
-                  "created_at": "2023-05-14T15:08:28.295+00:00",
-                  "deleted_at": "",
-                  "local": {
-                    "email": "test@test.com",
-                    "password": ""
-                  },
-                  "image": ""
-                }
-
-        400:
-          description: User not found.
-          body:
-            application/json:
-              type: object
-              example: |
-                {
-                  "field": ["error"],
-                  "message": ["User not Found"]
-                }
   /signup:
     post:
       description: Allows to create account
@@ -143,7 +102,47 @@ protocols: [HTTPS]
                   "field": ["error"],
                   "message": ["Your are always logged"]
                 }
+  /me:
+    get:
+      description: Get user informations.
+      securedBy: [ jwt ]
+      responses:
+        200:
+          description: User informations.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "username": "Test",
+                  "firstname": "Test",
+                  "lastname": "Test",
+                  "role": "6465d4ab9cf91b1420a3f83c",
+                  "created_at": "2023-05-14T15:08:28.295+00:00",
+                  "deleted_at": "",
+                  "local": {
+                    "email": "test@test.com",
+                    "password": ""
+                  },
+                  "image": ""
+                }
 
+        404:
+          description: User not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["User not Found"]
+                }
+  /logout:
+    get:
+      description: Log out a user using it's JWT.
+      securedBy: [ jwt ]
+      responses:
+        204:
 securitySchemes:
   jwt:
     description: JWT Bearer token.
