@@ -159,15 +159,15 @@ protocols: [HTTPS]
                 [
                   {
                     "name": "Rosa mosqueta",
+                    "url": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a",
                     "images" : [
                       { 
-                        path: "https://picturethisai.com/image-handle/website_cmsname/image/1080/157428813641285633.jpeg?x-oss-process=image/format,webp/quality,q_60/resize,l_400&v=1.0"
+                        path: "https://api.arosaje-stage.locascio.fr/public/image/rosa.jpg"
                       }
                     ],
-                    description: "Rosa mosqueta is also known as the musk rose because of its characteristic musky scent. It is often confused with Rosa brunonii, which has a similar aroma but flowers at a different time.",
-                    sunExposure: "Rosa mosqueta does best with exposure to full or part sun. They will perform best with direct morning light, but in summer they need protection from the strong afternoon sun",
-                    watering: "Every day",
-                    optimalTemperature: 50
+                    "sunExposure": "Rosa mosqueta does best with exposure to full or part sun. They will perform best with direct morning light, but in summer they need protection from the strong afternoon sun",
+                    "watering": "Every day",
+                    "optimalTemperature": 50
                   }
                 ]
         500:

@@ -8,6 +8,8 @@ import  mongoose from 'mongoose';
 import * as fs from 'fs';
 
 const limit:number = 5
+const API_HOSTNAME = (process.env.API_HOSTNAME) ? process.env.API_HOSTNAME : ""
+const API_VERSION = (process.env.API_VERSION) ? process.env.API_VERSION : ""
 
 export const getSpecies = async (req: Request, res: Response, _: NextFunction) => {
   try {
@@ -15,11 +17,24 @@ export const getSpecies = async (req: Request, res: Response, _: NextFunction) =
     order = order == "ASC" ? 1 : -1
     const skip: number = limit * page - limit;
     const species = await findLimitedSpecies(limit, skip, order, search)
-    res.status(200).json(species);
+    const result: any[] = []
+
+    species.forEach(item => {
+      result.push({
+          name: item.name,
+          url: API_HOSTNAME + "/api" + API_VERSION + "/species/" + item._id,
+          images: item.images,
+          sunExposure: item.sunExposure,
+          watering: item.watering,
+          optimalTemperature: item.optimalTemperature
+        })
+    })
+
+    res.status(200).json(result);
   } catch (e) {
     res.status(500).send({
-      "field": ["error"],
-      "message": ["An error was occurred. Please contact us"]
+      field: ["error"],
+      message: ["An error was occurred. Please contact us"]
     });
   }
 };
@@ -42,9 +57,6 @@ export const getSpecies = async (req: Request, res: Response, _: NextFunction) =
   export const updateSpecies = async (req:Request, res:Response, _:NextFunction) => {
     try {
       const speciesId = req.body.speciesId;
-
-      const API_HOSTNAME = (process.env.API_HOSTNAME) ? process.env.API_HOSTNAME : ""
-      const API_VERSION = (process.env.API_VERSION) ? process.env.API_VERSION : ""
 
       await speciesValidation.validateAsync(req.body, { abortEarly: false });
       await updateSpecieWithSpeciesId(new  mongoose.Types.ObjectId(speciesId.trim()),req.body);
