@@ -122,7 +122,6 @@ export const getOneSpecies = async (req: Request, res: Response, _: NextFunction
         });
       }
     }
-    
   };
 
 
@@ -172,24 +171,29 @@ export const getOneSpecies = async (req: Request, res: Response, _: NextFunction
     
   };
 
-  export const removeSpecies = async (req:Request, res:Response, _:NextFunction) => {
-    try {
-      const speciesId = req.params.speciedId
-      const species = await findOneSpecies(new  mongoose.Types.ObjectId(speciesId.trim()))
-      if (species){
-        species.images.forEach(async(image) => {
-          fs.unlinkSync("public/image/" + image.path);
-          await deleteImage(image._id)
-        });
-      await deleteSpeciesWithSpeciesId(new  mongoose.Types.ObjectId(speciesId.trim()))
-      res.status(200).send()
+export const removeSpecies = async (req: Request, res: Response, _: NextFunction) => {
+  try {
+    const speciesId = req.params.speciedId
+    const species = await findOneSpecies(new mongoose.Types.ObjectId(speciesId.trim()))
+    if (species) {
+      for (const image of species.images) {
+        fs.unlinkSync("public/image/" + image.path);
+        await deleteImage(image._id)
       }
-      else{
-        res.status(404).send("Cet espece de plante n'existe pas  n'existe pas");
-      }
-
-    } catch (e) {
-      res.status(404).send("error");
+      await deleteSpeciesWithSpeciesId(new mongoose.Types.ObjectId(speciesId.trim()))
+      res.status(204).send()
+      return ;
     }
-    
-  };
+    res.status(404).send({
+      field: ["error"],
+      message: ["Species not Found."]
+    });
+
+  } catch (e) {
+    res.status(500).send({
+      field: ["error"],
+      message: ["An error was occurred. Please contact us."]
+    });
+  }
+
+};
