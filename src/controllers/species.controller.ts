@@ -39,20 +39,25 @@ export const getSpecies = async (req: Request, res: Response, _: NextFunction) =
   }
 };
 
-  export const getOneSpecies = async (req:Request, res:Response, _:NextFunction) => {
-    try {
-      const speciesId = req.params.speciesId;
-      const species = await findOneSpecies(new  mongoose.Types.ObjectId(speciesId.trim()))
-      if(species){
-        res.status(200).json( species );
-      }else{
-      res.status(404).send({ message: "Cette espece de plante n'existe pas" });
-      }
-    } catch (e) {
-      res.status(404).send({ message: "Erreur" });
+export const getOneSpecies = async (req: Request, res: Response, _: NextFunction) => {
+  try {
+    const speciesId = req.params.speciesId;
+    const species = await findOneSpecies(new mongoose.Types.ObjectId(speciesId.trim()))
+    if (species) {
+      res.status(200).json(species);
+      return ;
     }
-    
-  };
+    res.status(404).send({
+      field: ["error"],
+      message: ["Species not Found."]
+    });
+  } catch (e) {
+    res.status(500).send({
+      field: ["error"],
+      message: ["An error was occurred. Please contact us."]
+    });
+  }
+};
 
   export const updateSpecies = async (req:Request, res:Response, _:NextFunction) => {
     try {
