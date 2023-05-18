@@ -303,6 +303,49 @@ protocols: [HTTPS]
                   "field": ["error"],
                   "message": ["An error was occurred. Please contact us"]
                 }
+  /species/addImage/{speciesId}:
+    post:
+      description: Add image to an species
+      securedBy: [ jwtBotanist ]
+      body:
+        multipart/form-data:
+          properties:
+            file:
+              description: The name of file to be uploaded
+              type: file
+              fileTypes: ['*/*']
+      responses:
+        200:
+          description: Successful upload image
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "speciesInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a"
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["file"],
+                  "message": ["The file attribute is not found"]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+
   /deleteImage/{speciesId}/{imageId}:
     delete:
       description: Delete the image of a species
