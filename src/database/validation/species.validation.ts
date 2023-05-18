@@ -23,7 +23,7 @@ const createSpeciesValidation = Joi.object({
 });
 
 const updateSpeciesValidation = Joi.object({
-  speciesId: Joi.string().min(24).required().messages({
+  speciesId: Joi.string().length(24).required().messages({
     "string.min": "Le numéro d'espèce recherché est invalide",
   }),
 
@@ -49,7 +49,5 @@ const updateSpeciesValidation = Joi.object({
 });
 
 
-export  {
-  createSpeciesValidation, updateSpeciesValidation
-  };
+export  {createSpeciesValidation, updateSpeciesValidation};
   

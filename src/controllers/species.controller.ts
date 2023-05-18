@@ -5,7 +5,10 @@ import  { ValidationError } from "joi";
 import { newImage } from "./image.controller";
 import  mongoose from 'mongoose';
 import * as fs from 'fs';
-import {createSpeciesValidation, updateSpeciesValidation} from "../database/validation/species.validation";
+import {
+  createSpeciesValidation,
+  updateSpeciesValidation
+} from "../database/validation/species.validation";
 import {API_HOSTNAME, API_VERSION} from "../index";
 
 const limit:number = 5
@@ -78,24 +81,7 @@ export const getOneSpecies = async (req: Request, res: Response, _: NextFunction
       }
 
     } catch (e) {
-      const field: any[] = [];
-      const message: any[] = [];
-      if (e instanceof ValidationError) {
-        e.details.forEach(item => {
-          field.push(item.path[0])
-          message.push(item.message)
-        });
-
-        res.status(400).send({
-          field: field,
-          message: message
-        });
-        return;
-      }
-      res.status(500).send({
-        field: ["error"],
-        message: ["An error was occurred. Please contact us"]
-      });
+      return400or500Errors(e, res)
     }
     
   };
@@ -108,49 +94,40 @@ export const getOneSpecies = async (req: Request, res: Response, _: NextFunction
       const species = await createSpecies(req.body);
       res.status(200).send(species);
     } catch (e) {
-      const field: any[] = [];
-      const message: any[] = [];
-      if (e instanceof ValidationError) {
-        e.details.forEach(item => {
-          field.push(item.path[0])
-          message.push(item.message)
-        });
-
-        res.status(400).send({
-          field: field,
-          message: message
-        });
-      }else {
-        res.status(500).send({
-          field: ["error"],
-          message: ["An error was occurred. Please contact us"]
-        });
-      }
+      return400or500Errors(e, res)
     }
   };
 
 
-
-
-
-
-
-  export const addImageFromSpecies = async (req:Request, res:Response, _:NextFunction) => {
-    try {
-      const file = req.file as Express.Multer.File
-      const speciesId = req.params.speciesId;
-
-      if (file){
-        const imageSpecies = await  newImage(file)
-        const newSpecies = await addImageWithSpeciesId(imageSpecies,new  mongoose.Types.ObjectId(speciesId.trim()))
-        res.status(200).send(newSpecies);
+export const addImageFromSpecies = async (req: Request, res: Response, _: NextFunction) => {
+  try {
+    const file = req.file as Express.Multer.File
+    const speciesId = req.body.speciesId
+    const species = await findOneSpecies(new mongoose.Types.ObjectId(speciesId.trim()))
+    if (file) {
+      if(species){
+        const imageSpecies = await newImage(file)
+        await addImageWithSpeciesId(imageSpecies, new mongoose.Types.ObjectId(req.body.speciesId.trim()))
+        res.status(200).send({
+          status: "success",
+          speciesInfo: API_HOSTNAME + "/api" + API_VERSION + "/species/" + req.body.speciesId.trim()
+        });
       }else{
-        res.status(404).send("No file");
+        res.status(400).send({
+          field: ["error"],
+          message: ["Species not Found"]
+        })
       }
-    } catch (e) {
-      res.status(404).send("error");
+    } else {
+      res.status(400).send({
+        field: ["error"],
+        message: ["Only image are allowed"]
+      });
     }
-  };
+  } catch (e) {
+    return400or500Errors(e, res)
+  }
+};
 
 
 
@@ -202,3 +179,24 @@ export const removeSpecies = async (req: Request, res: Response, _: NextFunction
   }
 
 };
+
+function return400or500Errors(error: any, res: Response){
+  const field: any[] = [];
+  const message: any[] = [];
+  if (error instanceof ValidationError) {
+    error.details.forEach(item => {
+      field.push(item.path[0])
+      message.push(item.message)
+    });
+
+    res.status(400).send({
+      field: field,
+      message: message
+    });
+  }else {
+    res.status(500).send({
+      field: ["error"],
+      message: ["An error was occurred. Please contact us"]
+    });
+  }
+}
