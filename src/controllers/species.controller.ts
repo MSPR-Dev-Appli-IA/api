@@ -6,10 +6,9 @@ import { newImage } from "./image.controller";
 import  mongoose from 'mongoose';
 import * as fs from 'fs';
 import {createSpeciesValidation, updateSpeciesValidation} from "../database/validation/species.validation";
+import {API_HOSTNAME, API_VERSION} from "../index";
 
 const limit:number = 5
-const API_HOSTNAME = (process.env.API_HOSTNAME) ? process.env.API_HOSTNAME : ""
-const API_VERSION = (process.env.API_VERSION) ? process.env.API_VERSION : ""
 
 export const getSpecies = async (req: Request, res: Response, _: NextFunction) => {
   try {

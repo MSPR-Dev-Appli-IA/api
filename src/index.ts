@@ -45,6 +45,8 @@ app.use(function (_req:Request, res:Response, next:NextFunction) {
 
 import "./config/jwt.config";
 
+const API_HOSTNAME = (process.env.API_HOSTNAME) ? process.env.API_HOSTNAME : ""
+const API_VERSION = (process.env.API_VERSION) ? process.env.API_VERSION : ""
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(router);
@@ -56,3 +58,5 @@ app.get('*', (_:Request, res:Response) => {
 if (process.env.NODE_ENV !== 'test') {
     app.listen(8000);
 }
+
+export {API_HOSTNAME, API_VERSION};
