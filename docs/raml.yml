@@ -143,6 +143,43 @@ protocols: [HTTPS]
       securedBy: [ jwt ]
       responses:
         204:
+
+/species:
+  /:
+    get:
+      description: Get all species information's
+      securedBy: [ jwt ]
+      responses:
+        200:
+          description: Get all species information's
+          body:
+            application/json:
+              type: array
+              example: |
+                [
+                  {
+                    "name": { type: String, required: true ,unique:true},
+                    "images" : [
+                      { 
+                        path: "https://picturethisai.com/image-handle/website_cmsname/image/1080/157428813641285633.jpeg?x-oss-process=image/format,webp/quality,q_60/resize,l_400&v=1.0"
+                      }
+                    ],
+                    description: "Rosa mosqueta is also known as the musk rose because of its characteristic musky scent. It is often confused with Rosa brunonii, which has a similar aroma but flowers at a different time.",
+                    sunExposure: "Rosa mosqueta does best with exposure to full or part sun. They will perform best with direct morning light, but in summer they need protection from the strong afternoon sun",
+                    watering: "Every day",
+                    optimalTemperature: 50
+                  }
+                ]
+        500:
+          description: An error was occurred
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
 securitySchemes:
   jwt:
     description: JWT Bearer token.
