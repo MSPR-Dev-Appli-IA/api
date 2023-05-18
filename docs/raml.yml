@@ -105,7 +105,7 @@ protocols: [HTTPS]
   /me:
     get:
       description: Get user informations.
-      securedBy: [ jwt ]
+      securedBy: [ jwtUser ]
       responses:
         200:
           description: User informations.
@@ -140,17 +140,298 @@ protocols: [HTTPS]
   /logout:
     get:
       description: Log out a user using it's JWT.
-      securedBy: [ jwt ]
+      securedBy: [ jwtUser ]
       responses:
         204:
+
+/species:
+  /:
+    get:
+      description: Get all species information's
+      securedBy: [ jwtUser ]
+      responses:
+        200:
+          description: Get all species information's
+          body:
+            application/json:
+              type: array
+              example: |
+                [
+                  {
+                    "name": "Rosa mosqueta",
+                    "images" : [
+                      { 
+                        path: "https://picturethisai.com/image-handle/website_cmsname/image/1080/157428813641285633.jpeg?x-oss-process=image/format,webp/quality,q_60/resize,l_400&v=1.0"
+                      }
+                    ],
+                    description: "Rosa mosqueta is also known as the musk rose because of its characteristic musky scent. It is often confused with Rosa brunonii, which has a similar aroma but flowers at a different time.",
+                    sunExposure: "Rosa mosqueta does best with exposure to full or part sun. They will perform best with direct morning light, but in summer they need protection from the strong afternoon sun",
+                    watering: "Every day",
+                    optimalTemperature: 50
+                  }
+                ]
+        500:
+          description: An error was occurred
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+    post:
+      description: Create an species
+      securedBy: [ jwtBotanist ]
+      body:
+        application/json:
+          type: object
+          example: |
+            {
+              "name": "Rosa mosqueta",
+              description: "Rosa mosqueta is also known as the musk rose because of its characteristic musky scent. It is often confused with Rosa brunonii, which has a similar aroma but flowers at a different time.",
+              sunExposure: "Rosa mosqueta does best with exposure to full or part sun. They will perform best with direct morning light, but in summer they need protection from the strong afternoon sun",
+              watering: "Every day",
+              optimalTemperature: 50
+            }
+      responses:
+        200:
+          description: Save species
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "path": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a"
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["name"],
+                  "message": ["MongoServerError: E11000 duplicate key error collection"]
+                }
+    put:
+      description:
+      securedBy: [ jwtBotanist ]
+      body:
+        application/json:
+          type: object
+          example: |
+            {
+              "speciesId": "646600435a318f27dd1d515a",
+              "name": "Daylilies 'Strawberry Candy'",
+              "description": "Daylilies 'Strawberry Candy' is one of the most popular reblooming daylilies, hybridized by Stamile in 1989",
+              "sunExposure": "It does best with exposure to full or part sun. They will perform best with direct morning light, but in summer they need protection from the strong afternoon sun",
+              "watering": "Every day",
+              "optimalTemperature": 30
+            }
+      responses:
+        200:
+          description: Successful update species
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "path": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a"
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["name"],
+                  "message": ["MongoServerError: E11000 duplicate key error collection"]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+  /{speciesId}:
+    get:
+      description: Get one species information's
+      securedBy: [ jwtUser ]
+      responses:
+        200:
+          description: Get one species information's
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "name": "Rosa mosqueta",
+                  "images" : [
+                    { 
+                      path: "https://picturethisai.com/image-handle/website_cmsname/image/1080/157428813641285633.jpeg?x-oss-process=image/format,webp/quality,q_60/resize,l_400&v=1.0"
+                    }
+                  ],
+                  description: "Rosa mosqueta is also known as the musk rose because of its characteristic musky scent. It is often confused with Rosa brunonii, which has a similar aroma but flowers at a different time.",
+                  sunExposure: "Rosa mosqueta does best with exposure to full or part sun. They will perform best with direct morning light, but in summer they need protection from the strong afternoon sun",
+                  watering: "Every day",
+                  optimalTemperature: 50
+                }
+        404:
+          description: Species not Found
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Species not Found"]
+                }
+        500:
+          description: An error was occurred
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+    delete:
+      description: Remove the species
+      securedBy: [ jwtBotanist ]
+      responses:
+        204:
+          description: Successful removal
+        404:
+          description: Species not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Species not Found"]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+  /addImage:
+    post:
+      description: Add image to an species
+      securedBy: [ jwtBotanist ]
+      body:
+        multipart/form-data:
+          properties:
+            file:
+              type: file
+              fileTypes: ['*/*']
+            speciesId:
+              type: string
+      responses:
+        200:
+          description: Successful upload image
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "speciesInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a"
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["file"],
+                  "message": ["The file attribute is not found"]
+                }
+        404:
+          description: Species not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Species not Found"]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+
+  /deleteImage/{speciesId}/{imageId}:
+    delete:
+      description: Delete the image of a species
+      securedBy: [ jwtBotanist ]
+      responses:
+        200:
+          description: Successful suppression
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "type": "success",
+                  "message": "File deleted"
+                }
+        404:
+          description: Species or image not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message: ["Species or image not found"]
+                }
 securitySchemes:
-  jwt:
-    description: JWT Bearer token.
-    type: x-jwt
+  jwtUser:
+    description: JWT Bearer token for users.
+    type: x-jwtUSer
     describedBy:
       responses:
         401:
           description: Bad token.
+        204:
+          description: Token valid.
+      headers:
+        Set-Cookie:
+          description: Cookie Content
+          type: string
+          example: "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkplYW4gUGllcnJlIiwiaWF0IjoxNTE2MjM5MDIyfQ.jnwOHy2wQm1LG5upI_y0lr0u9dN8yBQUWR0uKH15jWE; Path=/; Secure; SameSite=None; Domain=127.0.0.1"
+
+  jwtBotanist:
+    description: JWT Bearer token for botanists.
+    type: x-jwtBotanist
+    describedBy:
+      responses:
+        401:
+          description: Bad token or Invalid Permission.
         204:
           description: Token valid.
       headers:
