@@ -215,6 +215,52 @@ protocols: [HTTPS]
                   "field": ["name"],
                   "message": ["MongoServerError: E11000 duplicate key error collection"]
                 }
+    put:
+      description:
+      securedBy: [ jwtBotanist ]
+      body:
+        application/json:
+          type: object
+          example: |
+            {
+              "speciesId": "646600435a318f27dd1d515a",
+              "name": "Daylilies 'Strawberry Candy'",
+              "description": "Daylilies 'Strawberry Candy' is one of the most popular reblooming daylilies, hybridized by Stamile in 1989",
+              "sunExposure": "It does best with exposure to full or part sun. They will perform best with direct morning light, but in summer they need protection from the strong afternoon sun",
+              "watering": "Every day",
+              "optimalTemperature": 30
+            }
+      responses:
+        200:
+          description: Successful update species
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "path": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a"
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["name"],
+                  "message": ["MongoServerError: E11000 duplicate key error collection"]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
   /{speciesId}:
     get:
       description: Get one species information's
@@ -258,40 +304,21 @@ protocols: [HTTPS]
                   "field": ["error"],
                   "message": ["An error was occurred. Please contact us"]
                 }
-    put:
-      description:
+    delete:
+      description: Remove the species
       securedBy: [ jwtBotanist ]
-      body:
-        application/json:
-          type: object
-          example: |
-            {
-              "name": "Daylilies 'Strawberry Candy'",
-              description: "Daylilies 'Strawberry Candy' is one of the most popular reblooming daylilies, hybridized by Stamile in 1989",
-              sunExposure: "It does best with exposure to full or part sun. They will perform best with direct morning light, but in summer they need protection from the strong afternoon sun",
-              watering: "Every day",
-              optimalTemperature: 30
-            }
       responses:
-        200:
-          description: Successful update species
+        204:
+          description: Successful removal
+        404:
+          description: Species not found.
           body:
             application/json:
               type: object
               example: |
                 {
-                  "status": "success",
-                  "path": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a"
-                }
-        400:
-          description: Error with the passed parameters.
-          body:
-            application/json:
-              type: object
-              example: |
-                {
-                  "field": ["name"],
-                  "message": ["MongoServerError: E11000 duplicate key error collection"]
+                  "field": ["error"],
+                  "message": ["Species not Found"]
                 }
         500:
           description: An error was occurred.
@@ -303,7 +330,7 @@ protocols: [HTTPS]
                   "field": ["error"],
                   "message": ["An error was occurred. Please contact us"]
                 }
-  /species/addImage/{speciesId}:
+  /addImage:
     post:
       description: Add image to an species
       securedBy: [ jwtBotanist ]
@@ -311,9 +338,10 @@ protocols: [HTTPS]
         multipart/form-data:
           properties:
             file:
-              description: The name of file to be uploaded
               type: file
               fileTypes: ['*/*']
+            speciesId:
+              type: string
       responses:
         200:
           description: Successful upload image
@@ -335,6 +363,16 @@ protocols: [HTTPS]
                   "field": ["file"],
                   "message": ["The file attribute is not found"]
                 }
+        404:
+          description: Species not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Species not Found"]
+                }
         500:
           description: An error was occurred.
           body:
@@ -351,8 +389,16 @@ protocols: [HTTPS]
       description: Delete the image of a species
       securedBy: [ jwtBotanist ]
       responses:
-        204:
+        200:
           description: Successful suppression
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "type": "success",
+                  "message": "File deleted"
+                }
         404:
           description: Species or image not found.
           body:
