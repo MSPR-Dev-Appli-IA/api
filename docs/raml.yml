@@ -215,6 +215,16 @@ protocols: [HTTPS]
                   "field": ["name"],
                   "message": ["MongoServerError: E11000 duplicate key error collection"]
                 }
+        404:
+          description: Species not Found
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Species not Found"]
+                }
     put:
       description:
       securedBy: [ jwtBotanist ]
@@ -250,6 +260,16 @@ protocols: [HTTPS]
                 {
                   "field": ["name"],
                   "message": ["MongoServerError: E11000 duplicate key error collection"]
+                }
+        404:
+          description: Species not Found
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Species not Found"]
                 }
         500:
           description: An error was occurred.

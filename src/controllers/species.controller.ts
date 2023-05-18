@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import {findLimitedSpecies,findOneSpecies,createSpecies,updateSpecieWithSpeciesId,addImageWithSpeciesId,deleteImageWithSpeciesId,deleteSpeciesWithSpeciesId} from "../queries/species.queries"
 import { deleteImage ,getImageById} from "../queries/image.queries";
-import {speciesValidation} from "../database/validation/species.validation"
 import  { ValidationError } from "joi";
 import { newImage } from "./image.controller";
 import  mongoose from 'mongoose';
 import * as fs from 'fs';
+import {createSpeciesValidation, updateSpeciesValidation} from "../database/validation/species.validation";
 
 const limit:number = 5
 const API_HOSTNAME = (process.env.API_HOSTNAME) ? process.env.API_HOSTNAME : ""
@@ -63,13 +63,21 @@ export const getOneSpecies = async (req: Request, res: Response, _: NextFunction
     try {
       const speciesId = req.body.speciesId;
 
-      await speciesValidation.validateAsync(req.body, { abortEarly: false });
-      await updateSpecieWithSpeciesId(new  mongoose.Types.ObjectId(speciesId.trim()),req.body);
-      res.status(200).json({
-        status: "success",
-        path: API_HOSTNAME + "/api" + API_VERSION + "/species/" + speciesId
-      });
- 
+      await updateSpeciesValidation.validateAsync(req.body, { abortEarly: false });
+      const updateSpecies = await updateSpecieWithSpeciesId(new  mongoose.Types.ObjectId(speciesId.trim()),req.body);
+
+      if(updateSpecies){
+        res.status(200).json({
+          status: "success",
+          path: API_HOSTNAME + "/api" + API_VERSION + "/species/" + speciesId
+        })
+      }else{
+        res.status(404).send({
+          field: ["error"],
+          message: ["Species not Found."]
+        })
+      }
+
     } catch (e) {
       const field: any[] = [];
       const message: any[] = [];
@@ -97,10 +105,9 @@ export const getOneSpecies = async (req: Request, res: Response, _: NextFunction
 
   export const newSpecies = async (req:Request, res:Response, _:NextFunction) => {
     try {
-      await speciesValidation.validateAsync(req.body, { abortEarly: false });
+      await createSpeciesValidation.validateAsync(req.body, { abortEarly: false });
       const species = await createSpecies(req.body);
       res.status(200).send(species);
-      return ;
     } catch (e) {
       const field: any[] = [];
       const message: any[] = [];
@@ -114,7 +121,6 @@ export const getOneSpecies = async (req: Request, res: Response, _: NextFunction
           field: field,
           message: message
         });
-        return;
       }else {
         res.status(500).send({
           field: ["error"],
