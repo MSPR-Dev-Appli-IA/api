@@ -1,111 +1,160 @@
 #%RAML 1.0
 ---
 title: Arosaje API
-baseUri: https://api.arosaje-stage.locascio.fr/{version}
+baseUri: https://api.arosaje-stage.locascio.fr/api/{version}
 mediaType: application/json
 version: v1
+protocols: [HTTPS]
 
 /auth:
   /login:
     post:
-      description: Allows to login
+      description: Log-in a user using it's credentials.
       body:
         application/json:
-          type: UserLocal
+          type: object
+          example: |
+            {
+              "email": "test@test.com",
+              "password": "Test"
+            }
       responses:
         200:
+          description: User logged in with correct credentials.
           body:
             application/json:
-              type: UserResponse
-  /logout:
-    get:
-      description: Allows to logout
-      securedBy: [cookie-auth]
-      responses:
-        204:
-        401:
+              type: object
+              example: |
+                {
+                  "status": "You're logged in.",
+                  "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkplYW4gUGllcnJlIiwiaWF0IjoxNTE2MjM5MDIyfQ.jnwOHy2wQm1LG5upI_y0lr0u9dN8yBQUWR0uKH15jWE"
+                }
+        304:
+          description: Always logged
           body:
             application/json:
-              type: UnauthorizedResponse
-  /me:
-    get:
-      description: Allows to get user info
-      securedBy: [cookie-auth]
-      responses:
-        200:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Your are always logged"]
+                }
+        404:
+          description: User not found
           body:
             application/json:
-              type: UserResponse
-        401:
-          body:
-            application/json:
-              type: UnauthorizedResponse
-
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["L'email et/ou le mot de passe est incorrect"]
+                }
   /signup:
     post:
       description: Allows to create account
       body:
         application/json:
-          type: UserForm
-      response:
+          type: object
+          example: |
+            {
+              "email": "test@test.com",
+              "username": "Test",
+              "firstname": "Test",
+              "lastname": "Test",
+              "password": "Azerty"
+            }
+      responses:
         200:
+          description: User created.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "username": "Test",
+                  "firstname": "Test",
+                  "lastname": "Test",
+                  "role": "6465d4ab9cf91b1420a3f83c",
+                  "created_at": "2023-05-14T15:08:28.295+00:00",
+                  "deleted_at": "",
+                  "local": {
+                    "email": "test@test.com",
+                    "password": ""
+                  },
+                  "image": ""
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["email", "password"],
+                  "message": ["MongoServerError: E11000 duplicate key error collection", "Le mot de passe doit être au minimum de 6 caractères"]
+                }
+        304:
+          description: Always logged
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Your are always logged"]
+                }
+  /me:
+    get:
+      description: Get user informations.
+      securedBy: [ jwt ]
+      responses:
+        200:
+          description: User informations.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "username": "Test",
+                  "firstname": "Test",
+                  "lastname": "Test",
+                  "role": "6465d4ab9cf91b1420a3f83c",
+                  "created_at": "2023-05-14T15:08:28.295+00:00",
+                  "deleted_at": "",
+                  "local": {
+                    "email": "test@test.com",
+                    "password": ""
+                  },
+                  "image": ""
+                }
 
-types:
-  UserForm:
-    type: object
-    properties:
-      username: string
-      firstname: string
-      lastname: string
-      email: string
-      password: string
-    example:
-      email: "test@test.com"
-      username: "Test"
-      firstname: "Test"
-      lastname: "Test"
-      password: "Azerty"
-  UserLocal:
-    type: object
-    properties:
-      email: string
-      password: string
-    example:
-      email: "test@test.com"
-      password: "Azerty"
-  IUser:
-    type: object
-    properties:
-      username: string
-      firstname: string
-      lastname: string
-      role: string
-      created_at: datetime
-      deleted_at: datetime?
-      local: UserLocal[]
-  UserResponse:
-    type: object
-    properties:
-      data: IUser[]
-      message: array
-  UnauthorizedResponse:
-    type: object
-    properties:
-      data: object
-      message: string
-    example:
-      "data": { }
-      "message": "Unauthorized: You must to login before"
-
+        404:
+          description: User not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["User not Found"]
+                }
+  /logout:
+    get:
+      description: Log out a user using it's JWT.
+      securedBy: [ jwt ]
+      responses:
+        204:
 securitySchemes:
-  cookie-auth:
-    description: |
-      Custom authentication scheme for jwt cookie.
-    type:
-      x-custom
+  jwt:
+    description: JWT Bearer token.
+    type: x-jwt
     describedBy:
+      responses:
+        401:
+          description: Bad token.
+        204:
+          description: Token valid.
       headers:
-        Cookie:
-          description: |
-            jwt
+        Set-Cookie:
+          description: Cookie Content
           type: string
+          example: "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkplYW4gUGllcnJlIiwiaWF0IjoxNTE2MjM5MDIyfQ.jnwOHy2wQm1LG5upI_y0lr0u9dN8yBQUWR0uKH15jWE; Path=/; Secure; SameSite=None; Domain=127.0.0.1"
