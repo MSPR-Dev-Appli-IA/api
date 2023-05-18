@@ -6,11 +6,15 @@ const router = Router();
 
 import  {requireAuth,isItBotanist} from "../middleware/AuthMiddleware";
 
-router.get("/",  requireAuth, getSpecies);
+router.get("/", requireAuth, getSpecies);
+router.post("/", requireAuth,isItBotanist, newSpecies);
+router.put("/", requireAuth,isItBotanist, updateSpecies);
+
 router.get("/:speciesId",  requireAuth, getOneSpecies);
-router.post("/",  requireAuth,isItBotanist, newSpecies);
-router.post("/:speciesId",requireAuth,isItBotanist, updateSpecies);
-router.post("/addImage/:speciesId",requireAuth,isItBotanist,upload.single("file"),addImageFromSpecies)
-router.delete("/deleteImage/:speciedId/:imageId",  requireAuth,isItBotanist, removeImageFromSpecies);
 router.delete("/:speciedId",  requireAuth,isItBotanist, removeSpecies);
+
+router.post("/addImage/",requireAuth,isItBotanist,upload.single("file"),addImageFromSpecies)
+
+router.delete("/deleteImage/:speciedId/:imageId",  requireAuth,isItBotanist, removeImageFromSpecies);
+
 export default router;

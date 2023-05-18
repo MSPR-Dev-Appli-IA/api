@@ -9,17 +9,20 @@ import * as fs from 'fs';
 
 const limit:number = 5
 
-export const getSpecies  = async (req:Request, res:Response, _:NextFunction) => {
+export const getSpecies = async (req: Request, res: Response, _: NextFunction) => {
   try {
-    let { page=1, order, search } = req.body;
-    order = order == "ASC" ? 1 :-1
-    const skip:number =  limit * page - limit;
-    const species = await findLimitedSpecies(limit,skip,order,search)
-    res.status(200).json( species );
+    let {page = 1, order, search} = req.body;
+    order = order == "ASC" ? 1 : -1
+    const skip: number = limit * page - limit;
+    const species = await findLimitedSpecies(limit, skip, order, search)
+    res.status(200).json(species);
   } catch (e) {
-    res.status(404).send({ message: "Erreur" });
+    res.status(500).send({
+      "field": ["error"],
+      "message": ["An error was occurred. Please contact us"]
+    });
   }
-  };
+};
 
   export const getOneSpecies = async (req:Request, res:Response, _:NextFunction) => {
     try {
