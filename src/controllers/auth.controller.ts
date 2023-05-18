@@ -57,9 +57,8 @@ export const register = async (req: Request, res: Response, _: NextFunction) => 
         const body = req.body;
 
         const role = await getDefaultRole();
-        const user = (await createUser(body, role)).set("local.password", null);
+        await createUser(body, role);
 
-        req.login(user);
         res.status(204)
     } catch (e) {
         return400or500Errors(e, res)
