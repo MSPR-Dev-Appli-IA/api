@@ -195,8 +195,16 @@ protocols: [HTTPS]
               optimalTemperature: 50
             }
       responses:
-        204:
+        200:
           description: Save species
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "path": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a"
+                }
         400:
           description: Error with the passed parameters.
           body:
@@ -242,6 +250,51 @@ protocols: [HTTPS]
                 }
         500:
           description: An error was occurred
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+    put:
+      description:
+      securedBy: [ jwtBotanist ]
+      body:
+        application/json:
+          type: object
+          example: |
+            {
+              "name": "Daylilies 'Strawberry Candy'",
+              description: "Daylilies 'Strawberry Candy' is one of the most popular reblooming daylilies, hybridized by Stamile in 1989",
+              sunExposure: "It does best with exposure to full or part sun. They will perform best with direct morning light, but in summer they need protection from the strong afternoon sun",
+              watering: "Every day",
+              optimalTemperature: 30
+            }
+      responses:
+        200:
+          description: Successful update species
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "path": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a"
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["name"],
+                  "message": ["MongoServerError: E11000 duplicate key error collection"]
+                }
+        500:
+          description: An error was occurred.
           body:
             application/json:
               type: object
