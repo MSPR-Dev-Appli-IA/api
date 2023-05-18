@@ -4,7 +4,7 @@ export const requireAuth = (req:Request, res:Response, next:NextFunction) => {
   if (req.isAuthenticated()) {
     next();
   } else {
-    res.status(404).send({ message: "Your are not logged in" });
+    res.status(401).send({ field: ["error"], message: "Bad token. You must to logged in before" });
   }
 };
 
