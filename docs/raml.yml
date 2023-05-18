@@ -250,6 +250,23 @@ protocols: [HTTPS]
                   "field": ["error"],
                   "message": ["An error was occurred. Please contact us"]
                 }
+  /deleteImage/{speciesId}/{imageId}:
+    delete:
+      description: Delete the image of a species
+      securedBy: [ jwtBotanist ]
+      responses:
+        204:
+          description: Successful suppression
+        404:
+          description: Species or image not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message: ["Species or image not found"]
+                }
 securitySchemes:
   jwtUser:
     description: JWT Bearer token for users.
