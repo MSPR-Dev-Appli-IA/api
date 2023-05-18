@@ -41,21 +41,37 @@ export const getSpecies = async (req: Request, res: Response, _: NextFunction) =
 
   export const updateSpecies = async (req:Request, res:Response, _:NextFunction) => {
     try {
-      const speciesId = req.params.speciesId;
+      const speciesId = req.body.speciesId;
+
+      const API_HOSTNAME = (process.env.API_HOSTNAME) ? process.env.API_HOSTNAME : ""
+      const API_VERSION = (process.env.API_VERSION) ? process.env.API_VERSION : ""
+
       await speciesValidation.validateAsync(req.body, { abortEarly: false });
-      const species = await updateSpecieWithSpeciesId(new  mongoose.Types.ObjectId(speciesId.trim()),req.body);
-      res.status(200).json( species );
+      await updateSpecieWithSpeciesId(new  mongoose.Types.ObjectId(speciesId.trim()),req.body);
+      res.status(200).json({
+        status: "success",
+        path: API_HOSTNAME + "/api" + API_VERSION + "/species/" + speciesId
+      });
  
     } catch (e) {
-      const errors = [];
+      const field: any[] = [];
+      const message: any[] = [];
       if (e instanceof ValidationError) {
-        e.details.map((error) => {
-          errors.push({ field: error.path[0], message: error.message });
+        e.details.forEach(item => {
+          field.push(item.path[0])
+          message.push(item.message)
         });
-      }else {
-        errors.push({ field: "error", message: e })
-    }
-      res.status(404).send({  errors });
+
+        res.status(400).send({
+          field: field,
+          message: message
+        });
+        return;
+      }
+      res.status(500).send({
+        field: ["error"],
+        message: ["An error was occurred. Please contact us"]
+      });
     }
     
   };
