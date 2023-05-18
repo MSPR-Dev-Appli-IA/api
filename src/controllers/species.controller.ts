@@ -9,7 +9,6 @@ import {
     deleteSpeciesWithSpeciesId
 } from "../queries/species.queries"
 import {deleteImage, getImageById} from "../queries/image.queries";
-import {ValidationError} from "joi";
 import {newImage} from "./image.controller";
 import mongoose from 'mongoose';
 import * as fs from 'fs';
@@ -17,7 +16,7 @@ import {
     createSpeciesValidation,
     updateSpeciesValidation
 } from "../database/validation/species.validation";
-import {API_HOSTNAME, API_VERSION} from "../index";
+import {API_HOSTNAME, API_VERSION, return400or500Errors} from "../utils";
 
 const limit: number = 5
 
@@ -190,26 +189,4 @@ export const removeSpecies = async (req: Request, res: Response, _: NextFunction
             message: ["An error was occurred. Please contact us."]
         });
     }
-
 };
-
-function return400or500Errors(error: any, res: Response) {
-    const field: any[] = [];
-    const message: any[] = [];
-    if (error instanceof ValidationError) {
-        error.details.forEach(item => {
-            field.push(item.path[0])
-            message.push(item.message)
-        });
-
-        res.status(400).send({
-            field: field,
-            message: message
-        });
-    } else {
-        res.status(500).send({
-            field: ["error"],
-            message: ["An error was occurred. Please contact us"]
-        });
-    }
-}

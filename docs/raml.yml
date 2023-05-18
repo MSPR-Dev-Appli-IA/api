@@ -48,7 +48,7 @@ protocols: [HTTPS]
                   "field": ["error"],
                   "message": ["L'email et/ou le mot de passe est incorrect"]
                 }
-  /signup:
+  /register:
     post:
       description: Allows to create account
       body:
@@ -63,25 +63,8 @@ protocols: [HTTPS]
               "password": "Azerty"
             }
       responses:
-        200:
+        204:
           description: User created.
-          body:
-            application/json:
-              type: object
-              example: |
-                {
-                  "username": "Test",
-                  "firstname": "Test",
-                  "lastname": "Test",
-                  "role": "6465d4ab9cf91b1420a3f83c",
-                  "created_at": "2023-05-14T15:08:28.295+00:00",
-                  "deleted_at": "",
-                  "local": {
-                    "email": "test@test.com",
-                    "password": ""
-                  },
-                  "image": ""
-                }
         400:
           description: Error with the passed parameters.
           body:

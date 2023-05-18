@@ -1,8 +1,8 @@
 import  { findUserPerEmail, createUser } from "../queries/user.queries";
 import  {userSignupValidation} from "../database/validation/user.validation";
 import { NextFunction, Request, Response } from "express";
-import  { ValidationError } from "joi";
 import {getDefaultRole,getBotanistRole} from "../queries/role.queries";
+import {return400or500Errors} from "../utils";
 
 
 export const login = async (req:Request, res:Response, _:NextFunction) => {
@@ -49,29 +49,21 @@ export const signout = async (req:Request, res:Response, _:NextFunction) => {
 };
 
 
-export const signup = async (req:Request, res:Response, _:NextFunction) => {
+export const register = async (req: Request, res: Response, _: NextFunction) => {
 
     try {
-    await userSignupValidation.validateAsync(req.body, { abortEarly: false });
+        await userSignupValidation.validateAsync(req.body, {abortEarly: false});
 
-    const body = req.body;
+        const body = req.body;
 
-    const role = await getDefaultRole();
-    const user = (await createUser(body, role)).set("local.password",null);
+        const role = await getDefaultRole();
+        const user = (await createUser(body, role)).set("local.password", null);
 
-    req.login(user);
-    res.json(user)
+        req.login(user);
+        res.status(204)
     } catch (e) {
-    const errors = [];
-    if (e instanceof ValidationError) {
-      e.details.map((error) => {
-        errors.push({ field: error.path[0], message: error.message });
-      });
-    } else {
-        errors.push({ field: "error", message: e })
+        return400or500Errors(e, res)
     }
-    res.status(404).send(errors);
-  }
 };
 
 export const createAccountWithBotanistRight = async () => {
