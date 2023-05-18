@@ -105,7 +105,7 @@ protocols: [HTTPS]
   /me:
     get:
       description: Get user informations.
-      securedBy: [ jwt ]
+      securedBy: [ jwtUser ]
       responses:
         200:
           description: User informations.
@@ -140,7 +140,7 @@ protocols: [HTTPS]
   /logout:
     get:
       description: Log out a user using it's JWT.
-      securedBy: [ jwt ]
+      securedBy: [ jwtUser ]
       responses:
         204:
 
@@ -148,7 +148,7 @@ protocols: [HTTPS]
   /:
     get:
       description: Get all species information's
-      securedBy: [ jwt ]
+      securedBy: [ jwtUser ]
       responses:
         200:
           description: Get all species information's
@@ -158,7 +158,7 @@ protocols: [HTTPS]
               example: |
                 [
                   {
-                    "name": { type: String, required: true ,unique:true},
+                    "name": "Rosa mosqueta",
                     "images" : [
                       { 
                         path: "https://picturethisai.com/image-handle/website_cmsname/image/1080/157428813641285633.jpeg?x-oss-process=image/format,webp/quality,q_60/resize,l_400&v=1.0"
@@ -180,14 +180,56 @@ protocols: [HTTPS]
                   "field": ["error"],
                   "message": ["An error was occurred. Please contact us"]
                 }
+    post:
+      description: Create an species
+      securedBy: [ jwtBotanist ]
+      body:
+        application/json:
+          type: object
+          example: |
+            {
+              "name": "Rosa mosqueta",
+              description: "Rosa mosqueta is also known as the musk rose because of its characteristic musky scent. It is often confused with Rosa brunonii, which has a similar aroma but flowers at a different time.",
+              sunExposure: "Rosa mosqueta does best with exposure to full or part sun. They will perform best with direct morning light, but in summer they need protection from the strong afternoon sun",
+              watering: "Every day",
+              optimalTemperature: 50
+            }
+      responses:
+        204:
+          description: Save species
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["name"],
+                  "message": ["MongoServerError: E11000 duplicate key error collection"]
+                }
 securitySchemes:
-  jwt:
-    description: JWT Bearer token.
-    type: x-jwt
+  jwtUser:
+    description: JWT Bearer token for users.
+    type: x-jwtUSer
     describedBy:
       responses:
         401:
           description: Bad token.
+        204:
+          description: Token valid.
+      headers:
+        Set-Cookie:
+          description: Cookie Content
+          type: string
+          example: "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkplYW4gUGllcnJlIiwiaWF0IjoxNTE2MjM5MDIyfQ.jnwOHy2wQm1LG5upI_y0lr0u9dN8yBQUWR0uKH15jWE; Path=/; Secure; SameSite=None; Domain=127.0.0.1"
+
+  jwtBotanist:
+    description: JWT Bearer token for botanists.
+    type: x-jwtBotanist
+    describedBy:
+      responses:
+        401:
+          description: Bad token or Invalid Permission.
         204:
           description: Token valid.
       headers:
