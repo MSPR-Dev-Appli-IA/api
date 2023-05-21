@@ -24,7 +24,6 @@ const getOneOfMyPlantValidation = Joi.object({
   plantId: Joi.string().length(24)
 })
 
-
 export  {
     plantValidation, getMyPlantsValidation, getOneOfMyPlantValidation
   };

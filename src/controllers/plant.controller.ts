@@ -123,21 +123,34 @@ export const updatePlant = async (req: Request, res: Response, _: NextFunction) 
 
 export const addImageFromPlant = async (req: Request, res: Response, _: NextFunction) => {
     try {
-      
+
         const file = req.file as Express.Multer.File
-        const plantId = req.params.plantId;
-  
-        if (file){
-          const imagePlants = await  newImage(file)
-          const newImagePlant = await addImageWithPlantId(imagePlants,new  mongoose.Types.ObjectId(plantId.trim()))
-          res.status(200).send(newImagePlant);
-        }else{
-          res.status(404).send("No file");
+        const plantId = req.body.plantId;
+
+        if (file) {
+            const imagePlants = await newImage(file)
+            const newImagePlant = await addImageWithPlantId(imagePlants, plantId)
+            if (newImagePlant && imagePlants) {
+                res.status(200).send({
+                    "status": "success",
+                    "plantInfo": API_HOSTNAME + "/api" + API_VERSION + "/plant/" + newImagePlant._id
+                });
+            }else{
+                res.status(400).send({
+                    field: ["error"],
+                    message: ["PlantId is not Found."]
+                })
+            }
+        } else {
+            res.status(400).send({
+                field: ["error"],
+                message: ["The file attribute is not found"]
+            });
         }
-      } catch (e) {
-        res.status(404).send("error");
-      }
-      
+    } catch (e) {
+        return400or500Errors(e, res)
+    }
+
 };
 export const removeImageFromPlant= async (req: Request, res: Response, _: NextFunction) => {
     try {

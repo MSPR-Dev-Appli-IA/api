@@ -10,7 +10,9 @@ export const getOnePlantById = async (plantId: string) => {
     return await Plant.findOne({ _id: plantId }).populate({ path: "images", model: Image }).populate({ path: "user", model: User }).exec();
 };
 
-
+export const findPlantUser = async (userId: string) => {
+    return await Plant.findOne({user: userId}).populate({ path: "user", model: User }).exec()
+}
 
 export const findLimitedPlantsByUserIdAndSpeciesId = async (userId: String, speciesId: String| null = null, limit: number = 1, skip: number = 0, order: 1 | -1 = -1,search: String | null) => {
     return await Plant.find({
@@ -43,16 +45,15 @@ export const createPlant = async (speciesId:Types.ObjectId, userId:Types.ObjectI
   };
 
 
-  export const addImageWithPlantId = async (image: IImage, plantId: Types.ObjectId) => {
-    return await Plant.findOneAndUpdate(
-      { _id: plantId },
-      { $push: { images: image } },
-      { returnDocument: 'after' }
+export const addImageWithPlantId = async (image: IImage, plantId: string) => {
+    return Plant.findOneAndUpdate(
+        {_id: plantId},
+        {$push: {images: image}},
+        {returnDocument: 'after'}
     )
-    .populate({ path: "images", model: Image })
-    .populate({ path: "species", model: Species });
-  
-  }
+        .populate({path: "images", model: Image})
+        .populate({path: "species", model: Species});
+}
 
   export const deleteImageWithPlantId = async (imageId: Types.ObjectId, plantId: Types.ObjectId) => {
     return await Plant.findOneAndUpdate(
@@ -62,7 +63,7 @@ export const createPlant = async (speciesId:Types.ObjectId, userId:Types.ObjectI
     )
     .populate({ path: "images", model: Image })
     .populate({ path: "species", model: Species });
-  
+
   }
   
   export const deletePlantsWithPlantsId = async (plantId: Types.ObjectId) => {
