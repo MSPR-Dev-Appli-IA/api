@@ -20,6 +20,7 @@ export interface  IUser extends Document {
     deleted_at:null|Date
     local: IUserLocal
     image: Types.ObjectId|null;
+    jwtToken: string|null;
 
     comparePassword(password:string):boolean
     
@@ -42,7 +43,7 @@ export interface UserInfo{
 
 
 export interface UserjwtToken {
-    user:IUser|null,
+    user:IUser|undefined,
     id:string|undefined,
 }
 

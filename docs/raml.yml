@@ -31,14 +31,6 @@ protocols: [HTTPS]
                 }
         304:
           description: Always logged
-          body:
-            application/json:
-              type: object
-              example: |
-                {
-                  "field": ["error"],
-                  "message": ["Your are always logged"]
-                }
         404:
           description: User not found
           body:
@@ -48,7 +40,7 @@ protocols: [HTTPS]
                   "field": ["error"],
                   "message": ["L'email et/ou le mot de passe est incorrect"]
                 }
-  /signup:
+  /register:
     post:
       description: Allows to create account
       body:
@@ -70,17 +62,8 @@ protocols: [HTTPS]
               type: object
               example: |
                 {
-                  "username": "Test",
-                  "firstname": "Test",
-                  "lastname": "Test",
-                  "role": "6465d4ab9cf91b1420a3f83c",
-                  "created_at": "2023-05-14T15:08:28.295+00:00",
-                  "deleted_at": "",
-                  "local": {
-                    "email": "test@test.com",
-                    "password": ""
-                  },
-                  "image": ""
+                  "status": "success",
+                  "message": "User created."
                 }
         400:
           description: Error with the passed parameters.
@@ -90,7 +73,7 @@ protocols: [HTTPS]
               example: |
                 {
                   "field": ["email", "password"],
-                  "message": ["MongoServerError: E11000 duplicate key error collection", "Le mot de passe doit être au minimum de 6 caractères"]
+                  "message": ["Veuillez renseignez un email valide", "Le mot de passe doit être au minimum de 6 caractères"]
                 }
         304:
           description: Always logged
@@ -125,6 +108,7 @@ protocols: [HTTPS]
                     "password": ""
                   },
                   "image": ""
+                  "jwtToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkplYW4gUGllcnJlIiwiaWF0IjoxNTE2MjM5MDIyfQ.jnwOHy2wQm1LG5upI_y0lr0u9dN8yBQUWR0uKH15jWE"
                 }
 
         404:
@@ -142,7 +126,15 @@ protocols: [HTTPS]
       description: Log out a user using it's JWT.
       securedBy: [ jwtUser ]
       responses:
-        204:
+        200:
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "message": "You're logged out."
+                }
 
 /species:
   /:
@@ -159,15 +151,15 @@ protocols: [HTTPS]
                 [
                   {
                     "name": "Rosa mosqueta",
+                    "url": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a",
                     "images" : [
                       { 
-                        path: "https://picturethisai.com/image-handle/website_cmsname/image/1080/157428813641285633.jpeg?x-oss-process=image/format,webp/quality,q_60/resize,l_400&v=1.0"
+                        path: "https://api.arosaje-stage.locascio.fr/public/image/rosa.jpg"
                       }
                     ],
-                    description: "Rosa mosqueta is also known as the musk rose because of its characteristic musky scent. It is often confused with Rosa brunonii, which has a similar aroma but flowers at a different time.",
-                    sunExposure: "Rosa mosqueta does best with exposure to full or part sun. They will perform best with direct morning light, but in summer they need protection from the strong afternoon sun",
-                    watering: "Every day",
-                    optimalTemperature: 50
+                    "sunExposure": "Rosa mosqueta does best with exposure to full or part sun. They will perform best with direct morning light, but in summer they need protection from the strong afternoon sun",
+                    "watering": "Every day",
+                    "optimalTemperature": 50
                   }
                 ]
         500:
@@ -215,6 +207,16 @@ protocols: [HTTPS]
                   "field": ["name"],
                   "message": ["MongoServerError: E11000 duplicate key error collection"]
                 }
+        404:
+          description: Species not Found
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Species not Found"]
+                }
     put:
       description:
       securedBy: [ jwtBotanist ]
@@ -250,6 +252,16 @@ protocols: [HTTPS]
                 {
                   "field": ["name"],
                   "message": ["MongoServerError: E11000 duplicate key error collection"]
+                }
+        404:
+          description: Species not Found
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Species not Found"]
                 }
         500:
           description: An error was occurred.
@@ -384,7 +396,7 @@ protocols: [HTTPS]
                   "message": ["An error was occurred. Please contact us"]
                 }
 
-  /deleteImage/{speciesId}/{imageId}:
+  /{speciesId}/{imageId}:
     delete:
       description: Delete the image of a species
       securedBy: [ jwtBotanist ]
@@ -420,11 +432,11 @@ securitySchemes:
         204:
           description: Token valid.
       headers:
-        Set-Cookie:
-          description: Cookie Content
+        Authorization:
+          description: Bearer token.
           type: string
-          example: "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkplYW4gUGllcnJlIiwiaWF0IjoxNTE2MjM5MDIyfQ.jnwOHy2wQm1LG5upI_y0lr0u9dN8yBQUWR0uKH15jWE; Path=/; Secure; SameSite=None; Domain=127.0.0.1"
-
+          example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkplYW4gUGllcnJlIiwiaWF0IjoxNTE2MjM5MDIyfQ.jnwOHy2wQm1LG5upI_y0lr0u9dN8yBQUWR0uKH15jWE"
+          
   jwtBotanist:
     description: JWT Bearer token for botanists.
     type: x-jwtBotanist
@@ -435,7 +447,7 @@ securitySchemes:
         204:
           description: Token valid.
       headers:
-        Set-Cookie:
-          description: Cookie Content
+        Authorization:
+          description: Bearer token.
           type: string
-          example: "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkplYW4gUGllcnJlIiwiaWF0IjoxNTE2MjM5MDIyfQ.jnwOHy2wQm1LG5upI_y0lr0u9dN8yBQUWR0uKH15jWE; Path=/; Secure; SameSite=None; Domain=127.0.0.1"
+          example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkplYW4gUGllcnJlIiwiaWF0IjoxNTE2MjM5MDIyfQ.jnwOHy2wQm1LG5upI_y0lr0u9dN8yBQUWR0uKH15jWE"
