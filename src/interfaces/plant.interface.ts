@@ -10,6 +10,7 @@ export interface IPlant extends Document{
 }
 
 export interface PlantForm {
+    plantId: String
     name : String,
     speciesId: String
 }

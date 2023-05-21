@@ -1,13 +1,12 @@
 import { Plant } from "../database/models/plant.models";
 import { Image } from "../database/models/image.model"
 import { User } from "../database/models/user.model";
-import { IPlant } from "../interfaces";
 import { Types } from 'mongoose';
 import { Species } from "../database/models/species.model";
 import { IImage,PlantForm } from "../interfaces/index"
 
 
-export const getOnePlantById = async (plantId: Types.ObjectId): Promise<IPlant | null> => {
+export const getOnePlantById = async (plantId: string) => {
     return await Plant.findOne({ _id: plantId }).populate({ path: "images", model: Image }).populate({ path: "user", model: User }).exec();
 };
 
@@ -69,14 +68,14 @@ export const createPlant = async (speciesId:Types.ObjectId, userId:Types.ObjectI
   export const deletePlantsWithPlantsId = async (plantId: Types.ObjectId) => {
     await Plant.findOneAndDelete(plantId).exec();
   }
-  
 
-  export const updatePlantWithPlantId = async (plantId: Types.ObjectId, plant:PlantForm) => {
-    return await Plant.findByIdAndUpdate(plantId, {
-      name: plant.name, 
-      species : plant.speciesId
-    },
-      { new: true })
-    .populate({ path: "images", model: Image })
-    .populate({ path: "species", model: Species });
-  };
+
+export const updatePlantWithPlantId = async (plant: PlantForm) => {
+    return Plant.findByIdAndUpdate(plant.plantId, {
+            name: plant.name,
+            species: plant.speciesId
+        },
+        {new: true})
+        .populate({path: "images", model: Image})
+        .populate({path: "species", model: Species});
+};

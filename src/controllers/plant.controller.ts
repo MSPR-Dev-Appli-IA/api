@@ -5,7 +5,6 @@ import  mongoose from 'mongoose';
 import { newImage } from "./image.controller";
 import { deleteImage ,getImageById} from "../queries/image.queries";
 import {getMyPlantsValidation, plantValidation} from "../database/validation/plant.validation"
-import  { ValidationError } from "joi";
 import * as fs from 'fs';
 import {API_HOSTNAME, API_VERSION, return400or500Errors} from "../utils";
 
@@ -89,22 +88,25 @@ export const newPlant = async (req: Request, res: Response, _: NextFunction) => 
 
 export const updatePlant = async (req: Request, res: Response, _: NextFunction) => {
   try {
-    const plantId = req.params.plantId;
+
     await plantValidation.validateAsync(req.body, { abortEarly: false });
-    const plant = await updatePlantWithPlantId(new  mongoose.Types.ObjectId(plantId.trim()),req.body);
-    res.status(200).json( plant );
+
+    const species = await findOneSpecies(req.body.speciesId)
+    const plant = await updatePlantWithPlantId(req.body);
+    if(species && plant){
+        res.status(200).json( {
+            status: "success",
+            plantInfo: API_HOSTNAME + "/api" + API_VERSION + "/plant/" + plant._id
+        });
+    }else{
+        res.status(404).send({
+            field: ["error"],
+            message: ["Species not Found"]
+        })
+    }
 
   } catch (e) {
-    const errors = [];
-    if (e instanceof ValidationError) {
-      e.details.map((error) => {
-        errors.push({ field: error.path[0], message: error.message });
-      });
-    }else {
-      errors.push({ field: "error", message: e })
-  }
-  console.log(e)
-    res.status(404).send({  errors });
+    return400or500Errors(e, res)
   }
     
 };
