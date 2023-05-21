@@ -428,48 +428,56 @@ protocols: [HTTPS]
   /:
     get:
       description: Get the user's plants.
-      securedBy: [ jwtUser ]
-      body:
-        application/json:
-          type: object
-          properties:
-            speciesId:
-              description: "Return all plants of the species (optional)"
-              type: file
-              required: false
-            search:
-              description: "Search for plant names (optional)"
-              type: string
-              required: false
-            page:
-              description: "Number of pages to be paginated (optional)"
-              type: number
-              required: false
-            order:
-              description: "Order results per ASC or DESC (optional)"
-              type: string
-              required: false
-          example: |
-            {
-              "speciesId": "6469ff6539ef26a6fe2709f0",
-              "page": 2,
-              "order": "ASC",
-              "search": "Rosa"
-            }
+      securedBy: [ jwtUser, jwtBotanist ]
+      queryParameters:
+        speciesId:
+          description: "Return all plants of the species (optional)"
+          type: string
+          required: false
+          example: 646600435a318f27dd1d515a
+        search:
+          description: "Search for plant names (optional)"
+          type: string
+          required: false
+          example: "Rosa"
+        page:
+          description: "Number of pages to be paginated (optional)"
+          type: number
+          required: false
+          example: 1
+        order:
+          description: "Order results per ASC or DESC (optional)"
+          type: string
+          required: false
+          example: "ASC"
       responses:
         200:
           description: Get the user's plants.
           body:
             application/json:
               type: array
-#              TODO Vérifier les information de cette réponse
               example: |
                 [
                   {
+                    "_id": "646a0e573a625a4fe9c207bc",
                     "name": "Rosa mosqueta",
-                    "speciesId": "6469ff6539ef26a6fe2709f0"
+                    "speciesInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a"
                   }
                 ]
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": [
+                    "order"
+                  ],
+                  "message": [
+                    "\"order\" must be one of [ASC, DESC]"
+                  ]
+                }
         404:
           description: Species or Plant name not found.
           body:
@@ -509,13 +517,22 @@ protocols: [HTTPS]
               type: object
               example: |
                 {
-                  "name": "Rosa banksiae",
-                  "images": [],
-                  "species": "646a0c81054de87b1884c88e",
-                  "user": "6462626e3d3c2f859515bf13",
-                  "_id": "646a0e573a625a4fe9c207bc",
-                  "created_at": "2023-05-21T12:28:07.702Z",
-                  "__v": 0
+                  "status": "success",
+                  "plantInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/plant/646a0e573a625a4fe9c207bc"
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": [
+                    "speciesId"
+                  ],
+                  "message": [
+                    "\"speciesId\" is required"
+                  ]
                 }
         404:
           description: Species not Found

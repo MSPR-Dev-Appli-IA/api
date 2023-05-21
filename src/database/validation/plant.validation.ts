@@ -18,8 +18,15 @@ const plantValidation = Joi.object({
 
 });
 
+const getMyPlantsValidation = Joi.object({
+  speciesId: Joi.string().length(24),
+  search: Joi.string().min(2),
+  page: Joi.number().positive(),
+  order: Joi.string().min(3).valid("ASC", "DESC")
+})
+
 
 export  {
-    plantValidation
+    plantValidation, getMyPlantsValidation
   };
   

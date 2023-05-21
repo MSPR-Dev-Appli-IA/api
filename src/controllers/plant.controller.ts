@@ -4,22 +4,36 @@ import { findOneSpecies, } from "../queries/species.queries";
 import  mongoose from 'mongoose';
 import { newImage } from "./image.controller";
 import { deleteImage ,getImageById} from "../queries/image.queries";
-import  { plantValidation} from "../database/validation/plant.validation"
+import {getMyPlantsValidation, plantValidation} from "../database/validation/plant.validation"
 import  { ValidationError } from "joi";
 import * as fs from 'fs';
-import {return400or500Errors} from "../utils";
+import {API_HOSTNAME, API_VERSION, return400or500Errors} from "../utils";
 
 const limit:number = 5
 
 export const getMyPlants = async (req: Request, res: Response, _: NextFunction) => {
     try {
-        let { page=1, order,search,speciesId } = req.body;
-        order = order == "ASC" ? 1 :-1
+        const speciesId = (req.query.speciesId) ? String(req.query.speciesId) : ""
+        const search = (req.query.search) ? String(req.query.search) : ""
+        const page = (req.query.page) ? Number(req.query.page) : Number(1)
+        const order = (req.query.order == "ASC") ? 1  : -1
+
+        await getMyPlantsValidation.validateAsync(req.query, {abortEarly: false});
+
         const skip:number =  limit * page - limit;
         const plants = await findLimitedPlantsByUserIdAndSpeciesId(req.user._id,speciesId,limit,skip,order,search)
-        res.status(200).json( plants );
+        const result: any[] = []
+        plants.forEach(item => {
+            result.push({
+                _id: item._id,
+                name: item.name,
+                speciesInfo: API_HOSTNAME + "/api" + API_VERSION + "/species/" + item.species._id
+            })
+        })
+
+        res.status(200).json( {result});
       } catch (e) {
-        res.status(404).send({ message: e });
+        return400or500Errors(e, res)
       }
 };
 
@@ -42,7 +56,7 @@ export const newPlant = async (req: Request, res: Response, _: NextFunction) => 
     try {
         const plantName = req.body.name
         const userId = req.user._id
-        const speciesId = req.body.species
+        const speciesId = req.body.speciesId
 
         await plantValidation.validateAsync(req.body, {abortEarly: false});
 
@@ -50,7 +64,10 @@ export const newPlant = async (req: Request, res: Response, _: NextFunction) => 
         if (species){
             const newPlant = await createPlant(speciesId,userId,plantName)
             
-            res.status(200).json( newPlant );
+            res.status(200).send({
+                status: "success",
+                plantInfo: API_HOSTNAME + "/api" + API_VERSION + "/plant/" + newPlant._id
+            });
         }else{
             res.status(404).send({
                 field: ["error"],
