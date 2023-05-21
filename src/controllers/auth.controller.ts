@@ -1,76 +1,92 @@
-import  { findUserPerEmail, createUser } from "../queries/user.queries";
-import  {userSignupValidation} from "../database/validation/user.validation";
-import { NextFunction, Request, Response } from "express";
-import {getDefaultRole,getBotanistRole} from "../queries/role.queries";
+import {createUser} from "../queries/user.queries";
+import {NextFunction, Request, Response} from "express";
+import {getBotanistRole} from "../queries/role.queries";
 import {return400or500Errors} from "../utils";
+import {UserService} from "../services/userService";
+import {JwtService} from "../services/jwtService";
 
+const userService = new UserService();
+const jwtService = new JwtService();
 
-export const login = async (req:Request, res:Response, _:NextFunction) => {
-  try {
-    const { email, password } = req.body;
-
-    const user = await findUserPerEmail(email);
-
-    if (user) {
-      const match =  user.comparePassword(password);
-      if (match) {
-        req.login(user);
-        res.status(200).json(user.set("local.password",null));
-      } else {
-        res.status(404).json( [{ field: "password", message: "Mauvais identifiants" }] );
-      }
-    } else {
-    res.status(404).json(  [{ field: "password", message: "Mauvais identifiants" }]  );
-    }
-  } catch (e) {
-    res.status(404).json( "error" );
-  }
-};
-
-export const me = async (req:Request, res:Response) => {
-  try {
-    if (req.user) {
-      res.json(req.user.set("local.password",null));
-    } else {
-      res.json(null);
-    }
-  } catch (error) {
-    res.status(404).json( "error" );
-  }
-};
-
-export const signout = async (req:Request, res:Response, _:NextFunction) => {
-  try {
-    req.logout();
-    res.status(200).send();
-  } catch (error) {
-    res.status(404).json( "error" );
-  }
-};
-
-
-export const register = async (req: Request, res: Response, _: NextFunction) => {
-
+/*
+ * POST /api/auth/login
+ * Log-in a user using its credentials.
+ */
+export const login = async (req: Request, res: Response, _: NextFunction) => {
     try {
-        await userSignupValidation.validateAsync(req.body, {abortEarly: false});
+        await (userService.loginUser(req.body))
+            ? res.status(200).send({
+                status: "You're logged in.",
+                jwt: userService.jwtToken
+            })
+            : res.status(404).send({
+                field: ["error"],
+                message: ["L'email et/ou le mot de passe est incorrect"]
+            })
+    } catch (e) {
+        return400or500Errors(e, res)
+    }
+}
 
-        const body = req.body;
+/*
+ * POST /api/auth/register
+ * Allows to create account
+ */
+export const register = async (req: Request, res: Response, _: NextFunction) => {
+    try {
+        await userService.createUser(req.body)
 
-        const role = await getDefaultRole();
-        await createUser(body, role);
-
-        res.status(204)
+        res.status(200).send({
+            status: "success",
+            message: "User created."
+        })
     } catch (e) {
         return400or500Errors(e, res)
     }
 };
 
+
+export const logout = async (req: Request, res: Response, _: NextFunction) => {
+    try {
+        await jwtService.removeJwtToken(req.user._id)
+
+        res.status(200).send({
+            status: "success",
+            message: "You're logged out."
+        });
+    } catch (error) {
+        return400or500Errors(error, res)
+    }
+};
+
+export const me = async (req: Request, res: Response) => {
+    try {
+        if (req.user) {
+            res.json(req.user.set("local.password", null));
+        } else {
+            res.status(404).send({
+                field: ["error"],
+                message: ["User not Found"]
+            });
+        }
+    } catch (error) {
+        return400or500Errors(error, res)
+    }
+};
+
+
 export const createAccountWithBotanistRight = async () => {
-  try {
-  const body = {"username":"defaultBotanist","firstname":"John","lastname":"doe","email":"botanist@email.fr","password":"123456"};
-  const role = await getBotanistRole();
-  await createUser(body, role)
-  } catch (e) {
-  throw(e)
-}
+    try {
+        const body = {
+            "username": "defaultBotanist",
+            "firstname": "John",
+            "lastname": "doe",
+            "email": "botanist@email.fr",
+            "password": "123456"
+        };
+        const role = await getBotanistRole();
+        await createUser(body, role)
+    } catch (e) {
+        throw(e)
+    }
 };

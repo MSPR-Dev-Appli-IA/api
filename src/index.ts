@@ -43,7 +43,10 @@ app.use(function (_req:Request, res:Response, next:NextFunction) {
     next();
 });
 
-import "./config/jwt.config";
+import {addJwtFeatures, extractUserFromToken} from "./config/jwt.config";
+
+app.use(extractUserFromToken);
+app.use(addJwtFeatures);
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(router);

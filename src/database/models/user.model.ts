@@ -8,14 +8,15 @@ const userSchema = new mongoose.Schema<IUser, UserModel>({
     username: {type: String, required: true, unique: true},
     firstname: {type: String, required: true},
     lastname: {type: String, required: true},
-    created_at: {type: Date, require: true, default: Date.now()},
-    deleted_at: {type: Date, require: false},
+    created_at: {type: Date, required: true, default: Date.now()},
+    deleted_at: {type: Date, required: false},
     role: {type: schema.Types.ObjectId, ref: "Role", required: true},
     image: {type: schema.Types.ObjectId, ref: "Image", required: false, default: null},
     local: {
         email: {type: String, required: true, unique: true},
         password: {type: String, required: true},
     },
+    jwtToken: {type: String, required: false}
 
 });
 

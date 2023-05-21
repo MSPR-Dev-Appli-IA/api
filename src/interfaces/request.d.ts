@@ -5,9 +5,8 @@ declare global {
       export interface Request {
         language?: Language;
         user?: User;
+        jwt: string;
 
-        logout():void;
-        login(User:IUser):void;
         isAuthenticated():boolean;
       }
     }

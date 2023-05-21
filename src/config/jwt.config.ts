@@ -1,91 +1,66 @@
-import  jwt,{JwtPayload}  from "jsonwebtoken";
-import  {findUserPerId} from "../queries/user.queries";
-import  {app} from "../index";
-import { IUser,UserjwtToken } from "../interfaces";
 import { NextFunction, Request, Response } from "express";
+import {JwtError, JwtService} from "../services/jwtService";
+import {UserService} from "../services/userService";
+import {findUserPerId} from "../queries/user.queries";
 
-const key = process.env.JWTKEY ? process.env.JWTKEY : ""
-const createJwtToken = ({ user, id }:UserjwtToken) => {
-  
-  const jwtToken = jwt.sign(
-    {
-      sub: id || user?._id.toString(),
-      exp: Math.floor(Date.now() / 1000) + 5,
-    },
-    key
-  );
-  return jwtToken;
-};
+const jwtService = new JwtService();
+const userService = new UserService();
 
-const decodeJwtToken = (token:string) => {
-  return jwt.verify(token, key);
-};
-
-exports.decodeJwtToken = decodeJwtToken;
-
-exports.createJwtToken = createJwtToken;
-
-const checkExpirationToken = (token:JwtPayload, res:Response) => {
-  const tokenExp = token.exp;
-  const nowInSec = Math.floor(Date.now() / 1000);
-  if (tokenExp){
-  if (nowInSec <= tokenExp) {
-    return token;
-  } else if (nowInSec > tokenExp && nowInSec - tokenExp < 60 * 60 * 24) {
-    const refreshedToken = createJwtToken({user: null,id: token.sub });
-    res.cookie("jwt", refreshedToken, { sameSite: 'none', secure: true});
-    return jwt.verify(refreshedToken, key);
-  } else {
-    res.clearCookie("jwt");
-    res.status(401).send({
-      field: ["error"],
-      message: ["Token expired."]
-    })
-  }
-}
-return;
-};
-
-const extractUserFromToken = async (req: Request, res: Response, next: NextFunction) => {
-  const token = req.cookies.jwt;
-  if (token) {
+export const extractUserFromToken = async (req:Request, res:Response, next:NextFunction) => {
+  if (req.headers.authorization) {
+    const token = req.headers.authorization.split(" ")[1]
     try {
-      const decodedToken = jwt.verify(token, key, {ignoreExpiration: true}) as JwtPayload;
-      const decodedTokenCheck = checkExpirationToken(decodedToken, res);
-      if (decodedTokenCheck) {
-        const user = await findUserPerId(decodedTokenCheck.sub as string);
-        if (user) {
-          req.user = user;
-          next();
-        } else {
-          res.clearCookie("jwt");
-          res.status(404).send({
-            field: ["error"],
-            message: ["User not Found. Please contact us."]
-          })
-        }
-      }
-    } catch (e) {
-      res.clearCookie("jwt");
-      res.status(500).send({
+      const decodedTokenCheck = await jwtService.decodeJwtToken(token)
+
+      /*
+       * Get the id of the user in the JWT token and check if it exists in database
+       *  If it's not exist throw 404 errors
+       */
+      req.user = (decodedTokenCheck) ? await userService.checkUserExist(decodedTokenCheck.sub as string) : res.status(404).send({
         field: ["error"],
-        message: ["An error was occurred. Please contact us"]
+        message: ["User not Found. Please contact us."]
       })
+
+      next();
+
+    } catch (error) {
+      if(error instanceof JwtError){
+        res.status(401).send({
+          field: ["error"],
+          message: [error.message]
+        })
+      }else{
+        res.status(401).send({
+          field: ["error"],
+          message: ["Bad token. You must to logged in before"]
+        })
+      }
     }
   } else {
     next();
   }
+}
+
+export const addJwtFeatures = (req:Request, _res:Response, next:NextFunction) => {
+  // req.isAuthenticated = () => !!req.user
+  req.isAuthenticated = () => {
+    if (req.headers.authorization) {
+      const token = req.headers.authorization.split(" ")[1]
+      return !!processJwtToken(token)
+    }
+    return false
+  }
+  next()
 };
 
-const addJwtFeatures = (req:Request, res:Response, next:NextFunction) => {
-  req.isAuthenticated = () => !!req.user;
-  req.logout = () => res.clearCookie("jwt");
-  req.login = (user:IUser) => {
-    const token = createJwtToken({ user,id:undefined });
-    res.cookie("jwt", token);
-  };
-  next();
-};
-
-app.use(extractUserFromToken);
-app.use(addJwtFeatures);
+async function processJwtToken(token: string): Promise<boolean> {
+  return await jwtService.decodeJwtToken(token)
+      .then(async (jwtInfo) => {
+        const userId = jwtInfo.sub as string
+        const request = await findUserPerId(userId)
+        if (request) {
+          return (token === request.jwtToken)
+        }
+        return false
+      })
+}

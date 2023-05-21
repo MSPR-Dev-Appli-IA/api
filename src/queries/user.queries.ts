@@ -7,7 +7,11 @@ export const findUserPerEmail = (email:string) => {
 };
 
 export const findUserPerId = (id:string) => {
-  return User.findById(id).populate("role").populate("image").exec();
+  const request = User.findById(id).populate("role").populate("image").exec();
+  if(request){
+    return request
+  }
+  throw new Error("Failed to find user per id")
 };
 
 export const createUser= async (user :UserForm, role :IRole) => {
@@ -44,12 +48,12 @@ export const updateUserWithUserId = async (userId: Types.ObjectId, user: UserInf
 
 export const UpdateUserPasswordWithUserId = async (userId: Types.ObjectId, password: string) => {
     const hashedPassword =  await User.hashPassword(password);
-    return await User.findByIdAndUpdate(userId, {
-      $set: {
-        "local.password": hashedPassword,
-      },
-    },
-      { new: true })
+    return User.findByIdAndUpdate(userId, {
+          $set: {
+            "local.password": hashedPassword,
+          },
+        },
+        {new: true});
   
 };
 
@@ -61,12 +65,37 @@ export const UpdateUserAvatarWithUserId = async (userId: Types.ObjectId, image: 
 
 };
 
-
-
-
 export const deleteImageWithUserId= async (userId: string) => {
   return await User.findByIdAndUpdate(userId, {
     image:null,
   },
     { new: true }).populate("image")
+}
+
+
+export const addUserJWTToken = async (userId: string, jwtToken: string) => {
+  const request = await User.findByIdAndUpdate(userId, {
+        $set: {
+          "jwtToken": jwtToken,
+        },
+      },
+      {new: true});
+
+  if(request){
+    return request
+  }
+  throw new Error("Failed to add JwtToken in DB")
+}
+
+export const removeJwtUser = async (userId:string) => {
+  const request =  User.findByIdAndUpdate(userId, {
+    $unset : {
+      "jwtToken": ""
+    },
+  }, {new: true})
+
+  if(request){
+    return request
+  }
+  throw new Error("Failed to remove JwtToken in DB")
 }
