@@ -509,10 +509,23 @@ protocols: [HTTPS]
               type: object
               example: |
                 {
-                  "name": "Rosa",
-                  "user": "6469ffe5a9b9af7f6deca1aa",
-                  "species": "6469ff6539ef26a6fe2709f0",
-                  "images": []
+                  "name": "Rosa banksiae",
+                  "images": [],
+                  "species": "646a0c81054de87b1884c88e",
+                  "user": "6462626e3d3c2f859515bf13",
+                  "_id": "646a0e573a625a4fe9c207bc",
+                  "created_at": "2023-05-21T12:28:07.702Z",
+                  "__v": 0
+                }
+        404:
+          description: Species not Found
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Species not Found"]
                 }
         500:
           description: An error was occurred.

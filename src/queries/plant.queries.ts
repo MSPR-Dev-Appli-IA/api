@@ -33,7 +33,7 @@ export const findOnePlant = async (plantId: Types.ObjectId) => {
         .exec();
 };
 
-export const createPlant = async (speciesId:Types.ObjectId,userId:Types.ObjectId,name:String) => {
+export const createPlant = async (speciesId:Types.ObjectId, userId:Types.ObjectId, name:String) => {
     const newPlant = new Plant({
       images: [],
       species:speciesId,

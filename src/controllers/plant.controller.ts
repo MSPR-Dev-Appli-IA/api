@@ -7,6 +7,7 @@ import { deleteImage ,getImageById} from "../queries/image.queries";
 import  { plantValidation} from "../database/validation/plant.validation"
 import  { ValidationError } from "joi";
 import * as fs from 'fs';
+import {return400or500Errors} from "../utils";
 
 const limit:number = 5
 
@@ -35,23 +36,29 @@ export const getOneOfMyPlant = async (req: Request, res: Response, _: NextFuncti
       } catch (e) {
         res.status(404).send({ message: "Erreur" });
       }
-      
 };
+
 export const newPlant = async (req: Request, res: Response, _: NextFunction) => {
     try {
-        let { speciesId,name  } = req.body;
+        const plantName = req.body.name
+        const userId = req.user._id
+        const speciesId = req.body.species
+
+        await plantValidation.validateAsync(req.body, {abortEarly: false});
 
         const species = await findOneSpecies(speciesId)
         if (species){
-            const newPlant = await  createPlant(species._id,req.user._id,name? name: "Ma plante ( " + species.name + " )")
+            const newPlant = await createPlant(speciesId,userId,plantName)
             
             res.status(200).json( newPlant );
         }else{
-        res.status(404).send({ message: "Cette espece de  plante n'existe pas" });
+            res.status(404).send({
+                field: ["error"],
+                message: ["Species not Found"]
+            });
         }
-       
       } catch (e) {
-        res.status(404).send({ message: "Erreur" });
+        return400or500Errors(e, res)
       }
       
 };
