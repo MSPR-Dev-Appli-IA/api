@@ -31,14 +31,6 @@ protocols: [HTTPS]
                 }
         304:
           description: Always logged
-          body:
-            application/json:
-              type: object
-              example: |
-                {
-                  "field": ["error"],
-                  "message": ["Your are always logged"]
-                }
         404:
           description: User not found
           body:
@@ -63,8 +55,16 @@ protocols: [HTTPS]
               "password": "Azerty"
             }
       responses:
-        204:
+        200:
           description: User created.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "message": "User created."
+                }
         400:
           description: Error with the passed parameters.
           body:
@@ -73,7 +73,7 @@ protocols: [HTTPS]
               example: |
                 {
                   "field": ["email", "password"],
-                  "message": ["MongoServerError: E11000 duplicate key error collection", "Le mot de passe doit être au minimum de 6 caractères"]
+                  "message": ["Veuillez renseignez un email valide", "Le mot de passe doit être au minimum de 6 caractères"]
                 }
         304:
           description: Always logged
@@ -108,6 +108,7 @@ protocols: [HTTPS]
                     "password": ""
                   },
                   "image": ""
+                  "jwtToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkplYW4gUGllcnJlIiwiaWF0IjoxNTE2MjM5MDIyfQ.jnwOHy2wQm1LG5upI_y0lr0u9dN8yBQUWR0uKH15jWE"
                 }
 
         404:
@@ -125,7 +126,15 @@ protocols: [HTTPS]
       description: Log out a user using it's JWT.
       securedBy: [ jwtUser ]
       responses:
-        204:
+        200:
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "message": "You're logged out."
+                }
 
 /species:
   /:
@@ -423,11 +432,11 @@ securitySchemes:
         204:
           description: Token valid.
       headers:
-        Set-Cookie:
-          description: Cookie Content
+        Authorization:
+          description: Bearer token.
           type: string
-          example: "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkplYW4gUGllcnJlIiwiaWF0IjoxNTE2MjM5MDIyfQ.jnwOHy2wQm1LG5upI_y0lr0u9dN8yBQUWR0uKH15jWE; Path=/; Secure; SameSite=None; Domain=127.0.0.1"
-
+          example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkplYW4gUGllcnJlIiwiaWF0IjoxNTE2MjM5MDIyfQ.jnwOHy2wQm1LG5upI_y0lr0u9dN8yBQUWR0uKH15jWE"
+          
   jwtBotanist:
     description: JWT Bearer token for botanists.
     type: x-jwtBotanist
@@ -438,7 +447,7 @@ securitySchemes:
         204:
           description: Token valid.
       headers:
-        Set-Cookie:
-          description: Cookie Content
+        Authorization:
+          description: Bearer token.
           type: string
-          example: "jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkplYW4gUGllcnJlIiwiaWF0IjoxNTE2MjM5MDIyfQ.jnwOHy2wQm1LG5upI_y0lr0u9dN8yBQUWR0uKH15jWE; Path=/; Secure; SameSite=None; Domain=127.0.0.1"
+          example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkplYW4gUGllcnJlIiwiaWF0IjoxNTE2MjM5MDIyfQ.jnwOHy2wQm1LG5upI_y0lr0u9dN8yBQUWR0uKH15jWE"
