@@ -672,6 +672,16 @@ protocols: [HTTPS]
                   "field": ["error"],
                   "message: ["Plant not found"]
                 }
+        500:
+          description: An error was occurred
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
   /addImage:
     post:
       description: Add image to an plant

@@ -13,7 +13,9 @@ router.post("/",  requireAuth, newPlant);
 router.put("/",  requireAuth, areyouThePlantOwner, updatePlant);
 
 router.get("/:plantId",  requireAuth,areyouThePlantOwner, getOneOfMyPlant);
+router.delete("/:plantId",  requireAuth,areyouThePlantOwner, removePlant);
+
 router.post("/addImage/:plantId",requireAuth,areyouThePlantOwner,upload.single("file"),addImageFromPlant)
 router.delete("/deleteImage/:plantId/:imageId",  requireAuth,areyouThePlantOwner, removeImageFromPlant);
-router.delete("/:plantId",  requireAuth,areyouThePlantOwner, removePlant);
+
 export default router;

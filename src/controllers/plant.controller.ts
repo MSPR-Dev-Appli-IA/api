@@ -160,23 +160,21 @@ export const removeImageFromPlant= async (req: Request, res: Response, _: NextFu
       }
       
 };
-export const removePlant = async (req: Request,res: Response, _: NextFunction) => {
-  try {
-    const plantId = req.params.plantId
-    const plant = await findOnePlant(plantId)
-    if (plant){
-      plant.images.forEach(async(image) => {
-        fs.unlinkSync("public/image/" + image.path);
-        await deleteImage(image._id)
-      });
-    await deletePlantsWithPlantsId(new  mongoose.Types.ObjectId(plantId.trim()))
-    res.status(200).send()
+export const removePlant = async (req: Request, res: Response, _: NextFunction) => {
+    try {
+        const plant = await findOnePlant(req.params.plantId)
+        if (plant) {
+            for (const image of plant.images) {
+                fs.unlinkSync("public/image/" + image.path);
+                await deleteImage(image._id)
+            }
+            await deletePlantsWithPlantsId(new mongoose.Types.ObjectId(req.params.plantId.trim()))
+            res.status(200).send({
+                type: "success",
+                message: "Plant deleted"
+            })
+        }
+    } catch (e) {
+        return400or500Errors(e, res)
     }
-    else{
-      res.status(404).send("Cet plante n'existe pas  n'existe pas");
-    }
-
-  } catch (e) {
-    res.status(404).send("error");
-  }
 };
