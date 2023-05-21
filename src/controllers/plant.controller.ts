@@ -22,16 +22,23 @@ export const getMyPlants = async (req: Request, res: Response, _: NextFunction) 
 
         const skip:number =  limit * page - limit;
         const plants = await findLimitedPlantsByUserIdAndSpeciesId(req.user._id,speciesId,limit,skip,order,search)
-        const result: any[] = []
-        plants.forEach(item => {
-            result.push({
-                _id: item._id,
-                name: item.name,
-                speciesInfo: API_HOSTNAME + "/api" + API_VERSION + "/species/" + item.species._id
+        if(plants){
+            const result: any[] = []
+            plants.forEach(item => {
+                result.push({
+                    _id: item._id,
+                    name: item.name,
+                    speciesInfo: API_HOSTNAME + "/api" + API_VERSION + "/species/" + item.species._id
+                })
             })
-        })
 
-        res.status(200).json( {result});
+            res.status(200).json({result});
+        }else{
+            res.status(404).json({
+                "field": ["error"],
+                "message": ["Not species found."]
+            })
+        }
       } catch (e) {
         return400or500Errors(e, res)
       }
