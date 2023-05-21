@@ -75,7 +75,7 @@ export const me = async (req: Request, res: Response) => {
 };
 
 
-export const createAccountWithBotanistRight = async () => {
+export const createDefaultAccountWithBotanistRight = async () => {
     try {
         const body = {
             "username": "defaultBotanist",
