@@ -4,7 +4,11 @@ import { findOneSpecies, } from "../queries/species.queries";
 import  mongoose from 'mongoose';
 import { newImage } from "./image.controller";
 import { deleteImage ,getImageById} from "../queries/image.queries";
-import {getMyPlantsValidation, plantValidation} from "../database/validation/plant.validation"
+import {
+    getMyPlantsValidation,
+    getOneOfMyPlantValidation,
+    plantValidation
+} from "../database/validation/plant.validation"
 import * as fs from 'fs';
 import {API_HOSTNAME, API_VERSION, return400or500Errors} from "../utils";
 
@@ -27,6 +31,7 @@ export const getMyPlants = async (req: Request, res: Response, _: NextFunction) 
                 result.push({
                     _id: item._id,
                     name: item.name,
+                    plantInfo: API_HOSTNAME + "/api" + API_VERSION + "/plant/" + item._id,
                     speciesInfo: API_HOSTNAME + "/api" + API_VERSION + "/species/" + item.species._id
                 })
             })
@@ -46,15 +51,20 @@ export const getMyPlants = async (req: Request, res: Response, _: NextFunction) 
 
 export const getOneOfMyPlant = async (req: Request, res: Response, _: NextFunction) => {
     try {
-        const plantId = req.params.plantId;
-        const plant = await findOnePlant(new  mongoose.Types.ObjectId(plantId.trim()))
+        await getOneOfMyPlantValidation.validateAsync(req.params, {abortEarly: false});
+
+        const plant = await findOnePlant(req.params.plantId)
         if(plant){
-          res.status(200).json( plant );
-        }else{
-        res.status(404).send({ message: "Cette plante n'existe pas" });
+            res.status(200).send({
+                _id: plant._id,
+                name: plant.name,
+                images: plant.images,
+                created_at: plant.created_at,
+                speciesInfo: API_HOSTNAME + "/api" + API_VERSION + "/species/" + plant.species._id
+            })
         }
       } catch (e) {
-        res.status(404).send({ message: "Erreur" });
+        return400or500Errors(e, res)
       }
 };
 
@@ -153,7 +163,7 @@ export const removeImageFromPlant= async (req: Request, res: Response, _: NextFu
 export const removePlant = async (req: Request,res: Response, _: NextFunction) => {
   try {
     const plantId = req.params.plantId
-    const plant = await findOnePlant(new  mongoose.Types.ObjectId(plantId.trim()))
+    const plant = await findOnePlant(plantId)
     if (plant){
       plant.images.forEach(async(image) => {
         fs.unlinkSync("public/image/" + image.path);

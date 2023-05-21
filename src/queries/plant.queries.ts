@@ -25,7 +25,7 @@ export const findLimitedPlantsByUserIdAndSpeciesId = async (userId: String, spec
         .exec()
 };
 
-export const findOnePlant = async (plantId: Types.ObjectId) => {
+export const findOnePlant = async (plantId: string) => {
     return Plant.findOne({ _id: plantId })
         .populate({ path: "images", model: Image })
         .populate({ path: "species", model: Species })

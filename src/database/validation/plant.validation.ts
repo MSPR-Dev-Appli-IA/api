@@ -20,8 +20,12 @@ const getMyPlantsValidation = Joi.object({
   order: Joi.string().min(3).valid("ASC", "DESC")
 })
 
+const getOneOfMyPlantValidation = Joi.object({
+  plantId: Joi.string().length(24)
+})
+
 
 export  {
-    plantValidation, getMyPlantsValidation
+    plantValidation, getMyPlantsValidation, getOneOfMyPlantValidation
   };
   

@@ -467,6 +467,7 @@ protocols: [HTTPS]
                   {
                     "_id": "646a0e573a625a4fe9c207bc",
                     "name": "Rosa mosqueta",
+                    "plantInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/plant/646a0e573a625a4fe9c207bc",
                     "speciesInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a"
                   }
                 ]
@@ -599,16 +600,6 @@ protocols: [HTTPS]
                   "\"name\" is required"
                 ]
               }
-        404:
-          description: Species not Found
-          body:
-            application/json:
-              type: object
-              example: |
-                {
-                  "field": ["error"],
-                  "message": ["Plant not Found"]
-                }
         500:
           description: An error was occurred.
           body:
@@ -631,10 +622,13 @@ protocols: [HTTPS]
               type: object
               example: |
                 {
-                  "name": "Rosa mosqueta",
-#                  TODO Compléter les informations
+                  "_id": "646a11f029fe41c20955540e",
+                  "name": "Rosa laevigata",
+                  "images": [],
+                  "created_at": "2023-05-21T12:43:28.181Z",
+                  "speciesInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/api/species/646a0c81054de87b1884c88e"
                 }
-        404:
+        400:
           description: Plant not Found
           body:
             application/json:
