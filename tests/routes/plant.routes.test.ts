@@ -47,10 +47,7 @@ describe("create plants ", () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
             .set('Content-type', 'application/json')
             .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
-            .send({
-                "name": "Rosa",
-                "speciesId": mySpeciesId[0],
-            })
+            .send({"name": "Rosa", "speciesId": mySpeciesId[0],})
         expect(resp.statusCode).toBe(200)
         expect(resp.body).toEqual(expect.objectContaining({"status": "success"}))
     });
@@ -59,29 +56,18 @@ describe("create plants ", () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
             .set('Content-type', 'application/json')
             .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
-            .send({
-                "speciesId": mySpeciesId[0],
-            })
+            .send({"speciesId": mySpeciesId[0],})
         expect(resp.statusCode).toBe(400)
-        expect(resp.body).toEqual(expect.objectContaining({
-            "field": [
-                "name"
-            ],
-            "message": [
-                "\"name\" is required"
-            ]
+        expect(resp.body).toEqual(expect.objectContaining({"field": ["name"
+            ], "message": ["\"name\" is required"]
         }))
-
     });
 
     test("create one plant with botanist account", async () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
             .set('Content-type', 'application/json')
             .set('Authorization', 'Bearer ' + botanistInfo["JWTBotanist"])
-            .send({
-                "name": "Rosa botanist",
-                "speciesId": mySpeciesId[0],
-            })
+            .send({"name": "Rosa botanist", "speciesId": mySpeciesId[0]})
         expect(resp.statusCode).toBe(200)
         expect(resp.body).toEqual(expect.objectContaining({"status": "success"}))
     });
@@ -90,17 +76,11 @@ describe("create plants ", () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
             .set('Content-type', 'application/json')
             .set('Authorization', 'Bearer ' + botanistInfo["JWTBotanist"])
-            .send({
-                "name": "Rosa botanist 2",
-            })
+            .send({"name": "Rosa botanist 2"})
         expect(resp.statusCode).toBe(400)
         expect(resp.body).toEqual(expect.objectContaining({
-            "field": [
-                "speciesId"
-            ],
-            "message": [
-                "\"speciesId\" is required"
-            ]
+            "field": ["speciesId"],
+            "message": ["\"speciesId\" is required"]
         }))
     });
 
@@ -108,9 +88,7 @@ describe("create plants ", () => {
     test("create one plant without auth", async () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
             .set('Content-type', 'application/json')
-            .send({
-                "name": "Rosa",
-                "speciesId": mySpeciesId[0],
+            .send({"name": "Rosa", "speciesId": mySpeciesId[0],
             })
 
         expect(resp.statusCode).toBe(401)
