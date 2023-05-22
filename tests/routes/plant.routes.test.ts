@@ -7,8 +7,6 @@ const request = require("supertest");
 // import { IImage } from "../../src/interfaces";
 
 
-
-
 let userInfo: any
 let botanistInfo: any
 
@@ -45,7 +43,7 @@ beforeAll(async () => {
 
 describe("create plants ", () => {
 
-    test("create one plant  ", async () => {
+    test("create one plant with user account ", async () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
             .set('Content-type', 'application/json')
             .set('Authorization', 'Bearer '+ userInfo["JWTUser"])
@@ -75,25 +73,18 @@ describe("create plants ", () => {
         }))
 
     });
-    //
-    // test("create one plant with botanist account   ", async () => {
-    //     const resp = await request(app).post("/api/plant")
-    //         .set('Content-type', 'application/json')
-    //         .set('Cookie', cookieJWTBotanist)
-    //         .send({
-    //             "name": "Rosa botanist",
-    //             "speciesId": mySpeciesId[0],
-    //         })
-    //     expect(resp.statusCode).toBe(200)
-    //     expect(resp.body).toEqual(expect.objectContaining({
-    //         "name": "Rosa botanist",
-    //         "user": idBotanist,
-    //         "species": mySpeciesId[0],
-    //
-    //         "images": []
-    //     }))
-    //
-    // });
+
+    test("create one plant with botanist account", async () => {
+        const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
+            .set('Content-type', 'application/json')
+            .set('Authorization', 'Bearer '+ botanistInfo["JWTBotanist"])
+            .send({
+                "name": "Rosa botanist",
+                "speciesId": mySpeciesId[0],
+            })
+        expect(resp.statusCode).toBe(200)
+        expect(resp.body).toEqual(expect.objectContaining({"status": "success"}))
+    });
     //
     // test("create one plant without auth", async () => {
     //     const resp = await request(app).post("/api/plant")
