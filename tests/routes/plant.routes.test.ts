@@ -1,5 +1,5 @@
 import {loginWithBotanistRight, loginWithUserRight} from "../data/accounts.data";
-import {dataSpecies} from "../data/species.data";
+import {getAllSpecies} from "../utils/species";
 
 const request = require("supertest");
 // import { closeDatabase } from '../utils/db-handler'
@@ -9,29 +9,15 @@ const request = require("supertest");
 
 let userInfo: any
 let botanistInfo: any
-
 let mySpeciesId: string[] = []
+
 beforeAll(async () => {
 
     userInfo = await loginWithUserRight()
     botanistInfo = await loginWithBotanistRight(userInfo['JWTUser'])
 
-    await dataSpecies.reduce(async (a, element) => {
-        // Wait for the previous item to finish processing
-        await a;
-        // Process this item
-        const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/species")
-            .set('Content-type', 'application/json')
-            .set('Authorization', 'Bearer ' + botanistInfo["JWTBotanist"])
-            .send({
-                "name": element.name,
-                "description": element.description,
-                "sunExposure": element.sunExposure,
-                "watering": element.watering,
-                "optimalTemperature": element.optimalTemperature
-            })
-        mySpeciesId.push(resp.body._id)
-    }, Promise.resolve());
+    mySpeciesId = await getAllSpecies(botanistInfo["JWTBotanist"], mySpeciesId)
+
 }, 300000)
 
 // TODO FIX IT
@@ -110,7 +96,7 @@ describe("get plants  ", () => {
 
         expect(resp.statusCode).toBe(200)
         expect(resp.body.result.length).toEqual(1)
-        expect(resp.body[0]).toEqual(expect.objectContaining({"name": "Rosa botanist"}))
+        expect(resp.body['result'][0]).toEqual(expect.objectContaining({"name": "Rosa botanist"}))
     })
 //
 //
