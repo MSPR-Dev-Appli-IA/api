@@ -17,37 +17,49 @@ async function createAccountWithBotanistRight(JWTUser: string){
         .set('Content-type', 'application/json')
         .set('Authorization', 'Bearer ' + JWTUser)
 }
-export const loginWithUserRight = async () => {
 
-    await createAccountWithUserRight()
-
-    const respUser = await request("https://api-arosaje-test.locascio.fr").post("/api/auth/login")
+async function login(email: string, password: string) {
+    const respLogin = await request("https://api-arosaje-test.locascio.fr").post("/api/auth/login")
         .set('Content-type', 'application/json')
-        .send({"email": "jwttoken@hotmail.com", "password": "123456"});
+        .send({"email": email, "password": password});
+
+    return {
+        "statusCode": (respLogin.statusCode == 200),
+        "jwt": (respLogin.statusCode == 200) ? respLogin.body.jwt : ""
+    }
+}
+
+export const loginWithUserRight = async () => {
+    let loginData = await login("jwttoken@hotmail.com", "123456")
+    if(!loginData["statusCode"]){
+        await createAccountWithUserRight()
+        loginData = await login("jwttoken@hotmail.com", "123456")
+    }
 
     const respUserInfo =  await request("https://api-arosaje-test.locascio.fr").get("/api/auth/me")
         .set('Content-type', 'application/json')
-        .set('Authorization', 'Bearer ' + respUser.body.jwt)
+        .set('Authorization', 'Bearer ' + loginData["jwt"])
     return {
-        "JWTUser": respUser.body.jwt,
+        "JWTUser": loginData["jwt"],
         "idUser": respUserInfo.body._id
     }
 }
 
 export const loginWithBotanistRight = async(JWTUser: string) => {
 
-    await createAccountWithBotanistRight(JWTUser)
+    let loginData = await login("botanist@email.fr", "123456")
 
-    const respBotanist = await request("https://api-arosaje-test.locascio.fr").post("/api/auth/login")
-        .set('Content-type', 'application/json')
-        .send({ "email": "botanist@email.fr", "password": "123456" });
+    if(!loginData["statusCode"]){
+        await createAccountWithBotanistRight(JWTUser)
+        loginData = await login("botanist@email.fr", "123456")
+    }
 
     const respBotanistInfo =  await request("https://api-arosaje-test.locascio.fr").get("/api/auth/me")
         .set('Content-type', 'application/json')
-        .set('Authorization', 'Bearer ' + respBotanist.body.jwt)
+        .set('Authorization', 'Bearer ' + loginData["jwt"])
 
     return {
-        "JWTBotanist": respBotanist.body.jwt,
+        "JWTBotanist": loginData["jwt"],
         "idBotanist": respBotanistInfo.body._id
     }
 }
