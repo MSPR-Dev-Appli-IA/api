@@ -85,6 +85,26 @@ describe("create plants ", () => {
         expect(resp.statusCode).toBe(200)
         expect(resp.body).toEqual(expect.objectContaining({"status": "success"}))
     });
+
+    test("create one plant without species", async () => {
+        const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
+            .set('Content-type', 'application/json')
+            .set('Authorization', 'Bearer '+ botanistInfo["JWTBotanist"])
+            .send({
+                "name": "Rosa botanist 2",
+            })
+        expect(resp.statusCode).toBe(400)
+        expect(resp.body).toEqual(expect.objectContaining({
+            "field": [
+                "speciesId"
+            ],
+            "message": [
+                "\"speciesId\" is required"
+            ]
+        }))
+    });
+
+
     //
     // test("create one plant without auth", async () => {
     //     const resp = await request(app).post("/api/plant")
