@@ -32,7 +32,7 @@ beforeAll(async () => {
             })
         mySpeciesId.push(resp.body._id)
     }, Promise.resolve());
-})
+}, 300000)
 
 // TODO FIX IT
 // afterAll(() => {
@@ -47,7 +47,7 @@ describe("create plants ", () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
             .set('Content-type', 'application/json')
             .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
-            .send({"name": "Rosa", "speciesId": mySpeciesId[0],})
+            .send({"name": "Rosa", "speciesId": mySpeciesId[0]})
         expect(resp.statusCode).toBe(200)
         expect(resp.body).toEqual(expect.objectContaining({"status": "success"}))
     });
@@ -56,10 +56,11 @@ describe("create plants ", () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
             .set('Content-type', 'application/json')
             .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
-            .send({"speciesId": mySpeciesId[0],})
+            .send({"speciesId": mySpeciesId[0]})
         expect(resp.statusCode).toBe(400)
-        expect(resp.body).toEqual(expect.objectContaining({"field": ["name"
-            ], "message": ["\"name\" is required"]
+        expect(resp.body).toEqual(expect.objectContaining({
+            "field": ["name"],
+            "message": ["\"name\" is required"]
         }))
     });
 
