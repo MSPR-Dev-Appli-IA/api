@@ -57,23 +57,24 @@ describe("create plants ", () => {
         expect(resp.body).toEqual(expect.objectContaining({"status": "success"}))
     });
 
-    // test("create one plant with no name  ", async () => {
-    //     const resp = await request(app).post("/api/plant")
-    //         .set('Content-type', 'application/json')
-    //         .set('Cookie', cookieJWTUser)
-    //         .send({
-    //             "speciesId": mySpeciesId[0],
-    //         })
-    //     expect(resp.statusCode).toBe(200)
-    //     expect(resp.body).toEqual(expect.objectContaining({
-    //         "name": "Ma plante ( Ocimum diffusus )",
-    //         "user": idUser,
-    //         "species": mySpeciesId[0],
-    //
-    //         "images": []
-    //     }))
-    //
-    // });
+    test("create one plant with no name", async () => {
+        const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
+            .set('Content-type', 'application/json')
+            .set('Authorization', 'Bearer '+ userInfo["JWTUser"])
+            .send({
+                "speciesId": mySpeciesId[0],
+            })
+        expect(resp.statusCode).toBe(400)
+        expect(resp.body).toEqual(expect.objectContaining({
+            "field": [
+                "name"
+            ],
+            "message": [
+                "\"name\" is required"
+            ]
+        }))
+
+    });
     //
     // test("create one plant with botanist account   ", async () => {
     //     const resp = await request(app).post("/api/plant")
