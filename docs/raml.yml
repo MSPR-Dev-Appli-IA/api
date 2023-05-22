@@ -550,16 +550,18 @@ protocols: [HTTPS]
           description: Get the user's plants.
           body:
             application/json:
-              type: array
+              type: object
               example: |
-                [
-                  {
-                    "_id": "646a0e573a625a4fe9c207bc",
-                    "name": "Rosa mosqueta",
-                    "plantInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/plant/646a0e573a625a4fe9c207bc",
-                    "speciesInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a"
-                  }
-                ]
+                {
+                  "result": [
+                    {
+                      "_id": "646a0e573a625a4fe9c207bc",
+                      "name": "Rosa mosqueta",
+                      "plantInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/plant/646a0e573a625a4fe9c207bc",
+                      "speciesInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a"
+                    }
+                  ]
+                }
         400:
           description: Error with the passed parameters.
           body:

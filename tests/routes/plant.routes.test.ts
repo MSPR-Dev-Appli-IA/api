@@ -101,37 +101,17 @@ describe("create plants ", () => {
 })
 
 
-// describe("get plants  ", () => {
-//     let plantsUsersId: string[] = []
-//     beforeAll(async () => {
-//         await mySpeciesId.reduce(async (a, element) => {
-//             // Wait for the previous item to finish processing
-//             await a;
-//             // Process this item
-//             const resp = await request(app).post("/api/plant")
-//                 .set('Content-type', 'application/json')
-//                 .set('Cookie', cookieJWTUser)
-//                 .send({
-//                     "speciesId": element,
-//                 })
-//             plantsUsersId.push(resp.body._id)
-//         }, Promise.resolve());
-//
-//     })
-//
-//     test("get my plants ", async () => {
-//         const resp = await request(app).get("/api/plant")
-//             .set('Content-type', 'application/json')
-//             .set('Cookie', cookieJWTUser)
-//
-//         expect(resp.statusCode).toBe(200)
-//         expect(resp.body.length).toEqual(5)
-//         expect(resp.body[0].name).toEqual("Ma plante ( Amelanchier nokoense )")
-//         expect(resp.body[1].name).toEqual("Ma plante ( Porteranthus ensata )")
-//         expect(resp.body[2].name).toEqual('Ma plante ( Dionaea crispum )')
-//         expect(resp.body[3].name).toEqual('Ma plante ( Nelumbo pumila )')
-//         expect(resp.body[4].name).toEqual('Ma plante ( Echium hemisphaerica )')
-//     });
+describe("get plants  ", () => {
+
+    test("get my plants with botanist account", async () => {
+        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/plant")
+            .set('Content-type', 'application/json')
+            .set('Authorization', 'Bearer ' + botanistInfo["JWTBotanist"])
+
+        expect(resp.statusCode).toBe(200)
+        expect(resp.body.result.length).toEqual(1)
+        expect(resp.body[0]).toEqual(expect.objectContaining({"name": "Rosa botanist"}))
+    })
 //
 //
 //     test("get some of my  plants without token  ", async () => {
@@ -233,7 +213,7 @@ describe("create plants ", () => {
 //       });
 //
 //
-// })
+})
 //
 //
 // describe("plants and image ", () => {
