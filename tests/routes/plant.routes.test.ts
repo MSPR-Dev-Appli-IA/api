@@ -46,7 +46,7 @@ describe("create plants ", () => {
     test("create one plant with user account ", async () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
             .set('Content-type', 'application/json')
-            .set('Authorization', 'Bearer '+ userInfo["JWTUser"])
+            .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
             .send({
                 "name": "Rosa",
                 "speciesId": mySpeciesId[0],
@@ -58,7 +58,7 @@ describe("create plants ", () => {
     test("create one plant with no name", async () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
             .set('Content-type', 'application/json')
-            .set('Authorization', 'Bearer '+ userInfo["JWTUser"])
+            .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
             .send({
                 "speciesId": mySpeciesId[0],
             })
@@ -77,7 +77,7 @@ describe("create plants ", () => {
     test("create one plant with botanist account", async () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
             .set('Content-type', 'application/json')
-            .set('Authorization', 'Bearer '+ botanistInfo["JWTBotanist"])
+            .set('Authorization', 'Bearer ' + botanistInfo["JWTBotanist"])
             .send({
                 "name": "Rosa botanist",
                 "speciesId": mySpeciesId[0],
@@ -89,7 +89,7 @@ describe("create plants ", () => {
     test("create one plant without species", async () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
             .set('Content-type', 'application/json')
-            .set('Authorization', 'Bearer '+ botanistInfo["JWTBotanist"])
+            .set('Authorization', 'Bearer ' + botanistInfo["JWTBotanist"])
             .send({
                 "name": "Rosa botanist 2",
             })
@@ -105,17 +105,20 @@ describe("create plants ", () => {
     });
 
 
-    //
-    // test("create one plant without auth", async () => {
-    //     const resp = await request(app).post("/api/plant")
-    //         .set('Content-type', 'application/json')
-    //         .send({
-    //             "name": "Rosa",
-    //             "speciesId": mySpeciesId[0],
-    //         })
-    //
-    //     expect(resp.statusCode).toBe(404)
-    // });
+    test("create one plant without auth", async () => {
+        const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
+            .set('Content-type', 'application/json')
+            .send({
+                "name": "Rosa",
+                "speciesId": mySpeciesId[0],
+            })
+
+        expect(resp.statusCode).toBe(401)
+        expect(resp.body).toEqual(expect.objectContaining({
+            "field": ["error"],
+            "message": "Bad token. You must to logged in before"
+        }))
+    });
 })
 
 
