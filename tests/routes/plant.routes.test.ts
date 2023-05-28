@@ -6,7 +6,7 @@ import {dataPlants} from "../data/plant.data";
 const request = require("supertest");
 // import { closeDatabase } from '../utils/db-handler'
 // import * as fs from 'fs';
-// import { IImage } from "../../src/interfaces";
+
 
 
 let userInfo: any
@@ -193,131 +193,39 @@ describe("get plants", () => {
         })
     })
 })
-//
-//
-// describe("plants and image ", () => {
-//     let plantIdToGet:String|null = null
-//     let arrayPathImage:IImage[]= []
-//     beforeAll(async()=>{
-//
-//        const resp = await request(app).post("/api/plant")
-//         .set('Content-type', 'application/json')
-//         .set('Cookie', cookieJWTUser)
-//         .send({
-//         "speciesId": mySpeciesId[0],
-//      })
-//
-//      plantIdToGet = resp.body._id
-//
-//
-//       });
-//
-//
-//       test("add image to a plant ", async () => {
-//
-//         const resp = await request(app).post("/api/plant/addImage/"+plantIdToGet)
-//           .set('Content-Type','multipart/form-data')
-//           .set('Cookie', cookieJWTUser)
-//           .attach('file', `public/testImage/rosa.jpg`)
-//           expect(resp.statusCode).toBe(200)
-//           expect(resp.body.name).toEqual("Ma plante ( Ocimum diffusus )")
-//           expect(resp.body.images.length).toEqual(1)
-//           expect(fs.existsSync("public/image/" + resp.body.images[0].path)).toBeTruthy()
-//           arrayPathImage.push(resp.body.images[0])
-//       });
-//
-//       test("add image to a plant with wrong  botanist account ", async () => {
-//         const resp = await request(app).post("/api/plant/addImage/"+plantIdToGet)
-//           .set('Content-Type','multipart/form-data')
-//           .set('Cookie', cookieJWTBotanist)
-//           .attach('file', `public/testImage/rosa.jpg`)
-//           expect(resp.statusCode).toBe(404)
-//
-//       });
-//
-//
-//
-//       test("add another image to a plant ", async () => {
-//         const resp = await request(app).post("/api/plant/addImage/"+plantIdToGet)
-//           .set('Content-Type','multipart/form-data')
-//           .set('Cookie', cookieJWTUser)
-//           .attach('file', `public/testImage/rosa.jpg`)
-//           expect(resp.statusCode).toBe(200)
-//           expect(resp.body.name).toEqual("Ma plante ( Ocimum diffusus )")
-//           expect(resp.body.images.length).toEqual(2)
-//           expect(fs.existsSync("public/image/" + resp.body.images[1].path)).toBeTruthy()
-//           arrayPathImage.push(resp.body.images[1])
-//       });
-//
-//       test("add another image to a plant ", async () => {
-//         const resp = await request(app).post("/api/plant/addImage/"+plantIdToGet)
-//           .set('Content-Type','multipart/form-data')
-//           .set('Cookie', cookieJWTUser)
-//           .attach('file', `public/testImage/rosa.jpg`)
-//           expect(resp.statusCode).toBe(200)
-//           expect(resp.body.name).toEqual("Ma plante ( Ocimum diffusus )")
-//           expect(resp.body.images.length).toEqual(3)
-//           expect(fs.existsSync("public/image/" + resp.body.images[2].path)).toBeTruthy()
-//           arrayPathImage.push(resp.body.images[2])
-//       });
-//
-//
-//       test(" delete one image to a plant ", async () => {
-//         const resp = await request(app).delete("/api/plant/deleteImage/"+plantIdToGet+"/"+arrayPathImage[0]._id)
-//           .set('Cookie', cookieJWTUser)
-//           expect(resp.statusCode).toBe(200)
-//           expect(resp.body.name).toEqual("Ma plante ( Ocimum diffusus )")
-//           expect(resp.body.images.length).toEqual(2)
-//           expect(fs.existsSync("public/image/" + arrayPathImage[0].path)).toBeFalsy()
-//       });
-//
-//       test(" delete one image to a plant without botanist account ", async () => {
-//         const resp = await request(app).delete("/api/plant/deleteImage/"+plantIdToGet+"/"+arrayPathImage[0]._id)
-//           .set('Cookie', cookieJWTUser)
-//           expect(resp.statusCode).toBe(404)
-//
-//       });
-//
-//       test(" delete one image to a plant ", async () => {
-//         const resp = await request(app).delete("/api/plant/deleteImage/"+plantIdToGet+"/"+arrayPathImage[1]._id)
-//           .set('Cookie', cookieJWTUser)
-//           expect(resp.statusCode).toBe(200)
-//           expect(resp.body.name).toEqual("Ma plante ( Ocimum diffusus )")
-//           expect(resp.body.images.length).toEqual(1)
-//           expect(fs.existsSync("public/image/" + arrayPathImage[1].path)).toBeFalsy()
-//       });
-//
-//
-//       test(" delete one plant with wrong token ", async () => {
-//
-//         const resp = await request(app).delete("/api/plant/"+plantIdToGet)
-//           .set('Cookie', cookieJWTBotanist)
-//           expect(resp.statusCode).toBe(404)
-//
-//       });
-//
-//       test(" delete one plant ", async () => {
-//
-//         const resp = await request(app).delete("/api/plant/"+plantIdToGet)
-//           .set('Cookie', cookieJWTUser)
-//           expect(resp.statusCode).toBe(200)
-//           expect(fs.existsSync("public/image/" + arrayPathImage[2].path)).toBeFalsy()
-//       });
-//
-//       test("get one plant deleted", async () => {
-//
-//         const resp = await request(app).get("/api/plant/"+plantIdToGet)
-//           .set('Content-type', 'application/json')
-//           .set('Cookie', cookieJWTUser)
-//           expect(resp.statusCode).toBe(404)
-//
-//
-//       });
-//
-//
-//
-//
-//     })
+
+describe("add plant images", () => {
+    test("add image to a plant ", async () => {
+
+        const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant/addImage")
+            .set('Content-Type', 'multipart/form-data')
+            .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
+            .attach('file', `public/testImage/rosa.jpg`)
+            .field("plantId", myFirstPlant._id)
+        expect(resp.statusCode).toBe(200)
+        expect(resp.body.status).toEqual("success")
+    });
+
+
+    test("add another image to a plant ", async () => {
+        const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant/addImage")
+            .set('Content-Type', 'multipart/form-data')
+            .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
+            .field("plantId", myFirstPlant._id)
+            .attach('file', `public/testImage/rosa.jpg`)
+
+        expect(resp.statusCode).toBe(200)
+
+        const plantInfo = await request("https://api-arosaje-test.locascio.fr").get(resp.body.plantInfo)
+            .set('Content-Type', 'multipart/form-data')
+            .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
+
+        expect(plantInfo.body.images.length).toEqual(2)
+        expect(plantInfo.body.name).toEqual(myFirstPlant.name)
+    });
+})
+
+
 //
 //
 //
