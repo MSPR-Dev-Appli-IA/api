@@ -4,9 +4,6 @@ import {getAllPlants} from "../utils/plant";
 import {dataPlants} from "../data/plant.data";
 
 const request = require("supertest");
-// import { closeDatabase } from '../utils/db-handler'
-// import * as fs from 'fs';
-
 
 
 let userInfo: any
@@ -27,13 +24,6 @@ beforeAll(async () => {
     myFirstPlant = myPlants[0]
 
 }, 300000)
-
-// TODO FIX IT
-// afterAll(() => {
-//     closeDatabase()
-// }
-// );
-
 
 describe("create plants ", () => {
 
@@ -83,7 +73,8 @@ describe("create plants ", () => {
     test("create one plant without auth", async () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
             .set('Content-type', 'application/json')
-            .send({"name": "Rosa", "speciesId": mySpeciesId[0],
+            .send({
+                "name": "Rosa", "speciesId": mySpeciesId[0],
             })
 
         expect(resp.statusCode).toBe(401)
@@ -110,12 +101,12 @@ describe("get plants", () => {
     test("get some of my plants without token  ", async () => {
 
         const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/plant")
-          .set('Content-type', 'application/json')
-          expect(resp.statusCode).toBe(401)
-          expect(resp.body).toMatchObject({
-              "field": ["error"],
-              "message": "Bad token. You must to logged in before"
-          })
+            .set('Content-type', 'application/json')
+        expect(resp.statusCode).toBe(401)
+        expect(resp.body).toMatchObject({
+            "field": ["error"],
+            "message": "Bad token. You must to logged in before"
+        })
     });
 
     test("get some of my plants with one species", async () => {
@@ -176,7 +167,7 @@ describe("get plants", () => {
             .set('Authorization', 'Bearer ' + botanistInfo["JWTBotanist"])
         expect(resp.statusCode).toBe(200)
         expect(resp.body).toMatchObject({
-            "name":  myFirstPlant.name
+            "name": myFirstPlant.name
         })
     });
 
@@ -251,61 +242,17 @@ describe("delete plant and image", () => {
 
 })
 
-
-
-//
-//
-//
-// describe("update plants  ", () => {
-//       let plantIdToGet:String|null = null
-//       beforeAll(async()=>{
-//          const resp = await request(app).post("/api/plant")
-//           .set('Content-type', 'application/json')
-//           .set('Cookie', cookieJWTUser)
-//           .send({
-//         "name":"test_update",
-//           "speciesId": mySpeciesId[0],
-//        })
-//
-//        plantIdToGet = resp.body._id
-//
-//         });
-//
-//
-//
-//         test("update plant  ", async () => {
-//
-//
-//           const resp = await request(app).post("/api/plant/"+plantIdToGet)
-//            .set('Content-type', 'application/json')
-//             .set('Cookie', cookieJWTUser)
-//             .send({
-//                 "name":"test_update_updated",
-//                 "speciesId": mySpeciesId[1],
-//                })
-//             console.log(resp.body,"bodyyy")
-//             expect(resp.statusCode).toBe(200)
-//             expect(resp.body.name).toBe("test_update_updated");
-//             expect(resp.body.species._id).toBe(mySpeciesId[1]);
-//         });
-//
-//
-//
-//
-//         test("update species without wrong jwt account", async () => {
-//           const resp = await request(app).post("/api/species/"+plantIdToGet)
-//           .set('Content-type', 'application/json')
-//             .set('Cookie', cookieJWTBotanist)
-//             .send({
-//                 "name":"test_update_updated",
-//                   "speciesId": mySpeciesId[1],
-//                })
-//             expect(resp.statusCode).toBe(404)
-//
-//         });
-//
-//
-//
-//
-//
-//       })
+describe("update plants", () => {
+    test("update plant  ", async () => {
+        const resp = await request("https://api-arosaje-test.locascio.fr").put("/api/plant")
+            .set('Content-type', 'application/json')
+            .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
+            .send({
+                "name": "test_update_updated",
+                "plantId": myPlants[2]._id,
+                "speciesId": mySpeciesId[1],
+            })
+        expect(resp.statusCode).toBe(200)
+        expect(resp.body.status).toEqual("success")
+    });
+})
