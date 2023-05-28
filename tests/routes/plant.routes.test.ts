@@ -1,5 +1,7 @@
 import {loginWithBotanistRight, loginWithUserRight} from "../data/accounts.data";
 import {getAllSpecies} from "../utils/species";
+import {getAllPlants} from "../utils/plant";
+import {dataPlants} from "../data/plant.data";
 
 const request = require("supertest");
 // import { closeDatabase } from '../utils/db-handler'
@@ -10,6 +12,8 @@ const request = require("supertest");
 let userInfo: any
 let botanistInfo: any
 let mySpeciesId: string[] = []
+let myPlants: any
+let myFirstPlant: any
 
 beforeAll(async () => {
 
@@ -17,6 +21,9 @@ beforeAll(async () => {
     botanistInfo = await loginWithBotanistRight(userInfo['JWTUser'])
 
     mySpeciesId = await getAllSpecies(botanistInfo["JWTBotanist"], mySpeciesId)
+    myPlants = await getAllPlants(userInfo['JWTUser'], mySpeciesId)
+
+    myFirstPlant = myPlants[0]
 
 }, 300000)
 
@@ -87,7 +94,7 @@ describe("create plants ", () => {
 })
 
 
-describe("get plants  ", () => {
+describe("get plants", () => {
 
     test("get my plants with botanist account", async () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/plant")
@@ -98,107 +105,93 @@ describe("get plants  ", () => {
         expect(resp.body.result.length).toEqual(1)
         expect(resp.body['result'][0]).toEqual(expect.objectContaining({"name": "Rosa botanist"}))
     })
-//
-//
-//     test("get some of my  plants without token  ", async () => {
-//
-//         const resp = await request(app).get("/api/plant")
-//           .set('Content-type', 'application/json')
-//           expect(resp.statusCode).toBe(404)
-//           expect(resp.body).toMatchObject({ message: "Your are not logged in" })
-//
-//       });
-//
-//       test("get some of my plants withf one species ", async () => {
-//         const resp = await request(app).get("/api/plant")
-//           .set('Content-type', 'application/json')
-//           .send({"speciesId":mySpeciesId[3]})
-//           .set('Cookie', cookieJWTUser)
-//
-//           expect(resp.statusCode).toBe(200)
-//           expect(resp.body.length).toEqual(1)
-//           expect(resp.body[0].name).toEqual("Ma plante ( Botrychium laevis )")
-//
-//       });
-//
-//       test("get some of my  plants with page ", async () => {
-//         const resp = await request(app).get("/api/plant")
-//           .set('Content-type', 'application/json')
-//           .send({"page":2})
-//           .set('Cookie', cookieJWTUser)
-//
-//           expect(resp.statusCode).toBe(200)
-//           expect(resp.body.length).toEqual(5)
-//           expect(resp.body[0].name).toEqual("Ma plante ( Ruta calleryana )")
-//           expect(resp.body[1].name).toEqual('Ma plante ( Botrychium laevis )')
-//           expect(resp.body[2].name).toEqual('Ma plante ( Callistephus speciosa )')
-//           expect(resp.body[3].name).toEqual('Ma plante ( Paulownia vilarri )')
-//           expect(resp.body[4].name).toEqual('Ma plante ( Ocimum diffusus )')
-//       });
-//
-//
-//       test("get some of my   plants with order asc ", async () => {
-//
-//         const resp = await request(app).get("/api/plant")
-//           .set('Content-type', 'application/json')
-//           .send({"order":"ASC"})
-//           .set('Cookie', cookieJWTUser)
-//
-//           expect(resp.statusCode).toBe(200)
-//           expect(resp.body.length).toEqual(5)
-//           expect(resp.body[0].name).toEqual('Rosa')
-//           expect(resp.body[1].name).toEqual('Ma plante ( Ocimum diffusus )')
-//           expect(resp.body[2].name).toEqual('Ma plante ( Ocimum diffusus )')
-//           expect(resp.body[3].name).toEqual('Ma plante ( Paulownia vilarri )')
-//           expect(resp.body[4].name).toEqual('Ma plante ( Callistephus speciosa )')
-//       });
-//
-//
-//       test("get some of my plants with search ", async () => {
-//
-//         const resp = await request(app).get("/api/plant")
-//           .set('Content-type', 'application/json')
-//           .send({"search":"chiu"})
-//           .set('Cookie', cookieJWTUser)
-//           expect(resp.statusCode).toBe(200)
-//           expect(resp.body.length).toEqual(2)
-//           expect(resp.body[0].name).toEqual("Ma plante ( Echium hemisphaerica )")
-//           expect(resp.body[1].name).toEqual("Ma plante ( Botrychium laevis )")
-//
-//       });
-//
-//
-//       test("get one of my plant", async () => {
-//
-//         const resp = await request(app).get("/api/plant/"+plantsUsersId[1])
-//           .set('Content-type', 'application/json')
-//           .set('Cookie', cookieJWTUser)
-//           expect(resp.statusCode).toBe(200)
-//           expect(resp.body.name).toEqual("Ma plante ( Paulownia vilarri )")
-//
-//       });
-//
-//       test("get one plant with wrong jwt token", async () => {
-//
-//         const resp = await request(app).get("/api/plant/"+plantsUsersId[0])
-//           .set('Content-type', 'application/json')
-//           .set('Cookie', cookieJWTBotanist)
-//           expect(resp.statusCode).toBe(404)
-//           expect(resp.body).toMatchObject({ message: "Your are not allowed" })
-//
-//
-//       });
-//
-//       test("get one w-plant with wrong Id ", async () => {
-//
-//         const resp = await request(app).get("/api/plant/534651")
-//           .set('Content-type', 'application/json')
-//           .set('Cookie', cookieJWTUser)
-//           expect(resp.statusCode).toBe(404)
-//
-//       });
-//
-//
+
+
+    test("get some of my plants without token  ", async () => {
+
+        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/plant")
+          .set('Content-type', 'application/json')
+          expect(resp.statusCode).toBe(401)
+          expect(resp.body).toMatchObject({
+              "field": ["error"],
+              "message": "Bad token. You must to logged in before"
+          })
+    });
+
+    test("get some of my plants with one species", async () => {
+        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/plant")
+            .set('Content-type', 'application/json')
+            .send({"speciesId": mySpeciesId[3]})
+            .set('Authorization', 'Bearer ' + botanistInfo["JWTBotanist"])
+
+        expect(resp.statusCode).toBe(200)
+        expect(resp.body.result.length).toEqual(1)
+        expect(resp.body.result[0].name).toEqual("Rosa botanist")
+
+    });
+
+    test("get some of my plants with order asc ", async () => {
+
+        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/plant")
+            .set('Content-type', 'application/json')
+            .send({"order": "ASC"})
+            .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
+
+        expect(resp.statusCode).toBe(200)
+        expect(resp.body.result.length).toEqual(5)
+        expect(resp.body.result[0].name).toEqual("Rosa")
+        expect(resp.body.result[1].name).toEqual(dataPlants[3])
+        expect(resp.body.result[2].name).toEqual(dataPlants[2])
+        expect(resp.body.result[3].name).toEqual(dataPlants[1])
+        expect(resp.body.result[4].name).toEqual(dataPlants[0])
+    });
+
+
+    test("get some of my plants with search ", async () => {
+
+        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/plant?search=Rosa%20m")
+            .set('Content-type', 'application/json')
+            .send({"search": "Rosa m"})
+            .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
+        expect(resp.statusCode).toBe(200)
+        expect(resp.body.result.length).toEqual(1)
+        expect(resp.body.result[0].name).toEqual("Rosa mosqueta")
+
+    });
+
+
+    test("get one of my plant", async () => {
+
+        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/plant/" + myFirstPlant._id)
+            .set('Content-type', 'application/json')
+            .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
+        expect(resp.statusCode).toBe(200)
+        expect(resp.body.name).toEqual(myFirstPlant.name)
+
+    });
+
+    test("get one plant with wrong jwt token", async () => {
+
+        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/plant/" + myFirstPlant._id)
+            .set('Content-type', 'application/json')
+            .set('Authorization', 'Bearer ' + botanistInfo["JWTBotanist"])
+        expect(resp.statusCode).toBe(200)
+        expect(resp.body).toMatchObject({
+            "name":  myFirstPlant.name
+        })
+    });
+
+    test("get one plant with not an ObjectId ", async () => {
+
+        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/plant/534651")
+            .set('Content-type', 'application/json')
+            .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
+        expect(resp.statusCode).toBe(400)
+        expect(resp.body).toMatchObject({
+            "field": ["plantId"],
+            "message": ["\"plantId\" length must be 24 characters long"]
+        })
+    })
 })
 //
 //
