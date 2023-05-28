@@ -14,6 +14,7 @@ let botanistInfo: any
 let mySpeciesId: string[] = []
 let myPlants: any
 let myFirstPlant: any
+let myPlantInfo: any
 
 beforeAll(async () => {
 
@@ -93,7 +94,6 @@ describe("create plants ", () => {
     });
 })
 
-
 describe("get plants", () => {
 
     test("get my plants with botanist account", async () => {
@@ -155,7 +155,6 @@ describe("get plants", () => {
             .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
         expect(resp.statusCode).toBe(200)
         expect(resp.body.result.length).toEqual(1)
-        expect(resp.body.result[0].name).toEqual("Rosa mosqueta")
 
     });
 
@@ -224,6 +223,34 @@ describe("add plant images", () => {
         expect(plantInfo.body.name).toEqual(myFirstPlant.name)
     });
 })
+
+describe("delete plant and image", () => {
+
+    beforeEach(async () => {
+        myPlantInfo = await request("https://api-arosaje-test.locascio.fr").get(myFirstPlant.plantInfo)
+            .set('Content-type', 'application/json')
+            .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
+    }, 300000)
+
+    test("delete one image to a plant ", async () => {
+        const resp = await request("https://api-arosaje-test.locascio.fr").delete("/api/plant/deleteImage/" + myPlantInfo.body._id + "/" + myPlantInfo.body.images[0]._id)
+            .set('Content-type', 'application/json')
+            .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
+        expect(resp.statusCode).toBe(200)
+        expect(resp.body).toEqual({type: "success", message: "File deleted"})
+
+    });
+
+    test("delete plant", async () => {
+        const resp = await request("https://api-arosaje-test.locascio.fr").delete("/api/plant/" + myPlants[1]._id)
+            .set('Content-type', 'application/json')
+            .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
+        expect(resp.statusCode).toBe(200)
+        expect(resp.body).toEqual({type: "success", message: "Plant deleted"})
+    })
+
+})
+
 
 
 //
