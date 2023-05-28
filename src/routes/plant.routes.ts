@@ -9,10 +9,13 @@ import  {requireAuth} from "../middleware/AuthMiddleware";
 import  {areyouThePlantOwner} from "../middleware/PlantMiddleware";
 
 router.get("/",  requireAuth, getMyPlants);
-router.get("/:plantId",  requireAuth,areyouThePlantOwner, getOneOfMyPlant);
 router.post("/",  requireAuth, newPlant);
-router.post("/:plantId",  requireAuth,areyouThePlantOwner, updatePlant);
-router.post("/addImage/:plantId",requireAuth,areyouThePlantOwner,upload.single("file"),addImageFromPlant)
-router.delete("/deleteImage/:plantId/:imageId",  requireAuth,areyouThePlantOwner, removeImageFromPlant);
+router.put("/",  requireAuth, areyouThePlantOwner, updatePlant);
+
+router.get("/:plantId",  requireAuth,areyouThePlantOwner, getOneOfMyPlant);
 router.delete("/:plantId",  requireAuth,areyouThePlantOwner, removePlant);
+
+router.post("/addImage",requireAuth,areyouThePlantOwner,upload.single("file"),addImageFromPlant)
+router.delete("/deleteImage/:plantId/:imageId",  requireAuth,areyouThePlantOwner, removeImageFromPlant);
+
 export default router;
