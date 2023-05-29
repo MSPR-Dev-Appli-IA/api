@@ -48,6 +48,11 @@ const updateSpeciesValidation = Joi.object({
   }),
 });
 
+const getSpeciesValidation = Joi.object({
+  search: Joi.string().min(2),
+  page: Joi.number().positive(),
+  order: Joi.string().min(3).valid("ASC", "DESC")
+})
 
-export  {createSpeciesValidation, updateSpeciesValidation};
+export  {createSpeciesValidation, updateSpeciesValidation, getSpeciesValidation};
   

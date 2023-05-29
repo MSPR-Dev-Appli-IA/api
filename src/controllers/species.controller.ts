@@ -13,7 +13,7 @@ import {newImage} from "./image.controller";
 import mongoose from 'mongoose';
 import * as fs from 'fs';
 import {
-    createSpeciesValidation,
+    createSpeciesValidation, getSpeciesValidation,
     updateSpeciesValidation
 } from "../database/validation/species.validation";
 import {API_HOSTNAME, API_VERSION, return400or500Errors} from "../utils";
@@ -22,9 +22,13 @@ const limit: number = 5
 
 export const getSpecies = async (req: Request, res: Response, _: NextFunction) => {
     try {
-        let {page = 1, order, search} = req.body;
-        order = order == "ASC" ? 1 : -1
+        const search = (req.query.search) ? String(req.query.search) : ""
+        const page = (req.query.page) ? Number(req.query.page) : Number(1)
+        const order = (req.query.order == "ASC") ? 1 : -1
         const skip: number = limit * page - limit;
+
+        await getSpeciesValidation.validateAsync(req.query, {abortEarly: false});
+
         const species = await findLimitedSpecies(limit, skip, order, search)
         const result: any[] = []
 
