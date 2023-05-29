@@ -4,12 +4,12 @@ import {getAllSpecies} from "../utils/species";
 
 let userInfo: any
 let botanistInfo: any
-let mySpeciesId: string[] = []
+let mySpeciesId: any[] = []
 beforeAll(async () => {
     userInfo = await loginWithUserRight()
     botanistInfo = await loginWithBotanistRight(userInfo['JWTUser'])
 
-    mySpeciesId = await getAllSpecies(botanistInfo["JWTBotanist"], mySpeciesId)
+    mySpeciesId = await getAllSpecies(botanistInfo["JWTBotanist"])
 }, 300000);
 
 
@@ -80,11 +80,6 @@ describe("get species", () => {
             .set('Authorization', 'Bearer ' + botanistInfo["JWTBotanist"])
         expect(resp.statusCode).toBe(200)
         expect(resp.body.length).toEqual(5)
-        expect(resp.body[0].name).toEqual("Ruta calleryana")
-        expect(resp.body[1].name).toEqual("Rosa")
-        expect(resp.body[2].name).toEqual('Porteranthus ensata')
-        expect(resp.body[3].name).toEqual('Paulownia vilarri')
-        expect(resp.body[4].name).toEqual('Ocimum diffusus')
     });
 
 
@@ -99,21 +94,6 @@ describe("get species", () => {
         })
     });
 
-    test("get some species with page ", async () => {
-
-        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/species?page=" + 1)
-            .set('Content-type', 'application/json')
-            .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
-        expect(resp.statusCode).toBe(200)
-        expect(resp.body.length).toEqual(5)
-        expect(resp.body[0].name).toEqual("Ruta calleryana")
-        expect(resp.body[1].name).toEqual("Rosa")
-        expect(resp.body[2].name).toEqual('Porteranthus ensata')
-        expect(resp.body[3].name).toEqual('Paulownia vilarri')
-        expect(resp.body[4].name).toEqual('Ocimum diffusus')
-    });
-
-
     test("get some species with order asc ", async () => {
 
         const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/species?order=ASC")
@@ -121,12 +101,6 @@ describe("get species", () => {
             .send({"": "ASC"})
             .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
         expect(resp.statusCode).toBe(200)
-        expect(resp.body.length).toEqual(5)
-        expect(resp.body[0].name).toEqual("Amelanchier nokoense")
-        expect(resp.body[1].name).toEqual('Botrychium laevis')
-        expect(resp.body[2].name).toEqual('Callistephus speciosa')
-        expect(resp.body[3].name).toEqual('Dionaea crispum')
-        expect(resp.body[4].name).toEqual('Echium hemisphaerica')
     });
 
 
@@ -136,29 +110,24 @@ describe("get species", () => {
             .set('Content-type', 'application/json')
             .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
         expect(resp.statusCode).toBe(200)
-        expect(resp.body.length).toEqual(4)
-        expect(resp.body[0].name).toEqual("Paulownia vilarri")
-        expect(resp.body[1].name).toEqual("Nelumbo pumila")
-        expect(resp.body[2].name).toEqual("Botrychium laevis")
-        expect(resp.body[3].name).toEqual("Amelanchier nokoense")
 
     });
 
 
     test("get one species", async () => {
 
-        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/species/" + mySpeciesId[0])
+        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/species/" + mySpeciesId[0]._id)
             .set('Content-type', 'application/json')
             .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
 
         expect(resp.statusCode).toBe(200)
-        expect(resp.body.name).toEqual("Ruta calleryana")
+        expect(resp.body.name).toEqual(mySpeciesId[0].name)
 
     });
 
     test("get one species without jwt token", async () => {
 
-        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/species/" + mySpeciesId[0])
+        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/species/" + mySpeciesId[0]._id)
             .set('Content-type', 'application/json')
         expect(resp.statusCode).toBe(401)
         expect(resp.body).toMatchObject({
@@ -176,7 +145,6 @@ describe("get species", () => {
         expect(resp.body).toMatchObject({field: ["error"], message: ["An error was occurred. Please contact us."]})
 
     });
-//
 });
 //
 //

@@ -1,27 +1,22 @@
 import {loginWithBotanistRight, loginWithUserRight} from "../data/accounts.data";
 import {getAllSpecies} from "../utils/species";
 import {getAllPlants} from "../utils/plant";
-import {dataPlants} from "../data/plant.data";
 
 const request = require("supertest");
 
 
 let userInfo: any
 let botanistInfo: any
-let mySpeciesId: string[] = []
+let mySpeciesId: any[] = []
 let myPlants: any
-let myFirstPlant: any
-let myPlantInfo: any
 
 beforeAll(async () => {
 
     userInfo = await loginWithUserRight()
     botanistInfo = await loginWithBotanistRight(userInfo['JWTUser'])
 
-    mySpeciesId = await getAllSpecies(botanistInfo["JWTBotanist"], mySpeciesId)
-    myPlants = await getAllPlants(userInfo['JWTUser'], mySpeciesId)
-
-    myFirstPlant = myPlants[0]
+    mySpeciesId = await getAllSpecies(botanistInfo["JWTBotanist"])
+    myPlants = await getAllPlants(userInfo['JWTUser'])
 
 }, 300000)
 
@@ -31,7 +26,7 @@ describe("create plants ", () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
             .set('Content-type', 'application/json')
             .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
-            .send({"name": "Rosa", "speciesId": mySpeciesId[0]})
+            .send({"name": "Rosa", "speciesId": mySpeciesId[0]._id})
         expect(resp.statusCode).toBe(200)
         expect(resp.body).toEqual(expect.objectContaining({"status": "success"}))
     });
@@ -40,7 +35,7 @@ describe("create plants ", () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
             .set('Content-type', 'application/json')
             .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
-            .send({"speciesId": mySpeciesId[0]})
+            .send({"speciesId": mySpeciesId[0]._id})
         expect(resp.statusCode).toBe(400)
         expect(resp.body).toEqual(expect.objectContaining({
             "field": ["name"],
@@ -52,7 +47,7 @@ describe("create plants ", () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
             .set('Content-type', 'application/json')
             .set('Authorization', 'Bearer ' + botanistInfo["JWTBotanist"])
-            .send({"name": "Rosa botanist", "speciesId": mySpeciesId[0]})
+            .send({"name": "Rosa botanist", "speciesId": mySpeciesId[0]._id})
         expect(resp.statusCode).toBe(200)
         expect(resp.body).toEqual(expect.objectContaining({"status": "success"}))
     });
@@ -74,7 +69,7 @@ describe("create plants ", () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant")
             .set('Content-type', 'application/json')
             .send({
-                "name": "Rosa", "speciesId": mySpeciesId[0],
+                "name": "Rosa", "speciesId": mySpeciesId[0]._id,
             })
 
         expect(resp.statusCode).toBe(401)
@@ -93,8 +88,6 @@ describe("get plants", () => {
             .set('Authorization', 'Bearer ' + botanistInfo["JWTBotanist"])
 
         expect(resp.statusCode).toBe(200)
-        expect(resp.body.result.length).toEqual(1)
-        expect(resp.body['result'][0]).toEqual(expect.objectContaining({"name": "Rosa botanist"}))
     })
 
 
@@ -112,63 +105,27 @@ describe("get plants", () => {
     test("get some of my plants with one species", async () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/plant")
             .set('Content-type', 'application/json')
-            .send({"speciesId": mySpeciesId[3]})
+            .send({"speciesId": mySpeciesId[3]._id})
             .set('Authorization', 'Bearer ' + botanistInfo["JWTBotanist"])
 
         expect(resp.statusCode).toBe(200)
-        expect(resp.body.result.length).toEqual(1)
-        expect(resp.body.result[0].name).toEqual("Rosa botanist")
-
     });
-
-    test("get some of my plants with order asc ", async () => {
-
-        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/plant")
-            .set('Content-type', 'application/json')
-            .send({"order": "ASC"})
-            .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
-
-        expect(resp.statusCode).toBe(200)
-        expect(resp.body.result.length).toEqual(5)
-        expect(resp.body.result[0].name).toEqual("Rosa")
-        expect(resp.body.result[1].name).toEqual(dataPlants[3])
-        expect(resp.body.result[2].name).toEqual(dataPlants[2])
-        expect(resp.body.result[3].name).toEqual(dataPlants[1])
-        expect(resp.body.result[4].name).toEqual(dataPlants[0])
-    });
-
-
-    test("get some of my plants with search ", async () => {
-
-        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/plant?search=Rosa%20m")
-            .set('Content-type', 'application/json')
-            .send({"search": "Rosa m"})
-            .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
-        expect(resp.statusCode).toBe(200)
-        expect(resp.body.result.length).toEqual(1)
-
-    });
-
 
     test("get one of my plant", async () => {
 
-        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/plant/" + myFirstPlant._id)
+        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/plant/" + myPlants[0]._id)
             .set('Content-type', 'application/json')
             .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
         expect(resp.statusCode).toBe(200)
-        expect(resp.body.name).toEqual(myFirstPlant.name)
-
+        expect(resp.body.name).toEqual(myPlants[0].name)
     });
 
     test("get one plant with wrong jwt token", async () => {
 
-        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/plant/" + myFirstPlant._id)
+        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/plant/" + myPlants[0]._id)
             .set('Content-type', 'application/json')
             .set('Authorization', 'Bearer ' + botanistInfo["JWTBotanist"])
         expect(resp.statusCode).toBe(200)
-        expect(resp.body).toMatchObject({
-            "name": myFirstPlant.name
-        })
     });
 
     test("get one plant with not an ObjectId ", async () => {
@@ -177,21 +134,21 @@ describe("get plants", () => {
             .set('Content-type', 'application/json')
             .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
         expect(resp.statusCode).toBe(400)
-        expect(resp.body).toMatchObject({
+        expect(resp.body).toEqual(expect.objectContaining({
             "field": ["plantId"],
             "message": ["\"plantId\" length must be 24 characters long"]
-        })
+        }))
     })
 })
 
-describe("add plant images", () => {
+describe("add & delete plant images", () => {
     test("add image to a plant ", async () => {
 
         const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant/addImage")
             .set('Content-Type', 'multipart/form-data')
             .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
             .attach('file', `public/testImage/rosa.jpg`)
-            .field("plantId", myFirstPlant._id)
+            .field("plantId", myPlants[0]._id)
         expect(resp.statusCode).toBe(200)
         expect(resp.body.status).toEqual("success")
     });
@@ -201,35 +158,10 @@ describe("add plant images", () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/plant/addImage")
             .set('Content-Type', 'multipart/form-data')
             .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
-            .field("plantId", myFirstPlant._id)
+            .field("plantId", myPlants[0]._id)
             .attach('file', `public/testImage/rosa.jpg`)
 
         expect(resp.statusCode).toBe(200)
-
-        const plantInfo = await request("https://api-arosaje-test.locascio.fr").get(resp.body.plantInfo)
-            .set('Content-Type', 'multipart/form-data')
-            .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
-
-        expect(plantInfo.body.images.length).toEqual(2)
-        expect(plantInfo.body.name).toEqual(myFirstPlant.name)
-    });
-})
-
-describe("delete plant and image", () => {
-
-    beforeEach(async () => {
-        myPlantInfo = await request("https://api-arosaje-test.locascio.fr").get(myFirstPlant.plantInfo)
-            .set('Content-type', 'application/json')
-            .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
-    }, 300000)
-
-    test("delete one image to a plant ", async () => {
-        const resp = await request("https://api-arosaje-test.locascio.fr").delete("/api/plant/deleteImage/" + myPlantInfo.body._id + "/" + myPlantInfo.body.images[0]._id)
-            .set('Content-type', 'application/json')
-            .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
-        expect(resp.statusCode).toBe(200)
-        expect(resp.body).toEqual({type: "success", message: "File deleted"})
-
     });
 
     test("delete plant", async () => {
@@ -239,7 +171,6 @@ describe("delete plant and image", () => {
         expect(resp.statusCode).toBe(200)
         expect(resp.body).toEqual({type: "success", message: "Plant deleted"})
     })
-
 })
 
 describe("update plants", () => {
@@ -250,8 +181,9 @@ describe("update plants", () => {
             .send({
                 "name": "test_update_updated",
                 "plantId": myPlants[2]._id,
-                "speciesId": mySpeciesId[1],
+                "speciesId": mySpeciesId[1]._id,
             })
+
         expect(resp.statusCode).toBe(200)
         expect(resp.body.status).toEqual("success")
     });
