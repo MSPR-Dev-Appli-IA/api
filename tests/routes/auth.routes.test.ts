@@ -24,7 +24,7 @@ describe("Signup", () => {
   });
 });
 
-describe("Logged Signup or login", () => {
+describe("Authenticate Endpoints", () => {
 
   beforeAll(async () => {
 
@@ -51,6 +51,24 @@ describe("Logged Signup or login", () => {
     expect(resp.statusCode).toBe(304)
   });
 
+  test("logout ", async () => {
+    const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/auth/logout")
+        .set('Content-type', 'application/json')
+        .set('Authorization', 'Bearer ' + userToken)
+        .send()
+    expect(resp.statusCode).toBe(200)
+    expect(resp.body).toMatchObject({status: "success", message: "You're logged out."})
+  });
+
+  test("logout without being connected  ", async () => {
+    const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/auth/logout")
+        .set('Content-type', 'application/json')
+    expect(resp.statusCode).toBe(401)
+    expect(resp.body).toMatchObject({
+      "field": ["error"],
+      "message": "Bad token. You must to logged in before"
+    })
+  })
 })
 
 
@@ -66,36 +84,15 @@ describe("Login", () => {
 
   test("login wrong password ", async () => {
     const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/auth/login")
-      .send({"email": "email_test@hotmail.com", "password": "1234s56" })
+        .send({"email": "email_test@hotmail.com", "password": "1234s56" })
     expect(resp.statusCode).toBe(404)
     expect(resp.body).toMatchObject({
       "field": ["error"],
       "message": ["L'email et/ou le mot de passe est incorrect"]
     })
-  });
-});
+  })
+})
 
-
-
-//
-// describe("logout", () => {
-//
-//
-//   test("logout ", async () => {
-//     const resp = await request(app).get("/api/auth/logout")
-//       .set('Cookie', cookieJWT)
-//       .send()
-//     expect(resp.statusCode).toBe(200)
-//     expect(extractCookies(resp.headers).jwt.value).toEqual("")
-//   });
-//   test("logout without being connected  ", async () => {
-//     const resp = await request(app).get("/api/auth/logout")
-//       .send()
-//     expect(resp.statusCode).toBe(404)
-//     expect(resp.body).toMatchObject({ message: "Your are not logged in" })
-//   });
-//
-// });
 //
 //
 // describe("me", () => {
