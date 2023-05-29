@@ -24,7 +24,7 @@ describe("Signup", () => {
   });
 });
 
-describe("Logged Signup", () => {
+describe("Logged Signup or login", () => {
 
   beforeAll(async () => {
 
@@ -43,37 +43,40 @@ describe("Logged Signup", () => {
     expect(resp.statusCode).toBe(304)
   });
 
+  test("login while being already connected ", async () => {
+    const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/auth/login")
+        .set('Content-type', 'application/json')
+        .set('Authorization', 'Bearer ' + userToken)
+        .send({"email": "email_test@hotmail.com", "password": "123456"});
+    expect(resp.statusCode).toBe(304)
+  });
+
 })
 
 
-// describe("Login", () => {
-//
-//   test("login", async () => {
-//     const resp = await request(app).post("/api/auth/login")
-//       .send({ "email": "jwttoken@hotmail.com", "password": "123456" })
-//     expect(resp.statusCode).toBe(200)
-//     expect(resp.body.local).toEqual(expect.objectContaining({ 'email': "jwttoken@hotmail.com", "password": null }))
-//     expect(resp.body).toEqual(expect.objectContaining({ "username": "testjwt", "firstname": "tesjwt", "lastname": "teurff" }))
-//   });
-//   test("login while being already connected ", async () => {
-//     const resp = await request(app).post("/api/auth/login")
-//       .set('Cookie', cookieJWT)
-//       .send({ "email": "jwttoken@hotmail.com", "password": "123456" })
-//     expect(resp.statusCode).toBe(404)
-//     expect(resp.body).toMatchObject({ message: "Your are  logged in" })
-//   });
-//
-//   test("login wrong password ", async () => {
-//     const resp = await request(app).post("/api/auth/login")
-//       .send({ "email": "jwttoken@hotmail.com", "password": "1234s56" })
-//     expect(resp.statusCode).toBe(404)
-//     expect(resp.body).toMatchObject([{
-//       "field": "password",
-//       "message": "Mauvais identifiants"
-//     }])
-//   });
-//
-// });
+describe("Login", () => {
+
+  test("login", async () => {
+    const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/auth/login")
+        .set('Content-type', 'application/json')
+      .send({"email": "email_test@hotmail.com", "password": "123456"})
+    expect(resp.statusCode).toBe(200)
+    expect(resp.body).toEqual(expect.objectContaining({"status": "You're logged in."}))
+  });
+
+  test("login wrong password ", async () => {
+    const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/auth/login")
+      .send({"email": "email_test@hotmail.com", "password": "1234s56" })
+    expect(resp.statusCode).toBe(404)
+    expect(resp.body).toMatchObject({
+      "field": ["error"],
+      "message": ["L'email et/ou le mot de passe est incorrect"]
+    })
+  });
+});
+
+
+
 //
 // describe("logout", () => {
 //
