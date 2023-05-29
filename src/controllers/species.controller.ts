@@ -35,11 +35,7 @@ export const getSpecies = async (req: Request, res: Response, _: NextFunction) =
         species.forEach(item => {
             result.push({
                 name: item.name,
-                url: API_HOSTNAME + "/api" + API_VERSION + "/species/" + item._id,
-                images: item.images,
-                sunExposure: item.sunExposure,
-                watering: item.watering,
-                optimalTemperature: item.optimalTemperature
+                speciesInfo: API_HOSTNAME + "/api" + API_VERSION + "/species/" + item._id,
             })
         })
 
