@@ -98,7 +98,10 @@ export const newSpecies = async (req: Request, res: Response, _: NextFunction) =
     try {
         await createSpeciesValidation.validateAsync(req.body, {abortEarly: false});
         const species = await createSpecies(req.body);
-        res.status(200).send(species);
+        res.status(200).json({
+            status: "success",
+            path: API_HOSTNAME + "/api" + API_VERSION + "/species/" + species._id
+        })
     } catch (e) {
         return400or500Errors(e, res)
     }
