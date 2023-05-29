@@ -186,15 +186,7 @@ protocols: [HTTPS]
                 [
                   {
                     "name": "Rosa mosqueta",
-                    "url": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a",
-                    "images" : [
-                      { 
-                        path: "https://api.arosaje-stage.locascio.fr/public/image/rosa.jpg"
-                      }
-                    ],
-                    "sunExposure": "Rosa mosqueta does best with exposure to full or part sun. They will perform best with direct morning light, but in summer they need protection from the strong afternoon sun",
-                    "watering": "Every day",
-                    "optimalTemperature": 50
+                    "speciesInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a"
                   }
                 ]
         401:
