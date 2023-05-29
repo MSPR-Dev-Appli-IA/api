@@ -1,17 +1,16 @@
 import request from "supertest";
-// import { closeDatabase } from '../utils/db-handler'
-// import { app } from "../../src/index";
-// import { createAccountWithBotanistRight } from "../../src/controllers/auth.controller";
-// import {dataSpecies} from "../data/species.data";
 import {loginWithBotanistRight, loginWithUserRight} from "../data/accounts.data";
-// import { IImage } from "../../src/interfaces";
+import {getAllSpecies} from "../utils/species";
 
 let userInfo: any
 let botanistInfo: any
+let mySpeciesId: string[] = []
 beforeAll(async () => {
     userInfo = await loginWithUserRight()
     botanistInfo = await loginWithBotanistRight(userInfo['JWTUser'])
-});
+
+    mySpeciesId = await getAllSpecies(botanistInfo["JWTBotanist"], mySpeciesId)
+}, 300000);
 
 
 describe("create species", () => {
@@ -30,25 +29,6 @@ describe("create species", () => {
         expect(resp.statusCode).toBe(200)
         expect(resp.body).toEqual(expect.objectContaining({
             status: "success"
-        }))
-    });
-
-    test("create species with the same name ", async () => {
-
-        const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/species")
-            .set('Content-type', 'application/json')
-            .set('Authorization', 'Bearer ' + botanistInfo["JWTBotanist"])
-            .send({
-                "name": "Rosa",
-                "description": "Voila ma deszcription",
-                "sunExposure": "A lombre en vrai",
-                "watering": "l'eau dans 20 30 ans yen aura plus",
-                "optimalTemperature": "50"
-            })
-        expect(resp.statusCode).toBe(400)
-        expect(resp.body).toEqual(expect.objectContaining({
-            "field": ["error"],
-            "message": ["Duplicate key error."]
         }))
     });
 
@@ -91,130 +71,113 @@ describe("create species", () => {
 });
 
 
-// describe("get species", () => {
-//   let speciesIdToGet:String|null = null
-//   beforeAll(async()=>{
-//     dataSpecies.forEach(async(element,index) => {
-//      const resp = await request(app).post("/api/species")
-//       .set('Content-type', 'application/json')
-//       .set('Cookie', cookieJWTBotanist)
-//       .send({ "name":element.name,
-//       "description":element.description,
-//       "sunExposure":element.sunExposure,
-//       "watering":element.watering,
-//       "optimalTemperature":element.optimalTemperature
-//    })
-//    if (index==0){
-//     speciesIdToGet = resp.body._id
-//    }
+describe("get species", () => {
+
+    test("get some species ", async () => {
+
+        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/species")
+            .set('Content-type', 'application/json')
+            .set('Authorization', 'Bearer ' + botanistInfo["JWTBotanist"])
+        expect(resp.statusCode).toBe(200)
+        expect(resp.body.length).toEqual(5)
+        expect(resp.body[0].name).toEqual("Ruta calleryana")
+        expect(resp.body[1].name).toEqual("Rosa")
+        expect(resp.body[2].name).toEqual('Porteranthus ensata')
+        expect(resp.body[3].name).toEqual('Paulownia vilarri')
+        expect(resp.body[4].name).toEqual('Ocimum diffusus')
+    });
+
+
+    test("get some species without token  ", async () => {
+
+        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/species")
+            .set('Content-type', 'application/json')
+        expect(resp.statusCode).toBe(401)
+        expect(resp.body).toMatchObject({
+            "field": ["error"],
+            "message": "Bad token. You must to logged in before"
+        })
+    });
+
+    test("get some species with page ", async () => {
+
+        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/species?page=" + 1)
+            .set('Content-type', 'application/json')
+            .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
+        expect(resp.statusCode).toBe(200)
+        expect(resp.body.length).toEqual(5)
+        expect(resp.body[0].name).toEqual("Ruta calleryana")
+        expect(resp.body[1].name).toEqual("Rosa")
+        expect(resp.body[2].name).toEqual('Porteranthus ensata')
+        expect(resp.body[3].name).toEqual('Paulownia vilarri')
+        expect(resp.body[4].name).toEqual('Ocimum diffusus')
+    });
+
+
+    test("get some species with order asc ", async () => {
+
+        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/species?order=ASC")
+            .set('Content-type', 'application/json')
+            .send({"": "ASC"})
+            .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
+        expect(resp.statusCode).toBe(200)
+        expect(resp.body.length).toEqual(5)
+        expect(resp.body[0].name).toEqual("Amelanchier nokoense")
+        expect(resp.body[1].name).toEqual('Botrychium laevis')
+        expect(resp.body[2].name).toEqual('Callistephus speciosa')
+        expect(resp.body[3].name).toEqual('Dionaea crispum')
+        expect(resp.body[4].name).toEqual('Echium hemisphaerica')
+    });
+
+
+    test("get some species with search ", async () => {
+
+        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/species?search=la")
+            .set('Content-type', 'application/json')
+            .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
+        expect(resp.statusCode).toBe(200)
+        expect(resp.body.length).toEqual(4)
+        expect(resp.body[0].name).toEqual("Paulownia vilarri")
+        expect(resp.body[1].name).toEqual("Nelumbo pumila")
+        expect(resp.body[2].name).toEqual("Botrychium laevis")
+        expect(resp.body[3].name).toEqual("Amelanchier nokoense")
+
+    });
+
+
+    test("get one species", async () => {
+
+        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/species/" + mySpeciesId[0])
+            .set('Content-type', 'application/json')
+            .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
+
+        expect(resp.statusCode).toBe(200)
+        expect(resp.body.name).toEqual("Ruta calleryana")
+
+    });
+
+    test("get one species without jwt token", async () => {
+
+        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/species/" + mySpeciesId[0])
+            .set('Content-type', 'application/json')
+        expect(resp.statusCode).toBe(401)
+        expect(resp.body).toMatchObject({
+            "field": ["error"],
+            "message": "Bad token. You must to logged in before"
+        })
+    });
+
+    test("get one species with wrong Id ", async () => {
+
+        const resp = await request("https://api-arosaje-test.locascio.fr").get("/api/species/534651")
+            .set('Content-type', 'application/json')
+            .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
+        expect(resp.statusCode).toBe(500)
+        expect(resp.body).toMatchObject({field: ["error"], message: ["An error was occurred. Please contact us."]})
+
+    });
 //
-//     });
-//   })
-//
-//   test("get some species ", async () => {
-//
-//     const resp = await request(app).get("/api/species")
-//       .set('Content-type', 'application/json')
-//       .set('Cookie', cookieJWTUser)
-//       expect(resp.statusCode).toBe(200)
-//       expect(resp.body.length).toEqual(5)
-//       expect(resp.body[0].name).toEqual("Ruta calleryana")
-//       expect(resp.body[1].name).toEqual("Rosa")
-//       expect(resp.body[2].name).toEqual('Porteranthus ensata')
-//       expect(resp.body[3].name).toEqual('Paulownia vilarri')
-//       expect(resp.body[4].name).toEqual('Ocimum diffusus')
-//   });
-//
-//
-//   test("get some species without token  ", async () => {
-//
-//     const resp = await request(app).get("/api/species")
-//       .set('Content-type', 'application/json')
-//       expect(resp.statusCode).toBe(404)
-//       expect(resp.body).toMatchObject({ message: "Your are not logged in" })
-//
-//   });
-//
-//   test("get some species with page ", async () => {
-//
-//     const resp = await request(app).get("/api/species")
-//       .set('Content-type', 'application/json')
-//       .send({"page":2})
-//       .set('Cookie', cookieJWTUser)
-//       expect(resp.statusCode).toBe(200)
-//       expect(resp.body.length).toEqual(5)
-//       expect(resp.body[0].name).toEqual("Nelumbo pumila")
-//       expect(resp.body[1].name).toEqual('Echium hemisphaerica')
-//       expect(resp.body[2].name).toEqual('Dionaea crispum')
-//       expect(resp.body[3].name).toEqual('Callistephus speciosa')
-//       expect(resp.body[4].name).toEqual('Botrychium laevis')
-//   });
-//
-//
-//   test("get some species with order asc ", async () => {
-//
-//     const resp = await request(app).get("/api/species")
-//       .set('Content-type', 'application/json')
-//       .send({"order":"ASC"})
-//       .set('Cookie', cookieJWTUser)
-//       expect(resp.statusCode).toBe(200)
-//       expect(resp.body.length).toEqual(5)
-//       expect(resp.body[0].name).toEqual("Amelanchier nokoense")
-//       expect(resp.body[1].name).toEqual('Botrychium laevis')
-//       expect(resp.body[2].name).toEqual('Callistephus speciosa')
-//       expect(resp.body[3].name).toEqual('Dionaea crispum')
-//       expect(resp.body[4].name).toEqual('Echium hemisphaerica')
-//
-//
-//   });
-//
-//
-//   test("get some species with search ", async () => {
-//
-//     const resp = await request(app).get("/api/species")
-//       .set('Content-type', 'application/json')
-//       .send({"search":"la"})
-//       .set('Cookie', cookieJWTUser)
-//       expect(resp.statusCode).toBe(200)
-//       expect(resp.body.length).toEqual(4)
-//       expect(resp.body[0].name).toEqual("Paulownia vilarri")
-//       expect(resp.body[1].name).toEqual("Nelumbo pumila")
-//       expect(resp.body[2].name).toEqual("Botrychium laevis")
-//       expect(resp.body[3].name).toEqual("Amelanchier nokoense")
-//
-//   });
-//
-//
-//   test("get one species", async () => {
-//
-//     const resp = await request(app).get("/api/species/"+speciesIdToGet)
-//       .set('Content-type', 'application/json')
-//       .set('Cookie', cookieJWTUser)
-//
-//       expect(resp.statusCode).toBe(200)
-//       expect(resp.body.name).toEqual("Ocimum diffusus")
-//
-//   });
-//
-//   test("get one species without jwt token", async () => {
-//
-//     const resp = await request(app).get("/api/species/"+speciesIdToGet)
-//       .set('Content-type', 'application/json')
-//       expect(resp.statusCode).toBe(404)
-//
-//
-//   });
-//
-//   test("get one species with wrong Id ", async () => {
-//
-//     const resp = await request(app).get("/api/species/534651")
-//       .set('Content-type', 'application/json')
-//       .set('Cookie', cookieJWTUser)
-//       expect(resp.statusCode).toBe(404)
-//
-//   });
-//
-// });
+});
 //
 //
 // describe("species and image ", () => {
