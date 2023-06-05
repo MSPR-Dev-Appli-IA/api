@@ -37,25 +37,14 @@ export const createUser= async (user :UserForm, role :IRole) => {
 
 
 export const updateUserWithUserId = async (userId: Types.ObjectId, user: UserInfo) => {
-  return await User.findByIdAndUpdate(userId, {
-    username: user.username,
-    firstname:user.firstname,
-    lastname:user.lastname,
-  },
-    { new: true }).populate("image")
+
+  if(typeof user.password !== 'undefined'){
+    user.password = await User.hashPassword(user.password);
+  }
+
+  return User.findByIdAndUpdate(userId, Object.fromEntries(Object.entries(user)), {new: true}).populate("image")
 };
 
-
-export const UpdateUserPasswordWithUserId = async (userId: Types.ObjectId, password: string) => {
-    const hashedPassword =  await User.hashPassword(password);
-    return User.findByIdAndUpdate(userId, {
-          $set: {
-            "local.password": hashedPassword,
-          },
-        },
-        {new: true});
-  
-};
 
 export const UpdateUserAvatarWithUserId = async (userId: Types.ObjectId, image: IImage) => {
   return await User.findByIdAndUpdate(userId, {

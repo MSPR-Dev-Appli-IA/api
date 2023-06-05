@@ -38,6 +38,7 @@ export interface UserInfo{
     username: string,
     firstname:string,
     lastname:string,
+    password:string
 }
 
 
