@@ -1,126 +1,74 @@
 import request from "supertest";
-import { closeDatabase } from '../utils/db-handler'
-import { app } from "../../src/index";
-import * as fs from 'fs';
-import { IImage } from "../../src/interfaces";
+import {loginWithUserRight} from "../data/accounts.data";
 
-let cookieJWT: string[]
+let userInfo: any
 
 beforeAll(async () => {
-
-  const resp = await request(app).post("/api/auth/signup")
-    .set('Content-type', 'application/json')
-    .send({ "username": "testjwt", "firstname": "tesjwt", "lastname": "teurff", "email": "jwttoken@hotmail.com", "password": "123456" });
-  cookieJWT = resp.get('Set-Cookie')
+  userInfo = await loginWithUserRight()
 }, 15000);
 
 
-afterAll(async () => {
 
-  await closeDatabase()
+describe("User Info", () => {
+
+  test("Good Update User", async () => {
+    const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/user")
+        .set('Content-type', 'application/json')
+        .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
+        .send({"firstname": "tes_update", "lastname": "teur", "email": "john.doe@gmail.com", "password": "123456789"})
+    expect(resp.statusCode).toBe(200)
+  });
+
+  test("Update user with field missing", async () => {
+    const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/user")
+        .set('Content-type', 'application/json')
+        .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
+        .send({ "tret": "test25_update"})
+    expect(resp.statusCode).toBe(400)
+  });
+
+
+  test("Update user without token", async () => {
+    const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/user")
+        .set('Content-type', 'application/json')
+        .send({ "firstname": "tes_update", "lastname": "teur", "email": "john.doe@gmail.com" })
+    expect(resp.statusCode).toBe(401)
+
+  });
+
+  test("Update user password without constraint", async () => {
+    const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/user")
+        .set('Content-type', 'application/json')
+        .set('Authorization', 'Bearer ' + userInfo["JWTUser"])
+        .send({ "password":"12345" })
+    expect(resp.statusCode).toBe(400)
+  });
 });
 
+describe("User Avatar", () => {
 
-describe("udpate", () => {
-
-  test("update some info", async () => {
-    const resp = await request(app).post("/api/user/update")
-      .set('Content-type', 'application/json')
-      .set('Cookie', cookieJWT)
-      .send({ "username": "test25_update", "firstname": "tes_update", "lastname": "teur" })
-    expect(resp.statusCode).toBe(200)
-    expect(resp.body).toMatchObject({  "username": "test25_update", "firstname": "tes_update", "lastname": "teur"  })
-  });
-
-  test("update some info field missing", async () => {
-    const resp = await request(app).post("/api/user/update")
-      .set('Content-type', 'application/json')
-      .set('Cookie', cookieJWT)
-      .send({ "username": "test25_update", "lastname": "teur" })
+  test("Delete the image of a user who doesn't have one ", async () => {
+    const resp = await request("https://api-arosaje-test.locascio.fr").delete("/api/user/avatar")
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
     expect(resp.statusCode).toBe(404)
+    expect(resp.body.message).toEqual(["Image not found. Please Add image before."])
   });
 
-
-  test("update without token", async () => {
-    const resp = await request(app).post("/api/user/update")
-      .set('Content-type', 'application/json')
-      .send({ "username": "test25_update", "firstname": "tes_update", "lastname": "teur" })
-    expect(resp.statusCode).toBe(404)
- 
-  });
-
-
-  test("update password", async () => {
-    const resp = await request(app).post("/api/user/updatePassword")
-      .set('Content-type', 'application/json')
-      .set('Cookie', cookieJWT)
-      .send({ "password":"1234567" })
+  test("Add image to a user ", async () => {
+    const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/user/avatar")
+        .set('Content-Type', 'multipart/form-data')
+        .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
+        .attach('file', `public/testImage/rosa.jpg`)
     expect(resp.statusCode).toBe(200)
-    const respLogin = await request(app).post("/api/auth/login")
-    .send({ "email": "jwttoken@hotmail.com", "password": "1234567" })
-    expect(respLogin.statusCode).toBe(200)
+    expect(resp.body.status).toEqual("success")
   });
 
-  test("update password without contraint", async () => {
-    const resp = await request(app).post("/api/user/updatePassword")
-      .set('Content-type', 'application/json')
-      .set('Cookie', cookieJWT)
-      .send({ "password":"12345" })
-    expect(resp.statusCode).toBe(404)
-  });
-
-  test("update password withoutaccount", async () => {
-    const resp = await request(app).post("/api/user/updatePassword")
-      .set('Content-type', 'application/json')
-      .send({ "password":"1234567" })
-    expect(resp.statusCode).toBe(404)
-  });
-
-  let imagesAvatar : IImage[] = []
-  test("update avatar", async () => {
-    const resp = await request(app).post("/api/user/updateAvatar")
-      .set('Content-Type','multipart/form-data')
-      .set('Cookie', cookieJWT)
-      .attach('file', `public/testImage/rosa.jpg`) 
+  test("Delete image to a user ", async () => {
+    const resp = await request("https://api-arosaje-test.locascio.fr").delete("/api/user/avatar")
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + userInfo['JWTUser'])
     expect(resp.statusCode).toBe(200)
-    expect(fs.existsSync("public/image/" + resp.body.image.path)).toBeTruthy()
-    imagesAvatar.push(resp.body.image)
+    expect(resp.body.message).toEqual("File deleted")
   });
-
-  test("update avatar", async () => {
-    const resp = await request(app).post("/api/user/updateAvatar")
-      .set('Content-Type','multipart/form-data')
-      .set('Cookie', cookieJWT)
-      .attach('file', `public/testImage/rosa.jpg`) 
-    console.log(resp.body)
-    expect(resp.statusCode).toBe(200)
-    expect(fs.existsSync("public/image/" + resp.body.image.path)).toBeTruthy()
-    expect(fs.existsSync("public/image/" + imagesAvatar[0].path)).toBeFalsy()
-    imagesAvatar.push(resp.body.image)
-    
-  });
-
-  test("delete avatar", async () => {
-    const resp = await request(app).delete("/api/user/deleteAvatar")
-      .set('Content-type', 'application/json')
-      .set('Cookie', cookieJWT)
-    expect(resp.statusCode).toBe(200)
-    expect(fs.existsSync("public/image/" + imagesAvatar[1].path)).toBeFalsy()
-  });
-
-
-  test("update avatar without account", async () => {
-    const resp = await request(app).post("/api/user/updateAvatar")
-    .set('Content-Type','multipart/form-data')
-    .attach('file', `public/testImage/rosa.jpg`) 
-    expect(resp.statusCode).toBe(404)
-  });
-
-  
-
-
-
 });
-
-
-

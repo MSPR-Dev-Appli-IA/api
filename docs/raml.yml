@@ -160,6 +160,22 @@ protocols: [HTTPS]
     get:
       description: Get all species information's
       securedBy: [ jwtUser, jwtBotanist ]
+      queryParameters:
+        search:
+          description: "Search for plant names (optional)"
+          type: string
+          required: false
+          example: "Rosa"
+        page:
+          description: "Number of pages to be paginated (optional)"
+          type: number
+          required: false
+          example: 1
+        order:
+          description: "Order results per ASC or DESC (optional)"
+          type: string
+          required: false
+          example: "ASC"
       responses:
         200:
           description: Get all species information's
@@ -170,15 +186,7 @@ protocols: [HTTPS]
                 [
                   {
                     "name": "Rosa mosqueta",
-                    "url": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a",
-                    "images" : [
-                      { 
-                        path: "https://api.arosaje-stage.locascio.fr/public/image/rosa.jpg"
-                      }
-                    ],
-                    "sunExposure": "Rosa mosqueta does best with exposure to full or part sun. They will perform best with direct morning light, but in summer they need protection from the strong afternoon sun",
-                    "watering": "Every day",
-                    "optimalTemperature": 50
+                    "speciesInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a"
                   }
                 ]
         401:
@@ -923,6 +931,171 @@ protocols: [HTTPS]
                   "message: ["Plant or image not found"]
                 }
 
+
+/user:
+  /:
+    post:
+      description: Update User Info
+      securedBy: [ jwtUser, jwtBotanist ]
+      body:
+        application/json:
+          type: object
+          properties:
+            firstname:
+              required: false
+              type: string
+            lastname:
+              required: false
+              type: string
+            email:
+              required: false
+              type: string
+            password:
+              required: false
+              type: string
+          example: |
+            {
+              "firstname": "John",
+              "lastname": "Doe",
+              "email": "john.doe@gmail.com",
+              "password": "123456"
+            }
+      responses:
+        200:
+          description: Update a User Info.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "userInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/auth/me"
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["email"],
+                  "message": ["email is not valid"]
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+  /avatar:
+    post:
+      description: Add image to an user
+      securedBy: [ jwtUser, jwtBotanist ]
+      body:
+        multipart/form-data:
+          properties:
+            file:
+              type: file
+              fileTypes: [ '*/*' ]
+      responses:
+        200:
+          description: Successful upload image
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "userInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/auth/me"
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["file"],
+                  "message": ["The file attribute is not found"]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+    delete:
+      description: Delete the image of a User
+      securedBy: [ jwtUser, jwtBotanist ]
+      responses:
+        200:
+          description: Successful suppression
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "type": "success",
+                  "message": "File deleted"
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: Image not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message: ["Image not found. Please Add image before."]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
 securitySchemes:
   jwtUser:
     description: JWT Bearer token for users.
