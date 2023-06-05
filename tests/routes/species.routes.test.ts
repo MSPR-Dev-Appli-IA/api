@@ -152,7 +152,7 @@ describe("add & delete species images", () => {
 
     test("add image to a species ", async () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").post("/api/species/addImage")
-            -          .set('Content-Type', 'multipart/form-data')
+            .set('Content-Type', 'multipart/form-data')
             .set('Authorization', 'Bearer ' + botanistInfo["JWTBotanist"])
             .attach('file', `public/testImage/rosa.jpg`)
             .field("speciesId", mySpeciesId[0]._id)
