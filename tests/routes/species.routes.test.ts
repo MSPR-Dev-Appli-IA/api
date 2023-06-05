@@ -175,7 +175,6 @@ describe("add & delete species images", () => {
         const resp = await request("https://api-arosaje-test.locascio.fr").delete("/api/species/" + mySpeciesId[1]._id)
             .set('Content-type', 'application/json')
             .set('Authorization', 'Bearer ' + botanistInfo["JWTBotanist"])
-        expect(resp.statusCode).toBe(200)
-        expect(resp.body).toEqual({type: "success", message: "Plant deleted"})
+        expect(resp.statusCode).toBe(204)
     })
 })
