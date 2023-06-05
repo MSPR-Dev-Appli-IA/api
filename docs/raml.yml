@@ -1076,6 +1076,16 @@ protocols: [HTTPS]
                   field: ["error"],
                   message: ["Bad token. You must to logged in before."]
                 }
+        404:
+          description: Image not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message: ["Image not found. Please Add image before."]
+                }
         500:
           description: An error was occurred.
           body:
