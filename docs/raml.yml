@@ -1,0 +1,955 @@
+#%RAML 1.0
+---
+title: Arosaje API
+baseUri: https://api.arosaje-stage.locascio.fr/api/{version}
+mediaType: application/json
+version: v1
+protocols: [HTTPS]
+
+/auth:
+  /login:
+    post:
+      description: Log-in a user using it's credentials.
+      body:
+        application/json:
+          type: object
+          example: |
+            {
+              "email": "test@test.com",
+              "password": "Test"
+            }
+      responses:
+        200:
+          description: User logged in with correct credentials.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "You're logged in.",
+                  "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkplYW4gUGllcnJlIiwiaWF0IjoxNTE2MjM5MDIyfQ.jnwOHy2wQm1LG5upI_y0lr0u9dN8yBQUWR0uKH15jWE"
+                }
+        304:
+          description: Always logged
+        404:
+          description: User not found
+          body:
+            application/json:
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["L'email et/ou le mot de passe est incorrect"]
+                }
+  /register:
+    post:
+      description: Allows to create account
+      body:
+        application/json:
+          type: object
+          example: |
+            {
+              "email": "test@test.com",
+              "username": "Test",
+              "firstname": "Test",
+              "lastname": "Test",
+              "password": "Azerty"
+            }
+      responses:
+        200:
+          description: User created.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "message": "User created."
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["email", "password"],
+                  "message": ["Veuillez renseignez un email valide", "Le mot de passe doit être au minimum de 6 caractères"]
+                }
+        304:
+          description: Always logged
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Your are always logged"]
+                }
+  /me:
+    get:
+      description: Get user informations.
+      securedBy: [ jwtUser, jwtBotanist ]
+      responses:
+        200:
+          description: User informations.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "username": "Test",
+                  "firstname": "Test",
+                  "lastname": "Test",
+                  "role": "6465d4ab9cf91b1420a3f83c",
+                  "created_at": "2023-05-14T15:08:28.295+00:00",
+                  "deleted_at": "",
+                  "local": {
+                    "email": "test@test.com",
+                    "password": ""
+                  },
+                  "image": ""
+                  "jwtToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkplYW4gUGllcnJlIiwiaWF0IjoxNTE2MjM5MDIyfQ.jnwOHy2wQm1LG5upI_y0lr0u9dN8yBQUWR0uKH15jWE"
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: User not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["User not Found"]
+                }
+  /logout:
+    get:
+      description: Log out a user using it's JWT.
+      securedBy: [ jwtUser, jwtBotanist ]
+      responses:
+        200:
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "message": "You're logged out."
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+
+/species:
+  /:
+    get:
+      description: Get all species information's
+      securedBy: [ jwtUser, jwtBotanist ]
+      responses:
+        200:
+          description: Get all species information's
+          body:
+            application/json:
+              type: array
+              example: |
+                [
+                  {
+                    "name": "Rosa mosqueta",
+                    "url": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a",
+                    "images" : [
+                      { 
+                        path: "https://api.arosaje-stage.locascio.fr/public/image/rosa.jpg"
+                      }
+                    ],
+                    "sunExposure": "Rosa mosqueta does best with exposure to full or part sun. They will perform best with direct morning light, but in summer they need protection from the strong afternoon sun",
+                    "watering": "Every day",
+                    "optimalTemperature": 50
+                  }
+                ]
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        500:
+          description: An error was occurred
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+    post:
+      description: Create an species
+      securedBy: [ jwtBotanist ]
+      body:
+        application/json:
+          type: object
+          example: |
+            {
+              "name": "Rosa mosqueta",
+              description: "Rosa mosqueta is also known as the musk rose because of its characteristic musky scent. It is often confused with Rosa brunonii, which has a similar aroma but flowers at a different time.",
+              sunExposure: "Rosa mosqueta does best with exposure to full or part sun. They will perform best with direct morning light, but in summer they need protection from the strong afternoon sun",
+              watering: "Every day",
+              optimalTemperature: 50
+            }
+      responses:
+        200:
+          description: Save species
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "path": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a"
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": [
+                    "name"
+                  ],
+                  "message": [
+                    "\"name\" is required"
+                  ]
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: Species not Found
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Species not Found"]
+                }
+    put:
+      description:
+      securedBy: [ jwtBotanist ]
+      body:
+        application/json:
+          type: object
+          example: |
+            {
+              "speciesId": "646600435a318f27dd1d515a",
+              "name": "Daylilies 'Strawberry Candy'",
+              "description": "Daylilies 'Strawberry Candy' is one of the most popular reblooming daylilies, hybridized by Stamile in 1989",
+              "sunExposure": "It does best with exposure to full or part sun. They will perform best with direct morning light, but in summer they need protection from the strong afternoon sun",
+              "watering": "Every day",
+              "optimalTemperature": 30
+            }
+      responses:
+        200:
+          description: Successful update species
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "path": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a"
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": [
+                    "name"
+                  ],
+                  "message": [
+                    "\"name\" is required"
+                  ]
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: Species not Found
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Species not Found"]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+  /{speciesId}:
+    get:
+      description: Get one species information's
+      securedBy: [ jwtUser, jwtBotanist ]
+      responses:
+        200:
+          description: Get one species information's
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "name": "Rosa mosqueta",
+                  "images" : [
+                    { 
+                      path: "https://picturethisai.com/image-handle/website_cmsname/image/1080/157428813641285633.jpeg?x-oss-process=image/format,webp/quality,q_60/resize,l_400&v=1.0"
+                    }
+                  ],
+                  description: "Rosa mosqueta is also known as the musk rose because of its characteristic musky scent. It is often confused with Rosa brunonii, which has a similar aroma but flowers at a different time.",
+                  sunExposure: "Rosa mosqueta does best with exposure to full or part sun. They will perform best with direct morning light, but in summer they need protection from the strong afternoon sun",
+                  watering: "Every day",
+                  optimalTemperature: 50
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: Species not Found
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Species not Found"]
+                }
+        500:
+          description: An error was occurred
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+    delete:
+      description: Remove the species
+      securedBy: [ jwtBotanist ]
+      responses:
+        204:
+          description: Successful removal
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: Species not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Species not Found"]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+  /addImage:
+    post:
+      description: Add image to an species
+      securedBy: [ jwtBotanist ]
+      body:
+        multipart/form-data:
+          properties:
+            file:
+              type: file
+              fileTypes: ['*/*']
+            speciesId:
+              type: string
+      responses:
+        200:
+          description: Successful upload image
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "speciesInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a"
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["file"],
+                  "message": ["The file attribute is not found"]
+                }
+        404:
+          description: Species not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Species not Found"]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+
+  /{speciesId}/{imageId}:
+    delete:
+      description: Delete the image of a species
+      securedBy: [ jwtBotanist ]
+      responses:
+        200:
+          description: Successful suppression
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "type": "success",
+                  "message": "File deleted"
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: Species or image not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message: ["Species or image not found"]
+                }
+
+/plant:
+  /:
+    get:
+      description: Get the user's plants.
+      securedBy: [ jwtUser, jwtBotanist ]
+      queryParameters:
+        speciesId:
+          description: "Return all plants of the species (optional)"
+          type: string
+          required: false
+          example: 646600435a318f27dd1d515a
+        search:
+          description: "Search for plant names (optional)"
+          type: string
+          required: false
+          example: "Rosa"
+        page:
+          description: "Number of pages to be paginated (optional)"
+          type: number
+          required: false
+          example: 1
+        order:
+          description: "Order results per ASC or DESC (optional)"
+          type: string
+          required: false
+          example: "ASC"
+      responses:
+        200:
+          description: Get the user's plants.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "result": [
+                    {
+                      "_id": "646a0e573a625a4fe9c207bc",
+                      "name": "Rosa mosqueta",
+                      "plantInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/plant/646a0e573a625a4fe9c207bc",
+                      "speciesInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/species/646600435a318f27dd1d515a"
+                    }
+                  ]
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": [
+                    "order"
+                  ],
+                  "message": [
+                    "\"order\" must be one of [ASC, DESC]"
+                  ]
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: Species or Plant name not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"]
+                  "message": ["Not species found."]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+    post:
+      description: Create a new plant.
+      securedBy: [ jwtUser, jwtBotanist ]
+      body:
+        application/json:
+          type: object
+          example: |
+            {
+              "name": "Rosa mosqueta",
+              "speciesId": "6469ff6539ef26a6fe2709f0"
+            }
+      responses:
+        200:
+          description: Create a new plant.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "plantInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/plant/646a0e573a625a4fe9c207bc"
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": [
+                    "speciesId"
+                  ],
+                  "message": [
+                    "\"speciesId\" is required"
+                  ]
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: Species not Found
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Species not Found"]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+      
+
+    put:
+      description: Update of the user plant.
+      securedBy: [ jwtUser, jwtBotanist ]
+      body:
+        application/json:
+          type: object
+          example: |
+            {
+              "plantId": "646a074c10eeba758f6c7419",
+              "name": "Rosa mosqueta",
+              "speciesId": "6469ff6539ef26a6fe2709f0"
+            }
+      responses:
+        200:
+          description: Successful update plant.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "plantInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/plant/646a074c10eeba758f6c7419"
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                "field": [
+                  "name"
+                ],
+                "message": [
+                  "\"name\" is required"
+                ]
+              }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+  /{plantId}:
+    get:
+      description: Get one plant information's
+      securedBy: [ jwtUser ]
+      responses:
+        200:
+          description: Get one plant information's
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "_id": "646a11f029fe41c20955540e",
+                  "name": "Rosa laevigata",
+                  "images": [],
+                  "created_at": "2023-05-21T12:43:28.181Z",
+                  "speciesInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/api/species/646a0c81054de87b1884c88e"
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        400:
+          description: Plant not Found
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Plant not Found"]
+                }
+        500:
+          description: An error was occurred
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+    delete:
+      description: Delete an plant
+      securedBy: [ jwtUser, jwtBotanist ]
+      responses:
+        200:
+          description: Successful suppression
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "type": "success",
+                  "message": "Plant deleted"
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: Plant not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message: ["Plant not found"]
+                }
+        500:
+          description: An error was occurred
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+  /addImage:
+    post:
+      description: Add image to an plant
+      securedBy: [ jwtUser, jwtBotanist ]
+      body:
+        multipart/form-data:
+          properties:
+            file:
+              type: file
+              fileTypes: [ '*/*' ]
+            plantId:
+              type: string
+      responses:
+        200:
+          description: Successful upload image
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "plantInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/plant/646600435a318f27dd1d515a"
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["file"],
+                  "message": ["The file attribute is not found"]
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: Plant not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Plant not Found"]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+
+  /deleteImage/{plantId}/{imageId}:
+    delete:
+      description: Delete the image of a plant
+      securedBy: [ jwtUser, jwtBotanist ]
+      responses:
+        200:
+          description: Successful suppression
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "type": "success",
+                  "message": "File deleted"
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: Plant or image not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message: ["Plant or image not found"]
+                }
+
+securitySchemes:
+  jwtUser:
+    description: JWT Bearer token for users.
+    type: x-jwtUSer
+    describedBy:
+      responses:
+        401:
+          description: Bad token.
+        204:
+          description: Token valid.
+      headers:
+        Authorization:
+          description: Bearer token.
+          type: string
+          example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkplYW4gUGllcnJlIiwiaWF0IjoxNTE2MjM5MDIyfQ.jnwOHy2wQm1LG5upI_y0lr0u9dN8yBQUWR0uKH15jWE"
+          
+  jwtBotanist:
+    description: JWT Bearer token for botanists.
+    type: x-jwtBotanist
+    describedBy:
+      responses:
+        401:
+          description: Bad token or Invalid Permission.
+        204:
+          description: Token valid.
+      headers:
+        Authorization:
+          description: Bearer token.
+          type: string
+          example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkplYW4gUGllcnJlIiwiaWF0IjoxNTE2MjM5MDIyfQ.jnwOHy2wQm1LG5upI_y0lr0u9dN8yBQUWR0uKH15jWE"
