@@ -4,11 +4,12 @@
 name: Node.js CI PR
 
 on:
-  pull_request_target:
+  pull_request:
     branches: [ "develop" ]
 
 jobs:
   build:
+    name: Setup Node.js ${{ matrix.node-version }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -16,8 +17,6 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-
-
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
@@ -27,13 +26,32 @@ jobs:
       - name: Install Npm dependencies
         run: npm ci
       - name: Export Secrets
-        run: export API_KEY="${{ secrets.API_KEY }}" && export DB_HOST="${{ secrets.DB_HOST }}" && export DB_PORT="${{ secrets.DB_PORT }}" && export DB_USER="${{ secrets.DB_USER }}" && export DB_PASSWD="${{ secrets.DB_PASSWD }}"
+        run: export JWTKEY="${{ secrets.API_KEY }}" && export DATABASE_URL=\"mongodb://${{ secrets.DB_USER_DEV }}:${{ secrets.DB_PASSWD_DEV }}@${{ secrets.DB_HOST }}:${{DB_PORT_DEV}}/?authMechanism=DEFAULT\"
 
 
   coverage:
     name: Test with Node.js ${{ matrix.node-version }}
     runs-on: ubuntu-latest
+    env:
+      NODE_ENV: ${{ secrets.NODE_ENV }}
     steps:
       - uses: actions/checkout@v3
       - uses: ArtiomTr/jest-coverage-report-action@v2
 
+  sonar:
+    name: SonarQube Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      # If you wish to fail your job when the Quality Gate is red, uncomment the
+      # following lines. This would typically be used to fail a deployment.
+      - uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
