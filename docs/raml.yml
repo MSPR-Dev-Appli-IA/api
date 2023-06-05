@@ -931,6 +931,161 @@ protocols: [HTTPS]
                   "message: ["Plant or image not found"]
                 }
 
+
+/user:
+  /:
+    post:
+      description: Update User Info
+      securedBy: [ jwtUser, jwtBotanist ]
+      body:
+        application/json:
+          type: object
+          properties:
+            firstname:
+              required: false
+              type: string
+            lastname:
+              required: false
+              type: string
+            email:
+              required: false
+              type: string
+            password:
+              required: false
+              type: string
+          example: |
+            {
+              "firstname": "John",
+              "lastname": "Doe",
+              "email": "john.doe@gmail.com",
+              "password": "123456"
+            }
+      responses:
+        200:
+          description: Update a User Info.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "userInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/auth/me"
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["email"],
+                  "message": ["email is not valid"]
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+  /avatar:
+    post:
+      description: Add image to an user
+      securedBy: [ jwtUser, jwtBotanist ]
+      body:
+        multipart/form-data:
+          properties:
+            file:
+              type: file
+              fileTypes: [ '*/*' ]
+      responses:
+        200:
+          description: Successful upload image
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "userInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/auth/me"
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["file"],
+                  "message": ["The file attribute is not found"]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+    delete:
+      description: Delete the image of a User
+      securedBy: [ jwtUser, jwtBotanist ]
+      responses:
+        200:
+          description: Successful suppression
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "type": "success",
+                  "message": "File deleted"
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
 securitySchemes:
   jwtUser:
     description: JWT Bearer token for users.
