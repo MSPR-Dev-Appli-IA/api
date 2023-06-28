@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import {JwtError, JwtService} from "../services/jwtService";
 import {UserService} from "../services/userService";
-import {findUserPerId} from "../queries/user.queries";
+import {JwtPayload} from "jsonwebtoken";
 
 const jwtService = new JwtService();
 const userService = new UserService();
@@ -53,14 +53,6 @@ export const addJwtFeatures = (req:Request, _res:Response, next:NextFunction) =>
   next()
 };
 
-async function processJwtToken(token: string): Promise<boolean> {
+async function processJwtToken(token: string): Promise<JwtPayload | string> {
   return await jwtService.decodeJwtToken(token)
-      .then(async (jwtInfo) => {
-        const userId = jwtInfo.sub as string
-        const request = await findUserPerId(userId)
-        if (request) {
-          return (token === request.jwtToken)
-        }
-        return false
-      })
 }

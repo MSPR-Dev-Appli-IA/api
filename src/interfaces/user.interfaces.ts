@@ -20,7 +20,6 @@ export interface  IUser extends Document {
     deleted_at:null|Date
     local: IUserLocal
     image: Types.ObjectId|null;
-    jwtToken: string|null;
 
     comparePassword(password:string):boolean
     

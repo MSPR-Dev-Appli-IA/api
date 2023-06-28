@@ -16,8 +16,6 @@ const userSchema = new mongoose.Schema<IUser, UserModel>({
         email: {type: String, required: true, unique: true},
         password: {type: String, required: true},
     },
-    jwtToken: {type: String, required: false}
-
 });
 
 userSchema.statics.hashPassword = async (password: string) => {
