@@ -108,7 +108,6 @@ protocols: [HTTPS]
                     "password": ""
                   },
                   "image": ""
-                  "jwtToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkplYW4gUGllcnJlIiwiaWF0IjoxNTE2MjM5MDIyfQ.jnwOHy2wQm1LG5upI_y0lr0u9dN8yBQUWR0uKH15jWE"
                 }
         401:
           description: Bad token.

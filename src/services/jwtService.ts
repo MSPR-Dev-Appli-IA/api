@@ -8,7 +8,7 @@ export class JwtService{
         return jwt.sign(
             {
                 sub: id || user?._id.toString(),
-                exp: Math.floor(Date.now() / 1000) + 5,
+                exp: Math.floor(Date.now() / 1000) + 900,
             },
             process.env.JWTKEY
         );
@@ -23,7 +23,7 @@ export class JwtService{
         if (tokenExp && tokenUserId && userInfoInDB) {
             if (nowInSec <= tokenExp) {
                 return tokenDecoded;
-            } else if (nowInSec > tokenExp && nowInSec - tokenExp < JWT_TIME && typeof userInfoInDB.jwtToken !== 'undefined') {
+            } else if (nowInSec > tokenExp && nowInSec - tokenExp < JWT_TIME) {
                 const refreshedToken = this.createJwtToken({user: undefined, id: tokenDecoded.sub});
                 return jwt.verify(refreshedToken, process.env.JWTKEY);
             }else{
