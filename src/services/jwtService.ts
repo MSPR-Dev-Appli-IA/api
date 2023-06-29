@@ -1,6 +1,5 @@
 import {UserjwtToken} from "../interfaces";
 import jwt, {JwtPayload} from "jsonwebtoken";
-import {JWT_TIME} from "../utils";
 import {findUserPerId, removeJwtUser} from "../queries/user.queries";
 
 export class JwtService{
@@ -23,7 +22,7 @@ export class JwtService{
         if (tokenExp && tokenUserId && userInfoInDB) {
             if (nowInSec <= tokenExp) {
                 return tokenDecoded;
-            } else if (nowInSec > tokenExp && nowInSec - tokenExp < JWT_TIME) {
+            } else if (nowInSec > tokenExp && nowInSec - tokenExp) {
                 const refreshedToken = this.createJwtToken({user: undefined, id: tokenDecoded.sub});
                 return jwt.verify(refreshedToken, process.env.JWTKEY);
             }else{
