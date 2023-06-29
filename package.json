@@ -22,27 +22,27 @@
   "dependencies": {
     "@types/bcrypt": "^5.0.0",
     "@types/cookie-parser": "^1.4.3",
-    "@types/express": "^4.17.14",
-    "@types/jsonwebtoken": "^8.5.9",
+    "@types/express": "^4.17.17",
+    "@types/jsonwebtoken": "^9.0.2",
     "@types/mongoose": "^5.11.97",
     "@types/nodemon": "^1.19.2",
     "bcrypt": "^5.1.0",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
-    "dotenv": "^16.0.3",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-rate-limit": "^6.7.0",
-    "joi": "^17.6.3",
+    "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.0",
-    "mongodb": "^4.11.0",
-    "mongoose": "^6.6.5",
+    "mongodb": "^5.6.0",
+    "mongoose": "^7.3.1",
     "multer": "^1.4.5-lts.1",
-    "nodemon": "^2.0.20",
+    "nodemon": "^2.0.22",
     "sonar-scanner": "^3.1.0",
-    "typescript": "^4.9.3"
+    "typescript": "^5.1.6"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.1",
+    "@types/jest": "^29.5.2",
     "@types/multer": "^1.4.7",
     "@types/supertest": "^2.0.12",
     "cross-env": "^7.0.3",
@@ -50,6 +50,6 @@
     "path": "^0.12.7",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.0",
-    "tsc-watch": "^5.0.3"
+    "tsc-watch": "^6.0.4"
   }
 }
