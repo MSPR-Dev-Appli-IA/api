@@ -8,7 +8,7 @@ export const areyouThePlantSittingOwner = async (req: Request, res: Response, ne
         const plantSittingId = req.params.plantSittingId
         const plantSitting = await getOnePlantSittingById(new mongoose.Types.ObjectId(plantSittingId.trim()))
         if (plantSitting ) {
-            const plant = await getOnePlantById(plantSitting?.plant._id)
+            const plant = await getOnePlantById(plantSitting.plant._id.toString())
             if (plant){
                 if (req.user._id.equals(plant.user._id)) {
                     next()
@@ -18,7 +18,6 @@ export const areyouThePlantSittingOwner = async (req: Request, res: Response, ne
             }
            
         } else {
-
             res.status(404).send({ message: "Erreur" });
         }
 
