@@ -49,12 +49,25 @@ export const getOnePlantSitting = async (req: Request, res: Response, __: NextFu
         const plantSittingId = req.params.plantSittingId;
         const plantSitting = await findOnePlantSitting(new mongoose.Types.ObjectId(plantSittingId.trim()))
         if (plantSitting) {
-            res.status(200).json(plantSitting);
+            res.status(200).send({
+                _id: plantSitting._id,
+                plantInfo: plantSitting.plant,
+                description: plantSitting.description,
+                start_at: plantSitting.start_at,
+                end_at: plantSitting.end_at,
+                address: {
+                    x: plantSitting.address.location.x,
+                    y: plantSitting.address.location.y
+                },
+            });
         } else {
-            res.status(404).send({ message: "Ce gardiennage de plante  n'existe pas" });
+            res.status(404).send({
+                "field": ["error"],
+                "message": ["Plant Sitting not found"]
+            });
         }
     } catch (e) {
-        res.status(404).send({ message: "Erreur" });
+        return400or500Errors(e, res)
     }
 
 
