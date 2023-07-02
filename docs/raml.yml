@@ -1250,7 +1250,7 @@ protocols: [HTTPS]
               example: |
                 {
                   "field": ["error"],
-                  "message: ["Plant Sitting not found"]
+                  "message": ["Plant Sitting not found"]
                 }
         500:
           description: An error was occurred

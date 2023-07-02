@@ -113,23 +113,25 @@ export const updatePlantSitting = async (req: Request, res: Response, __: NextFu
     }
 };
 
-
-
 export const removePlantSitting = async (req: Request, res: Response, __: NextFunction) => {
     try {
         const plantSittingId = req.params.plantSittingId;
         const plantSitting = await findOnePlantSitting(new mongoose.Types.ObjectId(plantSittingId.trim()))
         if (plantSitting) {
             await deletePlantSittingWithPlantSittingId(new mongoose.Types.ObjectId(plantSittingId.trim()))
-            res.status(200).send()
+            res.status(200).send({
+                "type": "success",
+                "message": "Plant Sitting deleted"
+            })
         }
         else {
-            res.status(404).send("Cet plante n'existe pas  n'existe pas");
+            res.status(404).send({
+                "field": ["error"],
+                "message": ["Plant Sitting not found"]
+            });
         }
-
     } catch (e) {
-        res.status(404).send("error");
-
+        return400or500Errors(e, res)
     }
 }
 
