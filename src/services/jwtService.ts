@@ -1,6 +1,5 @@
 import {UserjwtToken} from "../interfaces";
 import jwt, {JwtPayload} from "jsonwebtoken";
-import {findUserPerId, removeJwtUser} from "../queries/user.queries";
 
 export class JwtService{
     createJwtToken({ user, id }:UserjwtToken) {
@@ -18,8 +17,7 @@ export class JwtService{
         const tokenExp = tokenDecoded.exp;
         const tokenUserId = tokenDecoded.sub
         const nowInSec = Math.floor(Date.now() / 1000);
-        const userInfoInDB = await findUserPerId(tokenUserId as string)
-        if (tokenExp && tokenUserId && userInfoInDB) {
+        if (tokenExp && tokenUserId) {
             if (nowInSec <= tokenExp) {
                 return tokenDecoded;
             } else if (nowInSec > tokenExp && nowInSec - tokenExp) {
@@ -38,14 +36,6 @@ export class JwtService{
             return test
         }else{
             throw new JwtError("Jwt decode failed")
-        }
-    }
-
-    async removeJwtToken(userId: string){
-        try {
-            await removeJwtUser(userId)
-        } catch (error) {
-            throw error
         }
     }
 }

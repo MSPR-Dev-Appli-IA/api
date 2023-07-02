@@ -75,16 +75,3 @@ export const addUserJWTToken = async (userId: string, jwtToken: string) => {
   }
   throw new Error("Failed to add JwtToken in DB")
 }
-
-export const removeJwtUser = async (userId:string) => {
-  const request =  User.findByIdAndUpdate(userId, {
-    $unset : {
-      "jwtToken": ""
-    },
-  }, {new: true})
-
-  if(request){
-    return request
-  }
-  throw new Error("Failed to remove JwtToken in DB")
-}
