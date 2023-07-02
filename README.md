@@ -29,7 +29,22 @@ In the application only botanists will be able to give advice. The company also 
 
 - A full featured API with authentification by JWT tokens.
 
-Cf. CHANGELOG.md
+Cf. [Release section](https://github.com/MSPR-Dev-Appli-IA/api/releases)
+
+### Environment Variables
+
+To run this project, you will need to add the following environment variables into your tomcat service
+
+| Name             | Type   | Description                                                                                                                 |
+|------------------|--------|-----------------------------------------------------------------------------------------------------------------------------|
+| JWTKEY           | string | JWT Secrets                                                                                                                 |
+| DATABASE_URL     | string | Mongo URL                                                                                                                   |
+| PORT             | string | Express Port                                                                                                                |
+| NODE_ENV         | string | Express Environment (test/production)                                                                                       |
+| API_HOSTNAME     | string | API Hostname                                                                                                                |
+| API_VERSION      | string | API version                                                                                                                 |
+| MAP_KEY          | string | ArcGIS API KEY [More Information](https://developers.arcgis.com/documentation/mapping-apis-and-services/security/api-keys/) |
+| DEFAULT_BOTANIST | string | Default Botanist Account                                                                                                    |
 
 
 ## FAQ
@@ -50,7 +65,7 @@ Here's our E/R diagram (made with [dbdiagram.io](https://dbdiagram.io/home)) :
 ## Run Locally
 *❗ You can't run this project without the keys needed for authentification*
 
-Clone the project
+### Clone the project
 
 ```bash
   git clone https://github.com/MSPR-Dev-Appli-IA/api.git
@@ -62,7 +77,7 @@ Go to the project directory
   cd api
 ```
 
-Install dependencies 
+### Install dependencies 
 
 ```bash
   npm ci
