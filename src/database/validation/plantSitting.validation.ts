@@ -12,8 +12,9 @@ export const plantSittingValidation = Joi.object({
   end_at: Joi.date().min(Joi.ref('start_at')).required().messages({
     "string.base": "La datez  de fin n'est pas valide",
   }),
-  address: Joi.string().min(2).required().messages({
-    "string.base": "L'addresse de fin n'est pas valide",
-  }),
+  address: Joi.object({
+    x: Joi.number(),
+    y: Joi.number()
+  })
 });
   

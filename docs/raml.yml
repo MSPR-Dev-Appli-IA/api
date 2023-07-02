@@ -943,11 +943,6 @@ protocols: [HTTPS]
           type: string
           required: false
           example: "Rosa"
-        page:
-          description: "Number of pages to be paginated (optional)"
-          type: number
-          required: false
-          example: 1
         order:
           description: "Order results per ASC or DESC (optional)"
           type: string
@@ -966,11 +961,19 @@ protocols: [HTTPS]
                       "_id": "646a0e573a625a4fe9c207bc",
                       "plantName": "My Plant",
                       "address": [
-                        "label": "Test",
-                        "longitude": "44.8378",
-                        "latitude": "-0.594"
+                        "x": {"$numberDecimal": "44.8378"},
+                        "y": {"$numberDecimal": "-0.594"}
                       ],
-                      "plantInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/plant/646a0e573a625a4fe9c207bc",
+                      "plantInfo": {
+                            "_id": "64a1a2a40f9c4ffc0b059f44",
+                            "name": "Rosa mosqueta",
+                            "images": [],
+                            "species": "64a1a2940f9c4ffc0b059f3f",
+                            "user": "64a19e0adb825d482fb32daf",
+                            "plantSittings": [],
+                            "created_at": "2023-07-02T16:15:32.366Z",
+                            "__v": 0
+                      }
                     }
                   ]
                 }
@@ -997,16 +1000,6 @@ protocols: [HTTPS]
                 {
                   field: ["error"],
                   message: ["Bad token. You must to logged in before."]
-                }
-        404:
-          description: Plant Sitting name not found.
-          body:
-            application/json:
-              type: object
-              example: |
-                {
-                  "field": ["error"],
-                  "message": ["Not plantSitting found."]
                 }
         500:
           description: An error was occurred.
