@@ -5,7 +5,6 @@ const schema = mongoose.Schema;
 
 
 const plantSittingSchema = new mongoose.Schema<IPlantSitting>({
-    title: { type: String, required: true },
     description: { type: String, required: true },
     created_at : { type: Date, default: Date.now },
     start_at : { type: Date, required: true },

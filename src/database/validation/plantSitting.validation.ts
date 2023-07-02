@@ -1,23 +1,6 @@
-// title: { type: String, required: true },
-//     description: { type: String, required: true },
-//     created_at : { type: Date, default: Date.now },
-//     start_at : { type: Date, required: true },
-//     end_at : { type: Date, required: true},
-//     is_taken: { type: Boolean, required: true,default: false},
-//     address: { type: schema.Types.ObjectId, ref: "Address", required: true },
-//     plant: { type: schema.Types.ObjectId, ref: "Plant", required: true },
-
-
 import  Joi from "joi";
-
-
-
-
-const plantSittingValidation = Joi.object({
-
-  title: Joi.string().min(2).required().messages({
-    "string.base": "Le  titre  n'est pas valide",
-  }),
+export const plantSittingValidation = Joi.object({
+  plantId: Joi.string().length(24).required(),
   description: Joi.string().min(2).required().messages({
     "string.base": "La description valide",
 
@@ -32,13 +15,5 @@ const plantSittingValidation = Joi.object({
   address: Joi.string().min(2).required().messages({
     "string.base": "L'addresse de fin n'est pas valide",
   }),
-
-
-
 });
-
-
-export  {
-    plantSittingValidation
-  };
   
