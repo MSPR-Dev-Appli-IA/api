@@ -1,7 +1,7 @@
 import {PlantSitting} from "../database/models/plantSitting.model";
 import {Plant} from "../database/models/plant.models";
 import {Types} from 'mongoose';
-import {IAddress, IPlantSitting} from "../interfaces";
+import {IPlantSitting} from "../interfaces";
 import {Address} from "../database/models/adress.model";
 
 
@@ -56,15 +56,15 @@ export const createPlantSitting = async (plantSitting: IPlantSitting) => {
 };
 
 
-export const updatePlantSittingWithPlantSittingsId = async (plantSittingId: Types.ObjectId, title: string, description: string, start_at: Date, end_at: Date, address: IAddress) => {
-    return await PlantSitting.findByIdAndUpdate(plantSittingId, {
-            title: title,
-            description: description,
-            start_at: start_at,
-            end_at: end_at,
-            address: address
+export const updatePlantSittingWithPlantSittingsId = async (plantSitting: IPlantSitting) => {
+    return PlantSitting.findByIdAndUpdate(plantSitting._id, {
+            plant: plantSitting.plant,
+            description: plantSitting.description,
+            start_at: plantSitting.start_at,
+            end_at: plantSitting.end_at,
+            address: plantSitting.address
         },
-        {new: true})
+        {new: true});
 };
 
 

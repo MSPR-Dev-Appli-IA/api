@@ -6,10 +6,10 @@ const router = Router();
 
 import  {requireAuth} from "../middleware/AuthMiddleware";
 
-router.get("/",  requireAuth, getPlantSitting);
-router.post("/",  requireAuth, areYouThePlantOwner, newPlantSitting);
+router.get("/", requireAuth, getPlantSitting);
+router.post("/", requireAuth, areYouThePlantOwner, newPlantSitting);
+router.put("/", requireAuth, updatePlantSitting);
 
-router.get("/:plantSittingId",  requireAuth, getOnePlantSitting);
-router.post("/:plantSittingId",requireAuth, updatePlantSitting);
-router.delete("/:plantSittingId",  requireAuth,areYouThePlantOwner, removePlantSitting);
+router.get("/:plantSittingId", requireAuth, getOnePlantSitting);
+router.delete("/:plantSittingId", requireAuth,areYouThePlantOwner, removePlantSitting);
 export default router;

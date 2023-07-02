@@ -1092,11 +1092,15 @@ protocols: [HTTPS]
           type: object
           example: |
             {
+              "plantSittingId": "64a1caf63ff09f7487d95265",
               "plantId": "646a0e573a625a4fe9c207bc",
               "description": "My first reservation",
               "start_at": "2023-07-02T13:14:21.000+00:00",
               "end_at": "2023-07-14T13:14:21.000+00:00",
-              "address": "114 rue Lucien Faure, 33300 Bordeaux"
+              "address": {
+                "x": -0.5603419619427825,
+                "y": 44.86529801733107
+              }
             }
       responses:
         200:

@@ -3,16 +3,14 @@ import { NextFunction, Request, Response } from "express";
 import {
     findPlantSittingsNotTakenAndNotBegin,
     findOnePlantSitting,
-    deletePlantSittingWithPlantSittingId,
-    createPlantSitting
+    deletePlantSittingWithPlantSittingId
 } from "../queries/plantSitting.queries";
-import { plantSittingValidation } from "../database/validation/plantSitting.validation";
+import {plantSittingValidation, updateplantSittingValidation} from "../database/validation/plantSitting.validation";
 import mongoose from 'mongoose';
 import {API_HOSTNAME, API_VERSION, return400or500Errors} from "../utils";
-import {findOnePlant} from "../queries/plant.queries";
-import {addressService} from "../services/addressService";
+import {plantSittingService} from "../services/plantSittingService";
 
-const AddressService = new addressService()
+const PlantSittingService = new plantSittingService()
 
 export const getPlantSitting = async (req: Request, res: Response, __: NextFunction) => {
     try {
@@ -62,60 +60,44 @@ export const getOnePlantSitting = async (req: Request, res: Response, __: NextFu
 
 };
 export const newPlantSitting = async (req: Request, res: Response, __: NextFunction) => {
-
     try {
-        const plantId: string = req.body.plantId
+        await plantSittingValidation.validateAsync(req.body, {abortEarly: false});
 
-        await plantSittingValidation.validateAsync(req.body, { abortEarly: false });
-
-        const plantInfo = await findOnePlant(plantId)
-
-        if(plantInfo){
-            req.body.address = await AddressService.getOrCreateAddress(req.body.address)
-            req.body.plant = plantInfo
-            const newPlantSitting = await createPlantSitting(req.body)
+        if (await PlantSittingService.create(req)) {
             res.status(200).send({
                 "status": "success",
-                "plantSittingInfo": API_HOSTNAME + "/api" + API_VERSION + "/plantSitting/" + newPlantSitting._id,
+                "plantSittingInfo": API_HOSTNAME + "/api" + API_VERSION + "/plantSitting/" + PlantSittingService.plantSittingInfo._id,
             });
-        }else{
+        } else {
             res.status(404).send({
                 "field": ["error"],
                 "message": ["Plant not Found"]
             })
         }
-      } catch (e) {
+    } catch (e) {
         return400or500Errors(e, res)
-      }
-
+    }
 };
 
-export const updatePlantSitting = async (_req: Request, _res: Response, __: NextFunction) => {
+export const updatePlantSitting = async (req: Request, res: Response, __: NextFunction) => {
+    try {
+        await updateplantSittingValidation.validateAsync(req.body, {abortEarly: false});
 
-    // try {
-    //     await plantSittingValidation.validateAsync(req.body, { abortEarly: false });
-    //     const plantSittingId = req.params.plantSittingId;
-    //     let { title,description,start_at,end_at,address} = req.body
-    //     const addressObject = await getAddressFromLabel(address)
-    //     if (addressObject){
-    //       const newPlantSitting = await updatePlantSittingWithPlantSittingsId(new  mongoose.Types.ObjectId(plantSittingId.trim()),title,description,start_at,end_at,addressObject)
-    //       res.status(200).json(newPlantSitting);
-    //     }else{
-    //         res.status(404).send({ message: "Cette addresse n'existe pas " });
-    //     }
-    //
-    //   } catch (e) {
-    //     const errors = [];
-    //     if (e instanceof ValidationError) {
-    //       e.details.map((error) => {
-    //         errors.push({ field: error.path[0], message: error.message });
-    //       });
-    //     }else {
-    //       errors.push({ field: "error", message: "Erreur" })
-    //   }
-    //     res.status(404).send({  errors });
-    //   }
+        if(await PlantSittingService.update(req)){
+            res.status(200).send({
+                "status": "success",
+                "plantSittingInfo": API_HOSTNAME + "/api" + API_VERSION + "/plantSitting/" + PlantSittingService.plantSittingInfo._id,
+            });
+        }else{
+            res.status(404).send({
+                "field": ["error"],
+                "message": ["Plant not Found"]
+            });
+        }
 
+    } catch (e) {
+        return400or500Errors(e, res)
+    }
 };
 
 
