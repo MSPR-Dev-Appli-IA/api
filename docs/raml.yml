@@ -938,6 +938,11 @@ protocols: [HTTPS]
       description: Get the plant sittings not taken and not begin
       securedBy: [ jwtUser, jwtBotanist ]
       queryParameters:
+        search:
+          description: "Search for plant names (optional)"
+          type: string
+          required: false
+          example: "Rosa"
         page:
           description: "Number of pages to be paginated (optional)"
           type: number
@@ -959,7 +964,7 @@ protocols: [HTTPS]
                   "result": [
                     {
                       "_id": "646a0e573a625a4fe9c207bc",
-                      "title": "My reservation",
+                      "plantName": "My Plant",
                       "address": [
                         "label": "Test",
                         "longitude": "44.8378",
@@ -1000,7 +1005,7 @@ protocols: [HTTPS]
               type: object
               example: |
                 {
-                  "field": ["error"]
+                  "field": ["error"],
                   "message": ["Not plantSitting found."]
                 }
         500:

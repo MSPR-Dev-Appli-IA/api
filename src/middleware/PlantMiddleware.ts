@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import {findPlantUser} from "../queries/plant.queries";
 import {return400or500Errors} from "../utils";
 
-export const areyouThePlantOwner = async (req: Request, res: Response, next: NextFunction) => {
+export const areYouThePlantOwner = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const plantUser = await findPlantUser(req.user._id)
         if (plantUser) {
@@ -14,7 +14,7 @@ export const areyouThePlantOwner = async (req: Request, res: Response, next: Nex
         } else {
             res.status(400).send({
                 "field": ["error"],
-                "message": ["Not plant found."]
+                "message": ["Please create plant before."]
             });
         }
 
