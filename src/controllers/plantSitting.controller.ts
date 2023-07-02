@@ -1,42 +1,44 @@
 
 import { NextFunction, Request, Response } from "express";
-import { findPlantSittingsNotTakenAndNotBegin, findOnePlantSitting, deletePlantSittingWithPlantSittingId ,createPlantSitting} from "../queries/plantSitting.queries";
+import {
+    findPlantSittingsNotTakenAndNotBegin,
+    findOnePlantSitting,
+    deletePlantSittingWithPlantSittingId,
+    createPlantSitting
+} from "../queries/plantSitting.queries";
 import { plantSittingValidation } from "../database/validation/plantSitting.validation";
 import mongoose from 'mongoose';
-// import  { ValidationError } from "joi";
 import {API_HOSTNAME, API_VERSION, return400or500Errors} from "../utils";
 import {findOnePlant} from "../queries/plant.queries";
 import {addressService} from "../services/addressService";
 
-const limit: number = 5
+const AddressService = new addressService()
 
 export const getPlantSitting = async (req: Request, res: Response, __: NextFunction) => {
     try {
         const search = (req.query.search) ? String(req.query.search) : ""
-        const page = (req.query.page) ? Number(req.query.page) : Number(1)
         const order = (req.query.order == "ASC") ? 1 : -1
-        const skip: number = limit * page - limit;
+        const result: any[] = []
 
-        const plantSitting = await findPlantSittingsNotTakenAndNotBegin(limit, skip, order, search)
+        const plantSitting = await findPlantSittingsNotTakenAndNotBegin(order, search)
 
-        if(plantSitting){
-            const result: any[] = []
-
-            plantSitting.forEach(item => {
+        plantSitting.forEach(item => {
+            if(item.plant){
                 result.push({
                     _id: item._id,
-                    plantName: item.plant._id,
-                    address: item.address,
-                    plantInfo: API_HOSTNAME + "/api" + API_VERSION + "/plant/" + item.plant._id,
+                    address: {
+                        x: item.address.location.x,
+                        y: item.address.location.y
+                    },
+                    plantInfo: item.plant
                 })
-            })
-            res.status(200).json(result);
-        }else{
-            res.status(404).json({
-                "field": ["error"],
-                "message": ["Not plantSitting found."]
-            })
-        }
+            }else{
+                throw new Error("Impossible to obtain plant name with this search name")
+            }
+        })
+        res.status(200).send({
+            "result": result
+        });
 
     } catch (e) {
         return400or500Errors(e, res)
@@ -63,26 +65,19 @@ export const newPlantSitting = async (req: Request, res: Response, __: NextFunct
 
     try {
         const plantId: string = req.body.plantId
-        const address: string = req.body.address
 
         await plantSittingValidation.validateAsync(req.body, { abortEarly: false });
 
         const plantInfo = await findOnePlant(plantId)
 
         if(plantInfo){
-
-            const AddressService = new addressService()
-
-            const addressObject = await AddressService.getAddressFromLabel(address)
-            if (addressObject){
-                const newPlantSitting = await createPlantSitting(req.body,addressObject)
-                res.status(200).send({
-                    "status": "success",
-                    "plantSittingInfo": API_HOSTNAME + "/api" + API_VERSION + "/plantSitting/" + newPlantSitting._id,
-                });
-            }else{
-                res.status(400).send({ message: "Cette addresse n'existe pas " });
-            }
+            req.body.address = await AddressService.getOrCreateAddress(req.body.address)
+            req.body.plant = plantInfo
+            const newPlantSitting = await createPlantSitting(req.body)
+            res.status(200).send({
+                "status": "success",
+                "plantSittingInfo": API_HOSTNAME + "/api" + API_VERSION + "/plantSitting/" + newPlantSitting._id,
+            });
         }else{
             res.status(404).send({
                 "field": ["error"],

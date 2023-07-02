@@ -12,17 +12,27 @@ export const getOnePlantSittingById = async (plantSittingId: Types.ObjectId): Pr
     }).populate({path: "address", model: Address}).exec();
 };
 
-export const findPlantSittingsNotTakenAndNotBegin = async (limit: number = 1, skip: number = 0, order: 1 | -1 = -1, search: String | null) => {
+export const findPlantSittingsNotTakenAndNotBegin = async (order: 1 | -1 = -1, search: string | null) => {
     const d = new Date();
-    return await PlantSitting.find({
+
+    const request = await PlantSitting.find({
         start_at: {$gte: d.getTime()},
-        is_taken: false,
-        name: search ? { $regex: search } : /.*/
+        is_taken: false
     })
-        .populate({path: "plant", model: Plant})
+        .populate({
+            path: "plant",
+            model: Plant,
+            match: {
+                $and: [
+                    { name: { $regex: search ? search : /.*/, $options: 'is' }}
+                ]
+            }
+        })
         .populate({path: "address", model: Address})
-        .sort({ name: order }).skip(skip).limit(limit)
+        .sort({ name: order })
         .exec()
+
+    return request
 };
 
 export const findOnePlantSitting = async (plantSittingId: Types.ObjectId) => {
@@ -32,13 +42,14 @@ export const findOnePlantSitting = async (plantSittingId: Types.ObjectId) => {
         .exec()
 };
 
-export const createPlantSitting = async (plantSitting: IPlantSitting, address: IAddress) => {
+export const createPlantSitting = async (plantSitting: IPlantSitting) => {
+
     const newPlantSitting = new PlantSitting({
         plant: plantSitting.plant,
         description: plantSitting.description,
         start_at: plantSitting.start_at,
         end_at: plantSitting.end_at,
-        address: address
+        address: plantSitting.address._id
     });
     return await newPlantSitting.save();
 
