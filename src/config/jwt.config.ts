@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import {JwtError, JwtService} from "../services/jwtService";
+import {JwtService} from "../services/jwtService";
 import {UserService} from "../services/userService";
 import {JwtPayload} from "jsonwebtoken";
+import {return401Errors} from "../utils";
 
 const jwtService = new JwtService();
 const userService = new UserService();
@@ -11,30 +12,18 @@ export const extractUserFromToken = async (req:Request, res:Response, next:NextF
     const token = req.headers.authorization.split(" ")[1]
     try {
       const decodedTokenCheck = await jwtService.decodeJwtToken(token)
+      const userInfo = await userService.checkUserExist(decodedTokenCheck.sub as string)
 
       /*
        * Get the id of the user in the JWT token and check if it exists in database
        *  If it's not exist throw 404 errors
        */
-      req.user = (decodedTokenCheck) ? await userService.checkUserExist(decodedTokenCheck.sub as string) : res.status(404).send({
-        field: ["error"],
-        message: ["User not Found. Please contact us."]
-      })
 
+      req.user = userInfo
       next();
 
     } catch (error) {
-      if(error instanceof JwtError){
-        res.status(401).send({
-          field: ["error"],
-          message: [error.message]
-        })
-      }else{
-        res.status(401).send({
-          field: ["error"],
-          message: ["Bad token. You must to logged in before"]
-        })
-      }
+      return401Errors(error, res)
     }
   } else {
     next();

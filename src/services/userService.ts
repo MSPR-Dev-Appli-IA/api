@@ -2,7 +2,7 @@ import {addUserJWTToken, createUser, findUserPerEmail, findUserPerId} from "../q
 import {IUserLocal, UserForm} from "../interfaces";
 import {userSignupValidation} from "../database/validation/user.validation";
 import {getDefaultRole} from "../queries/role.queries";
-import {JwtService} from "./jwtService";
+import {JwtError, JwtService} from "./jwtService";
 
 const jwtService = new JwtService()
 
@@ -39,8 +39,7 @@ export class UserService{
         const user = await findUserPerId(userId);
         if (user) {
             return user
-        } else {
-            return false
         }
+        throw new JwtError("User not Found. Please contact us.")
     }
 }
