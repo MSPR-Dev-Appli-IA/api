@@ -3,10 +3,8 @@ import {NextFunction, Request, Response} from "express";
 import {getBotanistRole} from "../queries/role.queries";
 import {return400or500Errors} from "../utils";
 import {UserService} from "../services/userService";
-import {JwtService} from "../services/jwtService";
 
 const userService = new UserService();
-const jwtService = new JwtService();
 
 /*
  * POST /api/auth/login
@@ -46,10 +44,8 @@ export const register = async (req: Request, res: Response, _: NextFunction) => 
 };
 
 
-export const logout = async (req: Request, res: Response, _: NextFunction) => {
+export const logout = async (_req: Request, res: Response, _: NextFunction) => {
     try {
-        await jwtService.removeJwtToken(req.user._id)
-
         res.status(200).send({
             status: "success",
             message: "You're logged out."
