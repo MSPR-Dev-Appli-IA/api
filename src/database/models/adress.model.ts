@@ -1,13 +1,16 @@
 import  mongoose from 'mongoose';
 import {IAddress } from '../../interfaces';
+import {Decimal128} from "mongodb";
 
 
 
 
 const addressSchema = new mongoose.Schema<IAddress>({
-    label: { type: String, required: true ,unique:true},
-    longitude: { type: String, required: true },
-    latitude: { type: String, required: true },
+    address: { type: String, required: true ,unique:true},
+    location: {
+        x: {type: Decimal128 , required: true, unique: true},
+        y: {type: Decimal128 , required: true},
+    },
 });
 
 

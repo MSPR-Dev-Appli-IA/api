@@ -1030,7 +1030,10 @@ protocols: [HTTPS]
               "description": "My first reservation",
               "start_at": "2023-07-02T13:14:21.000+00:00",
               "end_at": "2023-07-14T13:14:21.000+00:00",
-              "address": "114 rue Lucien Faure, 33300 Bordeaux"
+              "address": {
+                "x": -0.5603419619427825,
+                "y": 44.86529801733107
+              }
             }
       responses:
         200:
@@ -1256,6 +1259,67 @@ protocols: [HTTPS]
                   "message": ["An error was occurred. Please contact us"]
                 }
 
+
+/address:
+  /:
+    post:
+      description: Get Address Coordinates
+      body:
+        application/json:
+          type: object
+          example : |
+            {
+              "label": "114 rue Lucien Faure, 33000, Bordeaux",
+              "countryCode": "FR"
+            }
+      responses:
+        200:
+          description: All addresses found
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "result": [
+                    {
+                      "address": "114 Rue Lucien Faure, 33300, Bordeaux, Gironde, Nouvelle-Aquitaine",
+                      "location": {
+                        "x": -0.5603419619427825,
+                        "y": 44.86529801733107
+                      },
+                      "score": 100
+                    },
+                    {
+                      "address": "Rue Lucien Faure, 33300, Bordeaux, Gironde, Nouvelle-Aquitaine"
+                      "location" {
+                        "x": -0.5666050038145016,
+                        "y": 44.86965501442069
+                      },
+                      "score": 98.06
+                    }
+                  ]
+                }
+
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
 /user:
   /:
     post:
