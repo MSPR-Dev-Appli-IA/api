@@ -1170,16 +1170,23 @@ protocols: [HTTPS]
               example: |
                 {
                   "_id": "64a178dc08511d2f58bb0853",
-                  "title": "My reservation",
+                  "plantInfo": {
+                    "_id": "64a1e29b926224290f4d8f05",
+                    "name": "Rosa mosqueta 2",
+                    "images": [],
+                    "species": "64a1a2940f9c4ffc0b059f3f",
+                    "user": "64a19e0adb825d482fb32daf",
+                    "plantSittings": [],
+                    "created_at": "2023-07-02T20:48:27.261Z",
+                    "__v": 0
+                  },
                   "description": "6469ff6539ef26a6fe2709f0",
                   "start_at": "2023-07-02T13:14:21.000+00:00",
                   "end_at": "2023-07-14T13:14:21.000+00:00",
-                  "address": [
-                    "label": "Test",
-                    "longitude": "44.8378",
-                    "latitude": "-0.594"
-                  ],
-                  "plantInfo": "https://api.arosaje-stage.locascio.fr/api/{version}/plant/646a0e573a625a4fe9c207bc",
+                  "address": {
+                    "x": {"$numberDecimal": "44.8378"},
+                    "y": {"$numberDecimal": "-0.594"}
+                  }
                 }
         401:
           description: Bad token.
@@ -1199,7 +1206,7 @@ protocols: [HTTPS]
               example: |
                 {
                   "field": ["error"],
-                  "message: ["Plant Sitting not found"]
+                  "message": ["Plant Sitting not found"]
                 }
         500:
           description: An error was occurred
