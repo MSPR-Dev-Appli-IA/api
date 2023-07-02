@@ -1,15 +1,21 @@
 import { Document  } from "mongoose";
 
 
+interface ILocation{
+    x: bigint
+    y: bigint
+}
+
 export interface IAddress extends Document{
-    label : string
-    longitude: string
-    latitude: string
+    address : string
+    location: ILocation
+    score: bigint
 }
 
 
 export interface AddressForm{
-    label : String
+    label : string
+    countryCode : string
 }
 
 
