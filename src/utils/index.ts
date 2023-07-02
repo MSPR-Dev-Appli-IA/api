@@ -1,5 +1,6 @@
 import {Response} from "express";
 import {ValidationError} from "joi";
+import {JwtError} from "../services/jwtService";
 
 const API_HOSTNAME = (process.env.API_HOSTNAME) ? process.env.API_HOSTNAME : ""
 const API_VERSION = (process.env.API_VERSION) ? process.env.API_VERSION : ""
@@ -45,4 +46,18 @@ function return400or500Errors(error: any, res: Response) {
     }
 }
 
-export {API_HOSTNAME, API_VERSION, JWT_TIME, return400or500Errors};
+function return401Errors(error: any, res: Response){
+    if(error instanceof JwtError){
+        res.status(401).send({
+            field: ["error"],
+            message: [error.message]
+        })
+    }else{
+        res.status(401).send({
+            field: ["error"],
+            message: ["Bad token. You must to logged in before"]
+        })
+    }
+}
+
+export {API_HOSTNAME, API_VERSION, JWT_TIME, return400or500Errors, return401Errors};
