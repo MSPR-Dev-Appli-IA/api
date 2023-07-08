@@ -114,7 +114,7 @@ export const removeImageFromAdvice = async (req: Request, res: Response, __: Nex
     try {
         const adviceId = req.params.adviceId
         const imageId = req.params.imageId
-        const image = await  getImageById(new  mongoose.Types.ObjectId(imageId.trim()))
+        const image = await  getImageById(imageId)
         if(image){
         const newAdvice = await deleteImageWithAdviceId(image._id,new  mongoose.Types.ObjectId(adviceId.trim()))
         fs.unlinkSync("public/image/" + image.path);
