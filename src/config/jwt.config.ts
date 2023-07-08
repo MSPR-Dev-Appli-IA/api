@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import {JwtError, JwtService} from "../services/jwtService";
-import {UserService} from "../services/userService";
+import {JwtError, JwtService} from "../utils/services/jwtService";
+import {UserService} from "../utils/services/userService";
 import {JwtPayload} from "jsonwebtoken";
 
 const jwtService = new JwtService();

@@ -1,8 +1,7 @@
-import {addUserJWTToken, createUser, findUserPerEmail, findUserPerId} from "../queries/user.queries";
-import {IUserLocal, UserForm} from "../interfaces";
-import {userSignupValidation} from "../database/validation/user.validation";
-import {getDefaultRole} from "../queries/role.queries";
+import {IUserLocal, UserForm} from "../../interfaces";
+import {userSignupValidation} from "../../database/validation/user.validation";
 import {JwtService} from "./jwtService";
+import {addUserJWTToken, findUserPerEmail, findUserPerId} from "../../queries/user.queries";
 
 const jwtService = new JwtService()
 
@@ -15,8 +14,7 @@ export class UserService{
     async createUser(body: UserForm){
         await userSignupValidation.validateAsync(body, {abortEarly: false});
 
-        const role = await getDefaultRole();
-        await createUser(body, role);
+        await this.createUser(body);
     }
 
     async loginUser(body: IUserLocal){

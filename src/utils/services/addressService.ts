@@ -1,7 +1,7 @@
 import {ApiKeyManager} from "@esri/arcgis-rest-request";
 import {geocode} from "@esri/arcgis-rest-geocoding";
-import {AddressForm, ILocation} from "../interfaces";
-import {createAddress, getOneAddressByCoordinates} from "../queries/address.queries";
+import {AddressForm, ILocation} from "../../interfaces";
+import {createAddress, getOneAddressByCoordinates} from "../../queries/address.queries";
 
 export class addressService{
 

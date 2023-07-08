@@ -1,11 +1,12 @@
-import {findOnePlant} from "../queries/plant.queries";
+
 import {Request} from "express";
+import {addressService} from "./addressService";
+import {findOnePlant} from "../../queries/plant.queries";
 import {
     createPlantSitting,
     findOnePlantSitting,
     updatePlantSittingWithPlantSittingsId
-} from "../queries/plantSitting.queries";
-import {addressService} from "./addressService";
+} from "../../queries/plantSitting.queries";
 
 const AddressService = new addressService()
 
