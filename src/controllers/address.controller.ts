@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {addressService} from "../services/addressService";
+import {addressService} from "../utils/services/addressService";
 import {return400or500Errors} from "../utils";
 import {addressValidation} from "../database/validation/address.validation";
 
