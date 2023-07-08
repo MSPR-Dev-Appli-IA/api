@@ -6,6 +6,7 @@ import user from "./user.routes"
 import plantSitting from "./plantSitting.routes"
 import request from "./request.routes"
 import message from './message.routes'
+import address from './address.routes'
 
 
 const router = Router()
@@ -17,6 +18,7 @@ router.use("/api/species", species);
 router.use("/api/plant", plant);
 router.use("/api/user", user);
 router.use("/api/plantSitting", plantSitting);
+router.use("/api/address", address)
 router.use("/api/request", request);
 router.use("/api/message", message);
 export default router;

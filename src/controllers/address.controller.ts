@@ -1,31 +1,30 @@
+import {NextFunction, Request, Response} from "express";
+import {addressService} from "../services/addressService";
+import {return400or500Errors} from "../utils";
+import {addressValidation} from "../database/validation/address.validation";
 
-import { ApiKeyManager } from '@esri/arcgis-rest-request';
-import { geocode } from '@esri/arcgis-rest-geocoding';
-import { getOneAddressByLabel, createAddress } from '../queries/address.queries';
-import { IAddress } from '../interfaces';
+const AddressService = new addressService()
 
+export const getAddressCoordinates = async (req: Request, res: Response, _: NextFunction) => {
+    try{
+        await addressValidation.validateAsync(req.body, { abortEarly: false });
 
+        const addresses = await AddressService.getAddressFromLabel(req.body)
+        const result: any[] = []
 
-export const getAddressFromLabel = async (label: string): Promise<IAddress| null> => {
-    try {
-        const authentication = ApiKeyManager.fromKey(process.env.MAP_KEY as string);
-        const resp = await geocode({
-            address: label,
-            countryCode: "FR",
-            authentication
+        addresses.forEach((item: any) => {
+            result.push({
+                address: item.address,
+                location: {
+                    x: item.location.x,
+                    y: item.location.y
+                },
+                score: item.score
+            })
         })
-        if (resp.candidates.length > 0) {
-            const address = await getOneAddressByLabel(label)
-            if (address) {
-                return address
-            } else {
-                const addressObject = resp.candidates[0]
-                return await createAddress(addressObject.address, addressObject.location.y, addressObject.location.x)
-            }
-        } else {
-            return null
-        }
-    } catch (e) {
-        return null
+
+        res.status(200).send(result)
+    }catch (e) {
+        return400or500Errors(e, res)
     }
-};
+}
