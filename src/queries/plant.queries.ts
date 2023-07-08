@@ -3,14 +3,21 @@ import {Image} from "../database/models/image.model"
 import {User} from "../database/models/user.model";
 import {Types} from 'mongoose';
 import {Species} from "../database/models/species.model";
-import {IImage, PlantForm} from "../interfaces/index"
+import {IImage, IPlant, PlantForm} from "../interfaces/index"
+import {HttpError} from "../utils/HttpError";
 
 
-export const getOnePlantById = async (plantId: string) => {
-    return await Plant.findOne({_id: plantId}).populate({path: "images", model: Image}).populate({
+export const getOnePlantById = async (plantId: string) : Promise<IPlant> => {
+    const temp = await Plant.findOne({_id: plantId}).populate({path: "images", model: Image}).populate({
         path: "user",
         model: User
     }).exec();
+
+    if(temp){
+        return temp
+    }
+
+    throw new HttpError(404, "Plant not Found")
 };
 
 export const findPlantUser = async (userId: string) => {

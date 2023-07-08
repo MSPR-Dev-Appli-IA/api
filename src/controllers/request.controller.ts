@@ -1,14 +1,23 @@
 import { NextFunction, Request, Response } from "express";
 import  mongoose from 'mongoose';
-import { createRequest, deleteRequestWithId, getOneRequestById, setStatutRequestToAccept, setStatutRequestToRefuse } from "../queries/request.queries";
-import { findOnePlantSittinWithRequest, findOnePlantSitting, setTakenPlantSittingTrue } from "../queries/plantSitting.queries";
 import { deleteMessage } from "./message.controller";
+import {
+  createRequest, deleteRequestWithId,
+  getOneRequestById,
+  setStatutRequestToAccept,
+  setStatutRequestToRefuse
+} from "../queries/request.queries";
+import {
+  findOnePlantSitting,
+  findOnePlantSittinWithRequest,
+  setTakenPlantSittingTrue
+} from "../queries/plantSitting.queries";
 
 export const getOneRequest = async (req: Request, res: Response, __: NextFunction) => {
     
     try {
         const requestId = req.params.requestId;
-        const request = await  getOneRequestById(new  mongoose.Types.ObjectId(requestId.trim()))
+        const request = await  getOneRequestById(requestId)
         if(request){
           res.status(200).json( request );
         }else{
@@ -46,7 +55,7 @@ export const newRequest= async (req: Request, res: Response, __: NextFunction) =
 export const acceptRequest = async (req: Request, res: Response, __: NextFunction) => {
   try {
     const requestId = req.params.requestId;
-    const request = await  getOneRequestById(new  mongoose.Types.ObjectId(requestId.trim()))
+    const request = await  getOneRequestById(requestId)
     if(request){
       const plantSitting = await findOnePlantSittinWithRequest(new mongoose.Types.ObjectId(request.plantSitting._id.trim()))
       if (plantSitting){
@@ -54,7 +63,7 @@ export const acceptRequest = async (req: Request, res: Response, __: NextFunctio
           // Wait for the previous item to finish processing
           await a;
           if (!conv._id.equals(request._id)){
-            await setStatutRequestToRefuse(new  mongoose.Types.ObjectId(conv._id.trim()))
+            await setStatutRequestToRefuse(conv._id)
           }
           
         }, Promise.resolve());
@@ -82,9 +91,9 @@ export const refuseRequest = async (req: Request, res: Response, __: NextFunctio
     
   try {
     const requestId = req.params.requestId;
-    const request = await  getOneRequestById(new  mongoose.Types.ObjectId(requestId.trim()))
+    const request = await  getOneRequestById(requestId)
     if(request){
-      const requestUpdated = await setStatutRequestToRefuse(new  mongoose.Types.ObjectId(requestId.trim()))
+      const requestUpdated = await setStatutRequestToRefuse(requestId)
       res.status(200).json( requestUpdated );
     }else{
     res.status(404).send({ message: "Cette request n'existe pas" });
@@ -100,14 +109,14 @@ export const removeRequest = async (req: Request, res: Response, __: NextFunctio
     
   try {
     const requestId = req.params.requestId
-    const request = await  getOneRequestById(new  mongoose.Types.ObjectId(requestId.trim()))
+    const request = await  getOneRequestById(requestId)
     if (request){
       await request.messages.reduce(async (a, mess) => {
         // Wait for the previous item to finish processing
         await a;
         await deleteMessage(mess._id)
       }, Promise.resolve());
-    await deleteRequestWithId(new  mongoose.Types.ObjectId(requestId.trim()))
+    await deleteRequestWithId(requestId)
     res.status(200).send()
     }
     else{

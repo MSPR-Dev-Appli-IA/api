@@ -4,14 +4,19 @@ import {Types} from 'mongoose';
 import {IPlantSitting} from "../interfaces";
 import {Address} from "../database/models/adress.model";
 import {Request} from "../database/models/request.model";
+import {HttpError} from "../utils/HttpError";
 
 
-export const getOnePlantSittingById = async (plantSittingId: Types.ObjectId): Promise<IPlantSitting | null> => {
-    return await PlantSitting.findOne({_id: plantSittingId})
+export const getOnePlantSittingById = async (plantSittingId: string): Promise<IPlantSitting> => {
+    const plantInfo = await PlantSitting.findOne({_id: plantSittingId})
         .populate({path: "plant", model: Plant})
         .populate({path: "address", model: Address})
         .populate({path: "requests", model: Request})
         .exec();
+    if(plantInfo){
+        return plantInfo
+    }
+    throw new HttpError(404, "Plant Sitting not found.")
 };
 
 export const findPlantSittingsNotTakenAndNotBegin = async (order: 1 | -1 = -1, search: string | null) => {

@@ -1,10 +1,10 @@
 import {NextFunction, Request, Response} from "express";
 import {userInfoValidation} from "../database/validation/user.validation";
-import {updateUserWithUserId, UpdateUserAvatarWithUserId, deleteImageWithUserId} from "../queries/user.queries"
 import {newImage} from "./image.controller";
-import {deleteImage} from "../queries/image.queries";
 import * as fs from 'fs';
 import {API_HOSTNAME, API_VERSION, return400or500Errors} from "../utils";
+import {deleteImageWithUserId, UpdateUserAvatarWithUserId, updateUserWithUserId} from "../queries/user.queries";
+import {deleteImage} from "../queries/image.queries";
 
 export const updateUser = async (req: Request, res: Response, _: NextFunction) => {
     try {

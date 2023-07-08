@@ -1,15 +1,20 @@
-
 import { NextFunction, Request, Response } from "express";
 import mongoose from 'mongoose';
-import { getOneRequestById } from "../queries/request.queries";
 import { newImage } from "./image.controller";
-import { createMessageForAdvice, createMessageForRequest, deleteMessageWithMessageId, findMessageById } from "../queries/message.queries";
 import { Types } from 'mongoose';
-import { deleteImage } from "../queries/image.queries";
 import  { ValidationError } from "joi";
 import * as fs from 'fs';
 import { messageValidation } from "../database/validation/message.validation";
-import { getOneAdviceById } from "../queries/advice.queries";
+import {getOneRequestById} from "../queries/request.queries";
+import {
+    createMessageForAdvice,
+    createMessageForRequest,
+    deleteMessageWithMessageId,
+    findMessageById
+} from "../queries/message.queries";
+import {getOneAdviceById} from "../queries/advice.queries";
+import {deleteImage} from "../queries/image.queries";
+
 
 export const postContentMessageForRequest = async (req: Request, res: Response, __: NextFunction) => {
 
@@ -17,7 +22,7 @@ export const postContentMessageForRequest = async (req: Request, res: Response, 
         await messageValidation.validateAsync(req.body, { abortEarly: false });
         const {content} = req.body
         const requestId = req.params.requestId;
-        const request = await getOneRequestById(new mongoose.Types.ObjectId(requestId.trim()))
+        const request = await getOneRequestById(requestId)
         if (request) {
        
             const newMessage = await createMessageForRequest(null, req.user, request,content)
@@ -46,7 +51,7 @@ export const postImageMessageForRequest = async (req: Request, res: Response, __
 
         const file = req.file as Express.Multer.File
         const requestId = req.params.requestId;
-        const request = await getOneRequestById(new mongoose.Types.ObjectId(requestId.trim()))
+        const request = await getOneRequestById(requestId)
         if (file && request) {
             const imageMessage = await newImage(file)
             const newMessage = await createMessageForRequest(imageMessage, req.user, request)

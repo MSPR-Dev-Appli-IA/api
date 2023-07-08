@@ -1,14 +1,4 @@
 import {NextFunction, Request, Response} from "express";
-import {
-    findLimitedSpecies,
-    findOneSpecies,
-    createSpecies,
-    updateSpecieWithSpeciesId,
-    addImageWithSpeciesId,
-    deleteImageWithSpeciesId,
-    deleteSpeciesWithSpeciesId
-} from "../queries/species.queries"
-import {deleteImage, getImageById} from "../queries/image.queries";
 import {newImage} from "./image.controller";
 import mongoose from 'mongoose';
 import * as fs from 'fs';
@@ -17,6 +7,14 @@ import {
     updateSpeciesValidation
 } from "../database/validation/species.validation";
 import {API_HOSTNAME, API_VERSION, return400or500Errors} from "../utils";
+import {
+    addImageWithSpeciesId,
+    createSpecies, deleteImageWithSpeciesId, deleteSpeciesWithSpeciesId,
+    findLimitedSpecies,
+    findOneSpecies,
+    updateSpecieWithSpeciesId
+} from "../queries/species.queries";
+import {deleteImage, getImageById} from "../queries/image.queries";
 
 const limit: number = 5
 

@@ -1,13 +1,18 @@
 
 import { NextFunction, Request, Response } from "express";
-import { findLimitedAdvicesFoOnePlant, findLimitedAdvicesNotTaken,findLimitedAdvicesOfBotanist,getOneAdviceById,takeAnAdviceByAdviceId,deleteAdviceWithId,createAdviceWithPlantId,addImageWithAdviceId,deleteImageWithAdviceId,updateAdviceIthAdviceId } from "../queries/advice.queries";
 import mongoose from 'mongoose';
 import * as fs from 'fs';
-import { deleteImage, getImageById } from "../queries/image.queries";
 import { deleteMessage } from "./message.controller";
 import  { ValidationError } from "joi";
 import { adviceValidation } from "../database/validation/advice.validation";
 import { newImage } from "./image.controller";
+import {
+    addImageWithAdviceId,
+    createAdviceWithPlantId, deleteAdviceWithId, deleteImageWithAdviceId, findLimitedAdvicesFoOnePlant,
+    findLimitedAdvicesNotTaken,
+    findLimitedAdvicesOfBotanist, getOneAdviceById, takeAnAdviceByAdviceId, updateAdviceIthAdviceId
+} from "../queries/advice.queries";
+import {deleteImage, getImageById} from "../queries/image.queries";
 const limit = 5
 
 export const getAdvicesNotTaken = async (req: Request, res: Response, __: NextFunction) => {

@@ -1,5 +1,6 @@
 import {Response} from "express";
 import {ValidationError} from "joi";
+import {HttpError} from "./HttpError";
 
 const API_HOSTNAME = (process.env.API_HOSTNAME) ? process.env.API_HOSTNAME : ""
 const API_VERSION = (process.env.API_VERSION) ? process.env.API_VERSION : ""
@@ -19,7 +20,13 @@ function return400or500Errors(error: any, res: Response) {
             message: message
         });
         return ;
-    }else if(error.stack.split(': ')[0] == "MongoServerError"){
+    }else if (error instanceof HttpError){
+        res.status(error.statusCode).send({
+            "field": ["error"],
+            "message": [error.getErrorMessage()]
+        })
+    }
+    else if(error.stack.split(': ')[0] == "MongoServerError"){
         if(error.message.indexOf('duplicate key error') !== -1){
             res.status(400).send({
                 field: ["error"],

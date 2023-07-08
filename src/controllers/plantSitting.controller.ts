@@ -1,11 +1,16 @@
 
 import { NextFunction, Request, Response } from "express";
-import { findPlantSittingsNotTakenAndNotBegin, findOnePlantSitting, findOnePlantSittinWithRequest, deletePlantSittingWithPlantSittingId} from "../queries/plantSitting.queries";
 import {plantSittingValidation, updateplantSittingValidation} from "../database/validation/plantSitting.validation";
 import mongoose from 'mongoose';
 import {API_HOSTNAME, API_VERSION, return400or500Errors} from "../utils";
 
-import {plantSittingService} from "../services/plantSittingService";
+import {plantSittingService} from "../utils/services/plantSittingService";
+import {
+  deletePlantSittingWithPlantSittingId,
+  findOnePlantSitting,
+  findOnePlantSittinWithRequest,
+  findPlantSittingsNotTakenAndNotBegin
+} from "../queries/plantSitting.queries";
 
 const PlantSittingService = new plantSittingService()
 
