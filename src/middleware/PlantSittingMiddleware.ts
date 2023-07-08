@@ -36,7 +36,7 @@ export const areyouThePlantSittingOwnerFromTheRequest = async (req: Request, res
         const request = await getOneRequestById(new mongoose.Types.ObjectId(requestId.trim()))
         const plantSitting = await getOnePlantSittingById(new mongoose.Types.ObjectId(request?.plantSitting._id))
         if (plantSitting) {
-            const plant = await getOnePlantById(plantSitting.plant._id)
+            const plant = await getOnePlantById(plantSitting.plant._id.toString())
             if (plant){
                 if (req.user._id.equals(plant.user._id)) {
                     next()
