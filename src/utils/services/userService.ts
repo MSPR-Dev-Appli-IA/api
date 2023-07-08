@@ -1,8 +1,8 @@
-import {addUserJWTToken, createUser, findUserPerEmail, findUserPerId} from "../queries/user.queries";
-import {IUserLocal, UserForm} from "../interfaces";
-import {userSignupValidation} from "../database/validation/user.validation";
-import {getDefaultRole} from "../queries/role.queries";
-import {JwtError, JwtService} from "./jwtService";
+import {IUserLocal, UserForm} from "../../interfaces";
+import {userSignupValidation} from "../../database/validation/user.validation";
+import {JwtService} from "./jwtService";
+import {addUserJWTToken, createUser, findUserPerEmail, findUserPerId} from "../../queries/user.queries";
+import {getDefaultRole} from "../../queries/role.queries";
 
 const jwtService = new JwtService()
 
@@ -15,8 +15,7 @@ export class UserService{
     async createUser(body: UserForm){
         await userSignupValidation.validateAsync(body, {abortEarly: false});
 
-        const role = await getDefaultRole();
-        await createUser(body, role);
+        await createUser(body, await getDefaultRole())
     }
 
     async loginUser(body: IUserLocal){
@@ -36,10 +35,6 @@ export class UserService{
     }
 
     async checkUserExist(userId: string) {
-        const user = await findUserPerId(userId);
-        if (user) {
-            return user
-        }
-        throw new JwtError("User not Found. Please contact us.")
+        return await findUserPerId(userId);
     }
 }

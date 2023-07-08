@@ -15,5 +15,3 @@ const messageSchema = new mongoose.Schema<IMessage>({
 
 
 export const Message = mongoose.model('Message', messageSchema);
-
-

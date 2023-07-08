@@ -2,7 +2,7 @@ import {createUser} from "../queries/user.queries";
 import {NextFunction, Request, Response} from "express";
 import {getBotanistRole} from "../queries/role.queries";
 import {return400or500Errors} from "../utils";
-import {UserService} from "../services/userService";
+import {UserService} from "../utils/services/userService";
 
 const userService = new UserService();
 

@@ -1,5 +1,6 @@
-import {UserjwtToken} from "../interfaces";
+
 import jwt, {JwtPayload} from "jsonwebtoken";
+import {UserjwtToken} from "../../interfaces";
 
 export class JwtService{
     createJwtToken({ user, id }:UserjwtToken) {
