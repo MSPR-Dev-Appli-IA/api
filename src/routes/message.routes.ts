@@ -7,7 +7,7 @@ const router = Router();
 
 import  {requireAuth} from "../middleware/AuthMiddleware";
 import { areyouThePlantSittingOwnerOrTheBooker,isThisRequestTaken } from "../middleware/RequestMiddleware";
-import { areYouTheAdviceOwnerOrTheAdvicer,isThisAdviceTaken} from "../middleware/AdviceMiddleware";
+import { areYouTheAdviceOwnerOrTheAdvicer,isThisAdviceTaken} from "../middleware/adviceMiddleware";
 
 
 router.post("/plantSitting/image/:requestId",  requireAuth,isThisRequestTaken,areyouThePlantSittingOwnerOrTheBooker,upload.single("file"), postImageMessageForRequest);

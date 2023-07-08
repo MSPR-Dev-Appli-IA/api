@@ -5,7 +5,7 @@ import {getAdvicesNotTaken,getMyAdvicesBotanist,getOneAdvice,createAdvice,takeOn
 const router = Router();
 
 import  {isItBotanist, requireAuth} from "../middleware/AuthMiddleware";
-import { AreYouBotanistOrOwnerAdvice, areYouTheAdviceOwner ,notAlreadyTaken} from "../middleware/AdviceMiddleware";
+import { AreYouBotanistOrOwnerAdvice, areYouTheAdviceOwner ,notAlreadyTaken} from "../middleware/adviceMiddleware";
 import upload from '../config/image.config'
 
 
