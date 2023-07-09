@@ -9,6 +9,7 @@ import {plantSittingValidation, updateplantSittingValidation} from "../database/
 import mongoose from 'mongoose';
 import {API_HOSTNAME, API_VERSION, return400or500Errors} from "../utils";
 import {plantSittingService} from "../services/plantSittingService";
+import {findOnePlant} from "../queries/plant.queries";
 
 const PlantSittingService = new plantSittingService()
 
@@ -20,20 +21,29 @@ export const getPlantSitting = async (req: Request, res: Response, __: NextFunct
 
         const plantSitting = await findPlantSittingsNotTakenAndNotBegin(order, search)
 
-        plantSitting.forEach(item => {
+        await Promise.all(plantSitting.map(async (item) => {
             if(item.plant){
+                const plantInfo = await findOnePlant(item.plant._id.toString())
                 result.push({
                     _id: item._id,
+                    description: item.description,
+                    start: item.start_at,
+                    end: item.end_at,
                     address: {
+                        district: item.address.district,
                         x: item.address.location.x,
                         y: item.address.location.y
                     },
-                    plantInfo: item.plant
+                    plantInfo: {
+                        _id: plantInfo._id,
+                        name: plantInfo.name,
+                        images: plantInfo.images,
+                        species : plantInfo.species
+                    }
                 })
-            }else{
-                throw new Error("Impossible to obtain plant name with this search name")
             }
-        })
+
+        }))
         res.status(200).send({
             "result": result
         });
@@ -47,7 +57,7 @@ export const getPlantSitting = async (req: Request, res: Response, __: NextFunct
 export const getOnePlantSitting = async (req: Request, res: Response, __: NextFunction) => {
     try {
         const plantSittingId = req.params.plantSittingId;
-        const plantSitting = await findOnePlantSitting(new mongoose.Types.ObjectId(plantSittingId.trim()))
+        const plantSitting = await findOnePlantSitting(plantSittingId)
         if (plantSitting) {
             res.status(200).send({
                 _id: plantSitting._id,
@@ -56,6 +66,7 @@ export const getOnePlantSitting = async (req: Request, res: Response, __: NextFu
                 start_at: plantSitting.start_at,
                 end_at: plantSitting.end_at,
                 address: {
+                    district: plantSitting.address.district,
                     x: plantSitting.address.location.x,
                     y: plantSitting.address.location.y
                 },
@@ -116,7 +127,7 @@ export const updatePlantSitting = async (req: Request, res: Response, __: NextFu
 export const removePlantSitting = async (req: Request, res: Response, __: NextFunction) => {
     try {
         const plantSittingId = req.params.plantSittingId;
-        const plantSitting = await findOnePlantSitting(new mongoose.Types.ObjectId(plantSittingId.trim()))
+        const plantSitting = await findOnePlantSitting(plantSittingId)
         if (plantSitting) {
             await deletePlantSittingWithPlantSittingId(new mongoose.Types.ObjectId(plantSittingId.trim()))
             res.status(200).send({

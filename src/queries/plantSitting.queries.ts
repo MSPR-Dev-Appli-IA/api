@@ -32,14 +32,20 @@ export const findPlantSittingsNotTakenAndNotBegin = async (order: 1 | -1 = -1, s
         .sort({ name: order })
         .exec()
 
-    return request
+    if(request){
+        return request
+    }
+    throw new Error("Impossible to obtain plant name with this search name")
 };
 
-export const findOnePlantSitting = async (plantSittingId: Types.ObjectId) => {
-    return PlantSitting.findOne({_id: plantSittingId})
+export const findOnePlantSitting = async (plantSittingId: string): Promise<IPlantSitting> => {
+    const temp = await PlantSitting.findOne({_id: plantSittingId})
         .populate({path: "plant", model: Plant})
         .populate({path: "address", model: Address})
-        .exec()
+    if(temp){
+        return temp
+    }
+    throw new Error("Please contact us.")
 };
 
 export const createPlantSitting = async (plantSitting: IPlantSitting) => {

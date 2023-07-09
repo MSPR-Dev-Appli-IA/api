@@ -1,6 +1,6 @@
 import {ApiKeyManager} from "@esri/arcgis-rest-request";
 import {geocode} from "@esri/arcgis-rest-geocoding";
-import {AddressForm, ILocation} from "../interfaces";
+import {AddressForm, IAddress} from "../interfaces";
 import {createAddress, getOneAddressByCoordinates} from "../queries/address.queries";
 
 export class addressService{
@@ -18,14 +18,14 @@ export class addressService{
         return resp.candidates
     }
 
-    async getOrCreateAddress(coordinates: ILocation){
+    async getOrCreateAddress(address: IAddress){
 
-        const addressInfo = await getOneAddressByCoordinates(coordinates)
+        const addressInfo = await getOneAddressByCoordinates(address)
 
         if(addressInfo){
             return addressInfo
         }else{
-            return await createAddress(coordinates)
+            return await createAddress(address)
         }
     }
 }

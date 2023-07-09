@@ -12,13 +12,3 @@ export interface IPlantSitting extends Document{
 
     address: IAddress
 }
-
-
-export interface PlantSittingForm{
-    title : string
-    description : string
-    start_at :Date
-    end_at :Date
-    address:string
-}
-
