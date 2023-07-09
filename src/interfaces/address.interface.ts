@@ -7,7 +7,7 @@ export interface ILocation{
 }
 
 export interface IAddress extends Document{
-    label : string
+    district : string
     location: ILocation
 }
 

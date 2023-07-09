@@ -3,7 +3,7 @@ import {Image} from "../database/models/image.model"
 import {User} from "../database/models/user.model";
 import {Types} from 'mongoose';
 import {Species} from "../database/models/species.model";
-import {IImage, PlantForm} from "../interfaces/index"
+import {IImage, IPlant, PlantForm} from "../interfaces/index"
 
 
 export const getOnePlantById = async (plantId: string) => {
@@ -30,11 +30,15 @@ export const findLimitedPlantsByUserIdAndSpeciesId = async (userId: String, spec
         .exec()
 };
 
-export const findOnePlant = async (plantId: string) => {
-    return Plant.findOne({_id: plantId})
+export const findOnePlant = async (plantId: string): Promise<IPlant> => {
+    const temp = await Plant.findOne({_id: plantId})
         .populate({path: "images", model: Image})
         .populate({path: "species", model: Species})
         .exec();
+    if(temp){
+        return temp
+    }
+    throw new Error("Plant not found")
 };
 
 export const createPlant = async (speciesId: Types.ObjectId, userId: Types.ObjectId, name: String) => {

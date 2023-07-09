@@ -1,23 +1,24 @@
 import { Address } from "../database/models/adress.model";
-import {IAddress, ILocation} from "../interfaces";
+import {IAddress} from "../interfaces";
 
-export const getOneAddressByCoordinates = async (coordinates: ILocation): Promise<IAddress | null> => {
+export const getOneAddressByCoordinates = async (address: IAddress): Promise<IAddress | null> => {
     return await Address.findOne({
         $and: [
-            {"location.x":  coordinates.x},
-            {"location.y":  coordinates.y}
+            {"location.x":  address.location.x},
+            {"location.y":  address.location.y}
         ]
     }).exec();
 };
 
 
 
-export const createAddress = async (coordinates: ILocation) => {
-    const newPlant = new Address({
+export const createAddress = async (address: IAddress) => {
+    const newAddress = new Address({
+        district: address.district,
         location: {
-            x: coordinates.x,
-            y: coordinates.y
+            x: address.location.x,
+            y: address.location.y
         }
     });
-    return await newPlant.save();
+    return await newAddress.save();
   };

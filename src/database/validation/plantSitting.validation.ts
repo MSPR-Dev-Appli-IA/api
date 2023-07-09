@@ -13,8 +13,11 @@ export const plantSittingValidation = Joi.object({
     "string.base": "La datez  de fin n'est pas valide",
   }),
   address: Joi.object({
-    x: Joi.number(),
-    y: Joi.number()
+    district: Joi.string().min(3).required(),
+    location: Joi.object({
+      x: Joi.number().required(),
+      y: Joi.number().required()
+    })
   })
 });
 
