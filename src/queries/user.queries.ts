@@ -1,17 +1,18 @@
 import {User} from "../database/models/user.model";
-import {IRole, UserForm,UserInfo,IImage} from "../interfaces";
+import {IRole, UserForm, UserInfo, IImage, IUser} from "../interfaces";
 import { Types } from 'mongoose';
+import {HttpError} from "../utils/HttpError";
 
 export const findUserPerEmail = (email:string) => {
   return User.findOne({ "local.email": email }).exec();
 };
 
-export const findUserPerId = (id:string) => {
-  const request = User.findById(id).populate("role").populate("image").exec();
-  if(request){
+export const findUserPerId = async (id: string): Promise<IUser> => {
+  const request = await User.findById(id).populate("role").populate("image").exec();
+  if (request) {
     return request
   }
-  throw new Error("Failed to find user per id")
+  throw new HttpError(404, "User not Found.")
 };
 
 export const createUser= async (user :UserForm, role :IRole) => {
