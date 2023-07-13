@@ -12,7 +12,7 @@ import {getOnePlantSittingWithRequest} from "../controllers/plantSitting.control
 
 const router = Router();
 
-router.post("/:plantSittingId",  requireAuth, areyouThePlantSittingOwner, areThePlantSittingStillAvailable, newRequest);
+router.post("/",  requireAuth, areyouThePlantSittingOwner, areThePlantSittingStillAvailable, newRequest);
 
 router.get("/:requestId",  requireAuth,areyouThePlantSittingOwnerOrTheBooker, getOneRequest);
 router.get("/request/:plantSittingId",  requireAuth,areyouThePlantSittingOwner, getOnePlantSittingWithRequest);

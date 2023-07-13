@@ -12,6 +12,8 @@ import {
   findOnePlantSittinWithRequest,
   setTakenPlantSittingTrue
 } from "../queries/plantSitting.queries";
+import {createRequestValidation} from "../database/validation/requests.validation";
+import {return400or500Errors} from "../utils";
 
 export const getOneRequest = async (req: Request, res: Response, __: NextFunction) => {
     
@@ -33,20 +35,20 @@ export const getOneRequest = async (req: Request, res: Response, __: NextFunctio
 export const newRequest= async (req: Request, res: Response, __: NextFunction) => {
     
   try {
-    const plantSittingId = req.params.plantSittingId;
-    const plantSitting = await  findOnePlantSitting(plantSittingId)
 
+    await createRequestValidation.validateAsync(req.body, {abortEarly: false})
 
-    if (plantSitting){
-        const newRequest = await  createRequest(req.user,plantSitting)
-      
-        res.status(200).json( newRequest );
-    }else{
-    res.status(404).send({ message: "Cettedemande de gardiennage  n'existe pas" });
-    }
+    const plantSitting = await findOnePlantSitting(req.body.plantSittingId)
+
+    await createRequest(req.user, plantSitting)
+
+    res.status(200).send({
+      "status": "success",
+      "message": "Request sent."
+    })
    
   } catch (e) {
-    res.status(404).send({ message: "Erreur" });
+    return400or500Errors(e, res)
   }
 
 };
