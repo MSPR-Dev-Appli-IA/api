@@ -21,12 +21,8 @@ export class JwtService{
         if (tokenExp && tokenUserId) {
             if (nowInSec <= tokenExp) {
                 return tokenDecoded;
-            } else if (nowInSec > tokenExp && nowInSec - tokenExp) {
-                const refreshedToken = this.createJwtToken({user: undefined, id: tokenDecoded.sub});
-                return jwt.verify(refreshedToken, process.env.JWTKEY);
-            }else{
-                throw new JwtError("Token expired.")
             }
+            throw new JwtError("Token expired.")
         }
         throw new JwtError("Jwt invalid.")
     };
