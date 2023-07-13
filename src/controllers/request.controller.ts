@@ -34,7 +34,7 @@ export const newRequest= async (req: Request, res: Response, __: NextFunction) =
     
   try {
     const plantSittingId = req.params.plantSittingId;
-    const plantSitting = await  findOnePlantSitting(new  mongoose.Types.ObjectId(plantSittingId.trim()))
+    const plantSitting = await  findOnePlantSitting(plantSittingId)
 
 
     if (plantSitting){
