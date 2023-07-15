@@ -8,6 +8,7 @@ import { IAdvice } from "./advice.interface";
 export interface IMessage extends Document{
     send_at : Date
     sender:  IUser
+    receiver: IUser
     content: string|null
     image : IImage|null
     request : IRequest|null

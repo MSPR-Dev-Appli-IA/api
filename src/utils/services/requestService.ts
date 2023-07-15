@@ -1,9 +1,10 @@
 import {
-    createRequest, deleteRequestById, RequestQueries, setStatutRequestToAccept, setStatutRequestToRefuse
+    createRequest, deleteRequestById, getOneRequestById, setStatutRequestToAccept, setStatutRequestToRefuse
 } from "../../queries/request.queries";
 import {Request} from "express";
 import {
-    getAllPlantSittingExceptRequestId, PlantSittingQueries,
+    findOnePlantSitting,
+    getAllPlantSittingExceptRequestId, getOnePlantSittingByRequestId, linkPlantSittingToRequest, rollBack,
     setTakenPlantSittingTrue
 } from "../../queries/plantSitting.queries";
 import {
@@ -13,16 +14,9 @@ import {
 import {findOnePlant} from "../../queries/plant.queries";
 
 export class RequestService{
-    private plantSittingRepository: PlantSittingQueries;
-    private requestRepository: RequestQueries;
-
-    constructor() {
-        this.plantSittingRepository = new PlantSittingQueries()
-        this.requestRepository = new RequestQueries()
-    }
 
     public async create(request: Request) {
-        const plantSitting = await this.plantSittingRepository.findById(request.body.plantSittingId)
+        const plantSitting = await findOnePlantSitting(request.body.plantSittingId)
 
         const plantInfo = await findOnePlant(plantSitting.plant._id.toString())
         const receiver = plantInfo.user._id.toString()
@@ -30,7 +24,7 @@ export class RequestService{
         const newRequest = await createRequest(request.user)
         const sender = newRequest.booker._id.toString()
 
-        await this.plantSittingRepository.linkPlantSittingToRequest(plantSitting, newRequest._id.toString())
+        await linkPlantSittingToRequest(plantSitting, newRequest._id.toString())
 
         await createMessageForRequest(
             sender,
@@ -42,7 +36,7 @@ export class RequestService{
 
     public async accept(requestId: string) {
 
-        const plantSitting = await this.plantSittingRepository.getOneByRequestId(requestId)
+        const plantSitting = await getOnePlantSittingByRequestId(requestId)
 
         await setStatutRequestToAccept(requestId)
         await this.setOtherRequestForThisPlantSittingToRefuse(plantSitting._id.toString(), requestId)
@@ -62,7 +56,7 @@ export class RequestService{
     }
 
     public async refuse(requestId: string){
-        await this.requestRepository.findById(requestId)
+        await (requestId)
         await setStatutRequestToRefuse(requestId)
     }
 
@@ -70,14 +64,14 @@ export class RequestService{
 
         await this.deleteBookerMessages(requestId)
 
-        await this.plantSittingRepository.rollBack(requestId)
+        await rollBack(requestId)
 
         await deleteRequestById(requestId)
 
     }
 
     private async deleteBookerMessages(requestId: string){
-        const request = await this.requestRepository.findById(requestId)
+        const request = await getOneRequestById(requestId)
         const allMessageInfo = await getAllMessageByBookerId(request.booker._id.toString())
 
         for(let i = 0; i < allMessageInfo.length; i++){

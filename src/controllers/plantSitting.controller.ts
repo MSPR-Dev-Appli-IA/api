@@ -8,10 +8,10 @@ import {
 import {plantSittingValidation, updateplantSittingValidation} from "../database/validation/plantSitting.validation";
 import mongoose from 'mongoose';
 import {API_HOSTNAME, API_VERSION, return400or500Errors} from "../utils";
-import {plantSittingService} from "../services/plantSittingService";
 import {findOnePlant} from "../queries/plant.queries";
+import {PlantSittingService} from "../utils/services/plantSittingService"
 
-const PlantSittingService = new plantSittingService()
+const plantSittingService = new PlantSittingService()
 
 export const getPlantSitting = async (req: Request, res: Response, __: NextFunction) => {
     try {
@@ -86,17 +86,18 @@ export const getOnePlantSitting = async (req: Request, res: Response, __: NextFu
 export const newPlantSitting = async (req: Request, res: Response, __: NextFunction) => {
     try {
         await plantSittingValidation.validateAsync(req.body, {abortEarly: false});
+        const newPlantSitting = await plantSittingService.create(req);
 
-        if (await PlantSittingService.create(req)) {
-            res.status(200).send({
-                "status": "success",
-                "plantSittingInfo": API_HOSTNAME + "/api" + API_VERSION + "/plantSitting/" + PlantSittingService.plantSittingInfo._id,
-            });
-        } else {
+        if (!newPlantSitting) {
             res.status(404).send({
                 "field": ["error"],
                 "message": ["Plant not Found"]
             })
+        } else {
+            res.status(200).send({
+                "status": "success",
+                "plantSittingInfo": API_HOSTNAME + "/api" + API_VERSION + "/plantSitting/" + newPlantSitting._id,
+            });
         }
     } catch (e) {
         return400or500Errors(e, res)
@@ -106,11 +107,12 @@ export const newPlantSitting = async (req: Request, res: Response, __: NextFunct
 export const updatePlantSitting = async (req: Request, res: Response, __: NextFunction) => {
     try {
         await updateplantSittingValidation.validateAsync(req.body, {abortEarly: false});
+        const updatePlantSitting = await plantSittingService.update(req)
 
-        if(await PlantSittingService.update(req)){
+        if(updatePlantSitting){
             res.status(200).send({
                 "status": "success",
-                "plantSittingInfo": API_HOSTNAME + "/api" + API_VERSION + "/plantSitting/" + PlantSittingService.plantSittingInfo._id,
+                "plantSittingInfo": API_HOSTNAME + "/api" + API_VERSION + "/plantSitting/" + updatePlantSitting._id,
             });
         }else{
             res.status(404).send({

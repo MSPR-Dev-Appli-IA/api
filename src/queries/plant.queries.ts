@@ -4,17 +4,27 @@ import {User} from "../database/models/user.model";
 import {Types} from 'mongoose';
 import {Species} from "../database/models/species.model";
 import {IImage, IPlant, PlantForm} from "../interfaces/index"
+import {HttpError} from "../utils/HttpError";
 
 
 export const getOnePlantById = async (plantId: string) => {
-    return await Plant.findOne({_id: plantId}).populate({path: "images", model: Image}).populate({
+    const temp = await Plant.findOne({_id: plantId}).populate({path: "images", model: Image}).populate({
         path: "user",
         model: User
     }).exec();
+    if(temp){
+        return temp
+    }
+    throw new HttpError(404, "Plant not found.")
 };
 
-export const findPlantUser = async (userId: string) => {
-    return await Plant.findOne({user: userId}).populate({path: "user", model: User}).exec()
+export const findPlantUser = async (userId: string): Promise<IPlant> => {
+    const temp = await Plant.findOne({user: userId}).populate({path: "user", model: User}).exec()
+    if(temp){
+        return temp
+    }
+
+    throw new HttpError(404, "Not plant found.")
 }
 
 export const findLimitedPlantsByUserIdAndSpeciesId = async (userId: String, speciesId: String | null = null, limit: number = 1, skip: number = 0, order: 1 | -1 = -1, search: String | null) => {
@@ -33,6 +43,7 @@ export const findLimitedPlantsByUserIdAndSpeciesId = async (userId: String, spec
 export const findOnePlant = async (plantId: string): Promise<IPlant> => {
     const temp = await Plant.findOne({_id: plantId})
         .populate({path: "images", model: Image})
+        .populate({path: "user", model: User})
         .populate({path: "species", model: Species})
         .exec();
     if(temp){

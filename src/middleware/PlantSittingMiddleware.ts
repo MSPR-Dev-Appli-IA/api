@@ -1,103 +1,54 @@
-import { NextFunction, Request, Response } from "express";
-import { getOnePlantSittingById } from "../queries/plantSitting.queries";
-import { getOnePlantById } from "../queries/plant.queries";
-import mongoose from 'mongoose';
-import { getOneRequestById } from "../queries/request.queries";
-
-export const areyouThePlantSittingOwner = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const plantSittingId = req.params.plantSittingId
-        const plantSitting = await getOnePlantSittingById(new mongoose.Types.ObjectId(plantSittingId.trim()))
-        if (plantSitting ) {
-            const plant = await getOnePlantById(plantSitting.plant._id.toString())
-            if (plant){
-                if (req.user._id.equals(plant.user._id)) {
-                    next()
-                } else {
-                    res.status(404).send({ message: "Your are not allowed" });
-                }
-            }
-           
-        } else {
-            res.status(404).send({ message: "Erreur" });
-        }
-
-    } catch (error) {
-        
-        res.status(404).send({ message: error });
-    }
-};
-
+import {NextFunction, Request, Response} from "express";
+import {return400or500Errors} from "../utils";
+import {HttpError} from "../utils/HttpError";
+import {findOnePlantSitting, getOnePlantSittingByRequestId} from "../queries/plantSitting.queries";
+import {findOnePlant} from "../queries/plant.queries";
 
 
 export const areyouThePlantSittingOwnerFromTheRequest = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const requestId = req.params.requestId
-        const request = await getOneRequestById(new mongoose.Types.ObjectId(requestId.trim()))
-        const plantSitting = await getOnePlantSittingById(new mongoose.Types.ObjectId(request?.plantSitting._id))
-        if (plantSitting) {
-            const plant = await getOnePlantById(plantSitting.plant._id.toString())
-            if (plant){
-                if (req.user._id.equals(plant.user._id)) {
-                    next()
-                } else {
-                    res.status(404).send({ message: "Your are not allowed" });
-                }
-            }
-           
-        } else {
+        const myPlantSittingInfo = await getOnePlantSittingByRequestId(req.body.requestId)
+        const userInfo = await findOnePlant(myPlantSittingInfo.plant._id.toString())
 
-            res.status(404).send({ message: "Erreur" });
+        if (req.user._id.toString() == userInfo.user._id.toString()) {
+            next()
+            return;
         }
 
+        throw new HttpError(401, "You are not authorized to access this conversation. Because you aren't the plant sitting owner.")
+
     } catch (error) {
-        
-        res.status(404).send({ message: error });
+        return400or500Errors(error, res)
     }
-};
+}
 
 export const areThePlantSittingStillAvailable = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const plantSittingId = req.params.plantSittingId
-        const plantSitting = await getOnePlantSittingById(new mongoose.Types.ObjectId(plantSittingId.trim()))
-        if (plantSitting  ) {
-            if (!plantSitting.is_taken && Date.now() < plantSitting.start_at.getDate() ){
-                next()
-            }else{
-                res.status(404).send({ message: "Erreur" });
-            }
-            
-           
-        } else {
+        const plantSittingInfo = await findOnePlantSitting(req.body.plantSittingId)
 
-            res.status(404).send({ message: "Erreur" });
+        if (!plantSittingInfo.is_taken && Date.now() < plantSittingInfo.end_at.getTime()) {
+            next()
+            return;
         }
+        throw new HttpError(401, "This plant sitting are not available. Because it's ended or already taken.")
 
     } catch (error) {
-        
-        res.status(404).send({ message: error });
+        return400or500Errors(error, res);
     }
-};
+}
 
 export const areThePlantSittingStillAvailableFromTheRequest = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const requestId = req.params.requestId
-        const request = await getOneRequestById(new mongoose.Types.ObjectId(requestId.trim()))
-        if (request ) {
-            if (!request.plantSitting.is_taken && Date.now() < request.plantSitting.start_at.getDate() ){
-                next()
-            }else{
-                res.status(404).send({ message: "Erreur" });
-            }
-            
-           
-        } else {
+        const plantSittingInfo = await getOnePlantSittingByRequestId(req.body.requestId)
 
-            res.status(404).send({ message: "Erreur" });
+        if (!plantSittingInfo.is_taken && Date.now() < plantSittingInfo.end_at.getTime()) {
+            next()
+            return;
+        } else {
+            throw new HttpError(401, "This plant sitting are not available from this request.")
         }
 
     } catch (error) {
-        
-        res.status(404).send({ message: error });
+        return400or500Errors(error, res)
     }
-};
+}

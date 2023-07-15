@@ -8,25 +8,32 @@ import { messageValidation } from "../database/validation/message.validation";
 import {getOneRequestById} from "../queries/request.queries";
 import {
     createMessageForAdvice,
-    createMessageForRequest,
     deleteMessageWithMessageId,
     findMessageById
 } from "../queries/message.queries";
 import {getOneAdviceById} from "../queries/advice.queries";
 import {deleteImage} from "../queries/image.queries";
+import {return400or500Errors} from "../utils";
 
+export const sendMessage = async (_req: Request, res: Response, __: NextFunction) => {
+    try{
+
+    }catch (e) {
+        return400or500Errors(e, res)
+    }
+}
 
 export const postContentMessageForRequest = async (req: Request, res: Response, __: NextFunction) => {
 
     try {
         await messageValidation.validateAsync(req.body, { abortEarly: false });
-        const {content} = req.body
         const requestId = req.params.requestId;
         const request = await getOneRequestById(requestId)
         if (request) {
        
-            const newMessage = await createMessageForRequest(null, req.user, request,content)
-            res.status(200).send(newMessage);
+            // const newMessage = await createMessageForRequest(null, req.user, request, req.body)
+            // res.status(200).send(newMessage);
+            res.status(200).send();
         } else {
             res.status(404).send("Error");
         }
@@ -53,9 +60,10 @@ export const postImageMessageForRequest = async (req: Request, res: Response, __
         const requestId = req.params.requestId;
         const request = await getOneRequestById(requestId)
         if (file && request) {
-            const imageMessage = await newImage(file)
-            const newMessage = await createMessageForRequest(imageMessage, req.user, request)
-            res.status(200).send(newMessage);
+            // const imageMessage = await newImage(file)
+            // const newMessage = await createMessageForRequest(imageMessage, req.user, request)
+            // res.status(200).send(newMessage);
+            res.status(200).send();
         } else {
             res.status(404).send("Error");
         }

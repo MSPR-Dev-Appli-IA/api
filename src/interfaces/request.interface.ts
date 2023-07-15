@@ -1,19 +1,13 @@
 import { Document  } from "mongoose";
-import { IPlantSitting } from "./plantSitting.interface";
 import { IUser } from "./user.interfaces";
-import { IMessage } from "./message.interface";
 
-export type statusLabel = "En attente"| "Accepté"|"Refusé"
-
-
+export type statusLabel = "Pending"| "Accepted"|"Refused"
 
 
 export interface IRequest extends Document{
-    created_at:Date
+    created_at: Date
     status : statusLabel
-    plantSitting : IPlantSitting
     booker: IUser
-    messages: IMessage[]
 }
 
 

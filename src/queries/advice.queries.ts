@@ -44,7 +44,7 @@ export const findLimitedAdvicesFoOnePlant = async ( limit: number = 1, skip: num
 };
 
 
-export const findLimitedAdvicesOfBotanist = async ( limit: number = 1, skip: number = 0, order: 1 | -1 = -1,userId: Types.ObjectId) => {
+export const findLimitedAdvicesOfBotanist = async ( limit: number = 1, skip: number = 0, order: 1 | -1 = -1,userId: string) => {
     return await Advice.find({
         taked_by: userId,
        

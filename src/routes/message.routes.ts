@@ -1,5 +1,11 @@
 import { Router } from "express";
-import { postImageMessageForRequest,postContentMessageForRequest,postImageMessageForAdvice,postContentMessageForAdvice } from "../controllers/message.controller";
+import {
+    postImageMessageForRequest,
+    postContentMessageForRequest,
+    postImageMessageForAdvice,
+    postContentMessageForAdvice,
+    sendMessage
+} from "../controllers/message.controller";
 
 import upload from '../config/image.config'
 
@@ -9,6 +15,7 @@ import  {requireAuth} from "../middleware/AuthMiddleware";
 import { areyouThePlantSittingOwnerOrTheBooker,isThisRequestTaken } from "../middleware/RequestMiddleware";
 import { areYouTheAdviceOwnerOrTheAdvicer,isThisAdviceTaken} from "../middleware/adviceMiddleware";
 
+router.post("/", requireAuth, isThisRequestTaken, areyouThePlantSittingOwnerOrTheBooker, sendMessage)
 
 router.post("/plantSitting/image/:requestId",  requireAuth,isThisRequestTaken,areyouThePlantSittingOwnerOrTheBooker,upload.single("file"), postImageMessageForRequest);
 router.post("/plantSitting/:requestId",  requireAuth,isThisRequestTaken,areyouThePlantSittingOwnerOrTheBooker, postContentMessageForRequest);

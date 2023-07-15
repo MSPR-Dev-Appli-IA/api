@@ -5,12 +5,15 @@ const schema = mongoose.Schema;
 
 
 const messageSchema = new mongoose.Schema<IMessage>({
-    send_at: { type: Date, default: Date.now },
-    content: { type: String,required:false,default: null },
-    image: { type: schema.Types.ObjectId, ref: "Image", required: false, default: null },
     sender: { type: schema.Types.ObjectId, ref: "User" },
-    request: { type: schema.Types.ObjectId, ref: "Request",default:null },
-    advice: { type: schema.Types.ObjectId, ref: "Advice",default:null },
+    receiver: { type: schema.Types.ObjectId, ref: "User" },
+
+    send_at: { type: Date, default: Date.now },
+    content: { type: String,required:false, default: null },
+    image: { type: schema.Types.ObjectId, ref: "Image", required: false, default: null },
+
+    request: { type: schema.Types.ObjectId, ref: "Request", default:null },
+    advice: { type: schema.Types.ObjectId, ref: "Advice", default:null },
 });
 
 
