@@ -53,3 +53,17 @@ export const getAllMessageByBookerId = async (bookerId: string, requestId?: stri
 
   throw new  HttpError(404, "User not found.")
 }
+
+export const getLastMessageByBookerId = async (bookerId: string, requestId: string): Promise<any> => {
+  const temp = await Message.find({sender: bookerId, request: requestId})
+      .populate("image")
+      .sort({_id: -1})
+      .limit(1)
+      .exec()
+
+  if(temp){
+    return temp
+  }
+
+  throw new  HttpError(404, "User not found.")
+}

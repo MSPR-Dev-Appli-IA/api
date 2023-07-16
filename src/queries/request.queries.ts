@@ -7,7 +7,7 @@ import {Plant} from "../database/models/plant.models";
 import {findPlantUser} from "./plant.queries";
 
 
-export const getOneRequestById = async (requestId: string):Promise<IRequest> => {
+export const getOneRequestById = async (requestId: string): Promise<IRequest> => {
     const temp = await Request.findOne({_id: requestId})
         .populate({path: "booker", model: User})
         .exec();

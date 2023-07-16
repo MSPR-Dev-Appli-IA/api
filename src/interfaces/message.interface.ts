@@ -6,6 +6,7 @@ import { IAdvice } from "./advice.interface";
 
 
 export interface IMessage extends Document{
+    read_at : Date
     send_at : Date
     sender:  IUser
     receiver: IUser

@@ -9,6 +9,7 @@ const messageSchema = new mongoose.Schema<IMessage>({
     receiver: { type: schema.Types.ObjectId, ref: "User" },
 
     send_at: { type: Date, default: Date.now },
+    read_at: { type: Date, default: null },
     content: { type: String,required:false, default: null },
     image: { type: schema.Types.ObjectId, ref: "Image", required: false, default: null },
 
