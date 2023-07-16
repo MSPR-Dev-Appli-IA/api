@@ -23,7 +23,7 @@ export const areyouTheRequestOwner= async (req: Request, res: Response, next: Ne
 
 export const areyouThePlantSittingOwnerOrTheBooker= async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const requestId = req.params.requestId
+        const requestId = req.body.requestId
         const request = await getOneRequestById(requestId)
         const plantSitting = await getOnePlantSittingByRequestId(requestId)
         const plant = await getOnePlantById(plantSitting.plant._id.toString())
@@ -43,21 +43,16 @@ export const areyouThePlantSittingOwnerOrTheBooker= async (req: Request, res: Re
 
 export const isThisRequestTaken= async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const requestId = req.params.requestId
+        const requestId = req.body.requestId
         const request = await getOneRequestById(requestId)
-        if (request) {
-            if (request.status == "Accepted") {
-                next()
-            } else {
-                res.status(404).send({ message: "Your are not allowed" });
-            }
+        if (request.status == "Accepted") {
+            next()
         } else {
-            res.status(404).send({ message: "Erreurs" });
+            res.status(401).send({ message: "This request has not yet been accepted."});
         }
 
     } catch (error) {
         
-        res.status(404).send({ message: error });
+       return400or500Errors(error, res)
     }
 };
-

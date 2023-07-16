@@ -5,6 +5,7 @@ import { Message } from "../database/models/message.model";
 import { Types } from 'mongoose';
 import { IAdvice } from "../interfaces/advice.interface";
 import {HttpError} from "../utils/HttpError";
+import {User} from "../database/models/user.model";
 
 
 export const createMessageForRequest = async (sender: IUser, receiver: IUser, requestId: string, content: string,  image: IImage | null = null) => {
@@ -66,4 +67,37 @@ export const getLastMessageByBookerId = async (bookerId: string, requestId: stri
   }
 
   throw new  HttpError(404, "User not found.")
+}
+
+export class MessageQueries{
+
+  public async getMessagesFor (from: string, to: string) {
+    const temp = await Message.find({
+      $or: [
+        {sender: from, receiver: to}, {sender: to, receiver: from}
+      ]
+    })
+        .populate([{path: "sender", model: User}, {path: "receiver", model: User}])
+        .sort({send_at: -1})
+        .exec()
+
+    if(temp){
+      return temp
+    }
+
+    throw new HttpError(404, "Messages with its users not found.")
+  }
+
+  public async createMessageForRequest(sender: string | null, receiver: string | null, requestId: string, content: string, image: IImage | null = null) {
+    const newPlant = new Message({
+      image: image,
+      sender: sender,
+      receiver: receiver,
+      request: requestId,
+      content: content,
+      advice: null
+    });
+    return await newPlant.save();
+  };
+
 }

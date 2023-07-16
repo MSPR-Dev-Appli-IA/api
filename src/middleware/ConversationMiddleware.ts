@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 import {getOneRequestById} from "../queries/request.queries";
-import {findOnePlantSittinWithRequest } from "../queries/plantSitting.queries";
+import {getOnePlantSittingByRequestId} from "../queries/plantSitting.queries";
 import {getOnePlantById} from "../queries/plant.queries";
 import {HttpError} from "../utils/HttpError";
 import {return400or500Errors} from "../utils";
@@ -10,7 +10,7 @@ export class ConversationMiddleware{
         try {
             if (req.body.requestId){
                 const request = await getOneRequestById(req.body.requestId)
-                const plantSitting = await findOnePlantSittinWithRequest  (req.body.requestId)
+                const plantSitting = await getOnePlantSittingByRequestId(req.body.requestId)
                 const plant = await getOnePlantById(plantSitting.plant._id.toString())
 
                 req.receiver = (req.user._id.equals(request.booker._id)) ? plant.user._id.toString() : request.booker._id.toString()
