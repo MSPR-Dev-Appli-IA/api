@@ -110,7 +110,6 @@ export const newPlant = async (req: Request, res: Response, _: NextFunction) => 
             });
         }
     } catch (e) {
-        console.log(e)
         return400or500Errors(e, res)
     }
 
