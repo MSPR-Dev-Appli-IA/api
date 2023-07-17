@@ -1,4 +1,4 @@
-import {NextFunction, Request, Response} from "express";
+import { NextFunction, Request, Response } from "express";
 import {
     findLimitedPlantsByUserIdAndSpeciesId,
     findOnePlant,
@@ -8,19 +8,22 @@ import {
     deletePlantsWithPlantsId,
     updatePlantWithPlantId, getOnePlantById
 } from "../queries/plant.queries"
-import {findOneSpecies,} from "../queries/species.queries";
+import { findOneSpecies, } from "../queries/species.queries";
 import mongoose from 'mongoose';
-import {newImage} from "./image.controller";
-import {deleteImage, getImageById} from "../queries/image.queries";
+import { newImage } from "./image.controller";
+import { deleteImage, getImageById } from "../queries/image.queries";
 import {
     getMyPlantsValidation,
-    getOneOfMyPlantValidation, newPlantValidation,
+    getOneOfMyPlantValidation,
     plantValidation
 } from "../database/validation/plant.validation"
+import { speciesService } from "../services/speciesService";
 import * as fs from 'fs';
-import {API_HOSTNAME, API_VERSION, return400or500Errors} from "../utils";
+import { API_HOSTNAME, API_VERSION, return400or500Errors } from "../utils";
 
 const limit: number = 5
+
+const SpeciesService = new speciesService()
 
 export const getMyPlants = async (req: Request, res: Response, _: NextFunction) => {
     try {
@@ -29,7 +32,7 @@ export const getMyPlants = async (req: Request, res: Response, _: NextFunction) 
         const page = (req.query.page) ? Number(req.query.page) : Number(1)
         const order = (req.query.order == "ASC") ? 1 : -1
 
-        await getMyPlantsValidation.validateAsync(req.query, {abortEarly: false});
+        await getMyPlantsValidation.validateAsync(req.query, { abortEarly: false });
 
         const skip: number = limit * page - limit;
         const plants = await findLimitedPlantsByUserIdAndSpeciesId(req.user._id, speciesId, limit, skip, order, search)
@@ -44,7 +47,7 @@ export const getMyPlants = async (req: Request, res: Response, _: NextFunction) 
                 })
             })
 
-            res.status(200).json({result});
+            res.status(200).json({ result });
         } else {
             res.status(404).json({
                 "field": ["error"],
@@ -59,7 +62,7 @@ export const getMyPlants = async (req: Request, res: Response, _: NextFunction) 
 
 export const getOneOfMyPlant = async (req: Request, res: Response, _: NextFunction) => {
     try {
-        await getOneOfMyPlantValidation.validateAsync(req.params, {abortEarly: false});
+        await getOneOfMyPlantValidation.validateAsync(req.params, { abortEarly: false });
 
         const plant = await findOnePlant(req.params.plantId)
         if (plant) {
@@ -78,19 +81,27 @@ export const getOneOfMyPlant = async (req: Request, res: Response, _: NextFuncti
 
 export const newPlant = async (req: Request, res: Response, _: NextFunction) => {
     try {
+        const file = req.file as Express.Multer.File
+        if (!file) {
+            res.status(404).send({
+                field: ["error"],
+                message: ["image not Found"]
+            });
+        }
+        
         const plantName = req.body.name
         const userId = req.user._id
-        const speciesId = req.body.speciesId
 
-        await newPlantValidation.validateAsync(req.body, {abortEarly: false});
+        const mySpecies = await SpeciesService.getSpeciesFromImage(file.filename)
 
-        const species = await findOneSpecies(speciesId)
-        if (species) {
-            const newPlant = await createPlant(speciesId, userId, plantName)
+        if (mySpecies) {
+            const imagePlant = await newImage(file)
+            const newPlant = await createPlant(imagePlant, mySpecies._id, userId, plantName)
 
             res.status(200).send({
                 status: "success",
-                plantInfo: API_HOSTNAME + "/api" + API_VERSION + "/plant/" + newPlant._id
+                plant: newPlant,
+                species: mySpecies
             });
         } else {
             res.status(404).send({
@@ -99,6 +110,7 @@ export const newPlant = async (req: Request, res: Response, _: NextFunction) => 
             });
         }
     } catch (e) {
+        console.log(e)
         return400or500Errors(e, res)
     }
 
@@ -107,7 +119,7 @@ export const newPlant = async (req: Request, res: Response, _: NextFunction) => 
 export const updatePlant = async (req: Request, res: Response, _: NextFunction) => {
     try {
 
-        await plantValidation.validateAsync(req.body, {abortEarly: false});
+        await plantValidation.validateAsync(req.body, { abortEarly: false });
 
         const species = await findOneSpecies(req.body.speciesId)
         const plant = await updatePlantWithPlantId(req.body);

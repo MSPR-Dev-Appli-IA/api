@@ -1,22 +1,20 @@
 import { Document  } from "mongoose";
-import { IImage } from "./image.interface";
+
 
 export interface ISpecies extends Document{
     name : String
-    images : IImage[]
+    image : String
     description: String|null,
-    sunExposure: String|null,
-    watering: String|null,
-    optimalTemperature: String|null,
+    edible_parts: String[] | null
+    propagation_methods:  String[] | null
 }
 
 
 export interface SpeciesForm{
     name : String
-    description: String|null,
-    sunExposure: String|null,
-    watering: String|null,
-    optimalTemperature: String|null,
+    image : String
+    description: String,
+    edible_parts: String[]| null
+    propagation_methods:  String[] | null
 }
-
 

@@ -10,7 +10,7 @@ const plantValidation = Joi.object({
     "string.empty": "Vous n' avez pas de nom pour votre plante  ",
     "string.min": " Votre nom de plante  est trop courte",
   }),
-  speciesId: Joi.string().length(24).required()
+  
 });
 
 const getMyPlantsValidation = Joi.object({
@@ -26,7 +26,7 @@ const getOneOfMyPlantValidation = Joi.object({
 
 const newPlantValidation = Joi.object({
   name: Joi.string().min(2).required(),
-  speciesId: Joi.string().length(24).required()
+ 
 })
 
 export  {
