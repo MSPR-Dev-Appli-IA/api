@@ -1339,6 +1339,179 @@ protocols: [HTTPS]
                   "field": ["error"],
                   "message": ["An error was occurred. Please contact us"]
                 }
+/conversation:
+  get:
+    description: Recovers all user conversations.
+    securedBy: [ jwtUser, jwtBotanist ]
+    responses:
+      200:
+        description: Recovers all user conversations.
+        body:
+          application/json:
+            type: object
+            example: |
+              {
+                "result": [
+                  {
+                    "requestId": "646a0e573a625a4fe9c207bc",
+                    "userInfo": {
+                      "userName": "Utilisateur B"
+                      "avatar": "https://picturethisai.com/image-handle/website_cmsname/image/1080/157428813641285633.jpeg"
+                    },
+                    "lastMessage": {
+                      "content": "Bonjour, je suis disponible pour garder votre plante"
+                      "send_at": "2023-07-17T19:14:21.000Z"
+                    }
+                  }
+                ]
+              }
+      401:
+        description: Bad token.
+        body:
+          application/json:
+            type: object
+            example: |
+              {
+                field: ["error"],
+                message: ["Bad token. You must to logged in before."]
+              }
+      500:
+        description: An error was occurred.
+        body:
+          application/json:
+            type: object
+            example: |
+              {
+                "field": ["error"],
+                "message": ["An error was occurred. Please contact us"]
+              }
+
+  post:
+    description: Create an new message.
+    securedBy: [ jwtUser, jwtBotanist ]
+    body:
+      application/json:
+        type: object
+        example: |
+          {
+              "requestId": "64b4361d2698e2da854b5cac",
+              "content": "Mon super message depuis Test B"
+          }
+    responses:
+      200:
+        description: Create an plant sitting.
+        body:
+          application/json:
+            type: object
+            example: |
+              {
+                  "status": "sucess",
+                  "message": "Message sent."
+              }
+      400:
+        description: Error with the passed parameters.
+        body:
+          application/json:
+            type: object
+            example: |
+              {
+                "field": [
+                  "requestId"
+                ],
+                "message": [
+                  "\"requestId\" is required"
+                ]
+              }
+      401:
+        description: Bad token.
+        body:
+          application/json:
+            type: object
+            example: |
+              {
+                field: ["error"],
+                message: ["Bad token. You must to logged in before."]
+              }
+      404:
+        description: Request not Found
+        body:
+          application/json:
+            type: object
+            example: |
+              {
+                "field": ["error"],
+                "message": ["Request not Found"]
+              }
+      500:
+        description: An error was occurred.
+        body:
+          application/json:
+            type: object
+            example: |
+              {
+                "field": ["error"],
+                "message": ["An error was occurred. Please contact us"]
+              }
+
+  /{userId}:
+    get:
+      description: Returns messages sent between the two users.
+      securedBy: [ jwtUser, jwtBotanist ]
+      responses:
+        200:
+          description: Returns messages sent between the two users.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "userInfo":[{
+                    "userName": "Test A"
+                    "avatar": "https://picturethisai.com/image-handle/website_cmsname/image/1080/157428813641285633.jpeg"
+                  }, {
+                    "userName": "Test B"
+                    "avatar": "https://picturethisai.com/image-handle/website_cmsname/image/1080/157428813641285633.jpeg"
+                  }]
+                  "messages": [{
+                    "sender": {
+                      "content": "Mon super message depuis Test B",
+                    },
+                    "receiver": {
+                      content: null
+                    },                    
+                    "send_at": "2023-07-16T19:17:12.731Z"
+                  }]
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: User not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["User not found"]
+                }
+        500:
+          description: An error was occurred
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
 /user:
   /:
     post:
