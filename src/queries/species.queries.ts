@@ -1,7 +1,7 @@
 import { Species } from "../database/models/species.model"
-import { Image } from "../database/models/image.model"
 
-import { SpeciesForm, IImage } from "../interfaces/index"
+import { SpeciesForm } from "../interfaces/index"
+
 import { Types } from 'mongoose';
 
 
@@ -16,52 +16,27 @@ export const findLimitedSpecies = async (limit: number = 1, skip: number = 0, or
 
 export const findOneSpecies = async (speciedId: Types.ObjectId) => {
 
-  return Species.findOne({ _id: speciedId }).populate({ path: "images", model: Image }).exec();
+  return Species.findOne({ _id: speciedId }).exec();
 };
 
-export const updateSpecieWithSpeciesId = async (speciesId: Types.ObjectId, species: SpeciesForm) => {
-  return await Species.findByIdAndUpdate(speciesId, {
-    name: species.name,
-    description: species.description,
-    sunExposure: species.sunExposure,
-    watering: species.watering,
-    optimalTemperature: species.optimalTemperature,
-  },
-    { new: true })
+export const findOneSpeciesByName = async (name: string) => {
+  return Species.findOne({ name: name }).exec();
 };
 
-
-export const createSpecies = async (species: SpeciesForm) => {
+export const createSpecies = async (species:SpeciesForm) => {
   const newSpecies = new Species({
     name: species.name,
-    images: [],
+    image: species.image,
     description: species.description,
-    sunExposure: species.sunExposure,
-    watering: species.watering,
-    optimalTemperature: species.optimalTemperature,
+    edible_parts: species.edible_parts,
+    propagation_methods: species.propagation_methods
   });
   return await newSpecies.save();
-
-};
-
-
-export const addImageWithSpeciesId = async (image: IImage, speciesId: Types.ObjectId) => {
-  return await Species.findOneAndUpdate(
-    { _id: speciesId },
-    { $push: { images: image } },
-    { returnDocument: 'after' }
-  ).populate({ path: "images", model: Image });
-
 }
 
-export const deleteImageWithSpeciesId = async (imageId: Types.ObjectId, speciesId: Types.ObjectId) => {
-  return await Species.findOneAndUpdate(
-    { _id: speciesId },
-    { $pull: { images: imageId } },
-    { returnDocument: 'after' }
-  ).populate({ path: "images", model: Image });
 
-}
+
+
 
 export const deleteSpeciesWithSpeciesId = async (speciesId: Types.ObjectId) => {
   await Species.findOneAndDelete(speciesId).exec();
