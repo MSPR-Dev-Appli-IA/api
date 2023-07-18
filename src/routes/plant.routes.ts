@@ -9,7 +9,7 @@ import  {requireAuth} from "../middleware/AuthMiddleware";
 import  {areYouThePlantOwner} from "../middleware/PlantMiddleware";
 
 router.get("/",  requireAuth, getMyPlants);
-router.post("/",  requireAuth, newPlant);
+router.post("/",  requireAuth,upload.single("file"), newPlant);
 router.put("/",  requireAuth, areYouThePlantOwner, updatePlant);
 
 router.get("/:plantId",  requireAuth,areYouThePlantOwner, getOneOfMyPlant);

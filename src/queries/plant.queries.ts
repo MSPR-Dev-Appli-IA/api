@@ -41,9 +41,9 @@ export const findOnePlant = async (plantId: string): Promise<IPlant> => {
     throw new Error("Plant not found")
 };
 
-export const createPlant = async (speciesId: Types.ObjectId, userId: Types.ObjectId, name: String) => {
+export const createPlant = async (image: IImage, speciesId:Types.ObjectId, userId: Types.ObjectId, name: String) => {
     const newPlant = new Plant({
-        images: [],
+        images: [image],
         species: speciesId,
         user: userId,
         name: name
