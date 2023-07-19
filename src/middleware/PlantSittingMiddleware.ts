@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {return400or500Errors} from "../utils";
 import {HttpError} from "../utils/HttpError";
-import {findOnePlantSitting, getOnePlantSittingByRequestId} from "../queries/plantSitting.queries";
+import {getOnePlantSittingById, getOnePlantSittingByRequestId} from "../queries/plantSitting.queries";
 import {findOnePlant} from "../queries/plant.queries";
 
 
@@ -24,7 +24,7 @@ export const areyouThePlantSittingOwnerFromTheRequest = async (req: Request, res
 
 export const areThePlantSittingStillAvailable = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const plantSittingInfo = await findOnePlantSitting(req.body.plantSittingId)
+        const plantSittingInfo = await getOnePlantSittingById(req.body.plantSittingId)
 
         if (!plantSittingInfo.is_taken && Date.now() < plantSittingInfo.end_at.getTime()) {
             next()

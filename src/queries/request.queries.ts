@@ -6,7 +6,6 @@ import {PlantSitting} from "../database/models/plantSitting.model";
 import {Plant} from "../database/models/plant.models";
 import {findPlantUser} from "./plant.queries";
 
-
 export const getOneRequestById = async (requestId: string): Promise<IRequest> => {
     const temp = await Request.findOne({_id: requestId})
         .populate({path: "booker", model: User})
@@ -16,7 +15,50 @@ export const getOneRequestById = async (requestId: string): Promise<IRequest> =>
     }
 
     throw new HttpError(404, "Request Not Found.")
-};
+}
+
+export const findWaitingRequestForPlantSittingByUserId = async (userId: string): Promise<any> => {
+    const d = new Date();
+    const result: any[] = []
+    const plantUser = await findPlantUser(userId)
+
+    const temp = await PlantSitting.find({
+        start_at: {$gte: d.getTime()},
+        is_taken: false
+    })
+        .populate({
+            path: "plant",
+            model: Plant,
+            match: {
+                _id: {
+                    $in: [plantUser._id]
+                }
+            }
+        })
+        .populate({
+            path: "requests",
+            model: Request,
+            match: {status: {$in: ["Pending"]}}
+        })
+        .exec()
+
+
+    if (temp) {
+        for (let i = 0; i < temp.length; i++) {
+            // We check if plantSitting have request with pending status
+
+            if (temp[i].requests.length > 0) {
+                // Foreach requests we append it in the list
+                for (let z = 0; z < temp[i].requests.length; z++) {
+                    result.push(temp[i].requests[z])
+                }
+            }
+        }
+        return result
+    }
+
+    throw new HttpError(404, "An error occurred when filling the plants.")
+}
 
 export const createRequest = async (booker: IUser): Promise<IRequest> => {
     const newRequest = new Request({
@@ -65,53 +107,11 @@ export const deleteRequestById = async (requestId: string) => {
 }
 
 export const findRequestByUserId = async (userId: string): Promise<any> => {
-  const temp = await Request.find({booker: userId}).populate({path: "booker", model: User});
-
-  if(temp){
-      return temp
-  }
-
-  throw new HttpError(404, "User not found.")
-}
-
-export const findWaitingRequestForPlantSittingByUserId = async (userId: string) => {
-    const d = new Date();
-    const result: any[] = []
-    const plantUser = await findPlantUser(userId)
-
-    const temp = await PlantSitting.find({
-        start_at: {$gte: d.getTime()},
-        is_taken: false
-    })
-        .populate({
-            path: "plant",
-            model: Plant,
-            match: {
-                _id: {
-                    $in: [plantUser._id]
-                }
-            }
-        })
-        .populate({
-            path: "requests",
-            model: Request,
-            match: {status: {$in: ["Pending"]}}
-        })
-        .exec()
-
+    const temp = await Request.find({booker: userId}).populate({path: "booker", model: User});
 
     if (temp) {
-        for (let i = 0; i < temp.length; i++) {
-            // We check if plantSitting have request with pending status
-            if (temp[i].requests.length > 0) {
-                // Foreach requests we append it in the list
-                for (let z = 0; z < temp[i].requests.length; z++) {
-                    result.push(temp[i].requests[z])
-                }
-            }
-        }
-        return result
+        return temp
     }
 
-    throw new HttpError(404, "An error occurred when filling the plants.")
+    throw new HttpError(404, "User not found.")
 }

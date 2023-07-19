@@ -3,8 +3,8 @@ import {
 } from "../../queries/request.queries";
 import {Request} from "express";
 import {
-    findOnePlantSitting,
-    getAllPlantSittingExceptRequestId, getOnePlantSittingByRequestId, linkPlantSittingToRequest, rollBack,
+    getOnePlantSittingById,
+    getAllPlantSittingExceptRequestId, findOnePlantSittinWithRequest, linkPlantSittingToRequest, rollBack,
     setTakenPlantSittingTrue
 } from "../../queries/plantSitting.queries";
 import {
@@ -16,7 +16,7 @@ import {findOnePlant} from "../../queries/plant.queries";
 export class RequestService{
 
     public async create(request: Request) {
-        const plantSitting = await findOnePlantSitting(request.body.plantSittingId)
+        const plantSitting = await getOnePlantSittingById(request.body.plantSittingId)
 
         const plantInfo = await findOnePlant(plantSitting.plant._id.toString())
         const receiver = plantInfo.user._id.toString()
@@ -36,7 +36,7 @@ export class RequestService{
 
     public async accept(requestId: string) {
 
-        const plantSitting = await getOnePlantSittingByRequestId(requestId)
+        const plantSitting = await findOnePlantSittinWithRequest(requestId)
 
         await setStatutRequestToAccept(requestId)
         await this.setOtherRequestForThisPlantSittingToRefuse(plantSitting._id.toString(), requestId)

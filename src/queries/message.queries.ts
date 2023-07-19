@@ -8,7 +8,7 @@ import {HttpError} from "../utils/HttpError";
 import {User} from "../database/models/user.model";
 
 
-export const createMessageForRequest = async (sender: IUser, receiver: IUser, requestId: string, content: string,  image: IImage | null = null) => {
+export const createMessageForRequest = async (sender: string | null, receiver: string | null, requestId: string, content: string,  image: IImage | null = null) => {
   const newPlant = new Message({
     image: image,
     sender: sender,
@@ -55,8 +55,8 @@ export const getAllMessageByBookerId = async (bookerId: string, requestId?: stri
   throw new  HttpError(404, "User not found.")
 }
 
-export const getLastMessageByBookerId = async (bookerId: string, requestId: string): Promise<any> => {
-  const temp = await Message.find({sender: bookerId, request: requestId})
+export const getLastMessage = async (requestId: string): Promise<any> => {
+  const temp = await Message.find({request: requestId})
       .populate("image")
       .sort({_id: -1})
       .limit(1)
@@ -69,35 +69,19 @@ export const getLastMessageByBookerId = async (bookerId: string, requestId: stri
   throw new  HttpError(404, "User not found.")
 }
 
-export class MessageQueries{
+export const getMessagesFor = async (from: string, to: string) => {
+  const temp = await Message.find({
+    $or: [
+      {sender: from, receiver: to}, {sender: to, receiver: from}
+    ]
+  })
+      .populate([{path: "sender", model: User}, {path: "receiver", model: User}])
+      .sort({send_at: -1})
+      .exec()
 
-  public async getMessagesFor (from: string, to: string) {
-    const temp = await Message.find({
-      $or: [
-        {sender: from, receiver: to}, {sender: to, receiver: from}
-      ]
-    })
-        .populate([{path: "sender", model: User}, {path: "receiver", model: User}])
-        .sort({send_at: -1})
-        .exec()
-
-    if(temp){
-      return temp
-    }
-
-    throw new HttpError(404, "Messages with its users not found.")
+  if(temp){
+    return temp
   }
 
-  public async createMessageForRequest(sender: string | null, receiver: string | null, requestId: string, content: string, image: IImage | null = null) {
-    const newPlant = new Message({
-      image: image,
-      sender: sender,
-      receiver: receiver,
-      request: requestId,
-      content: content,
-      advice: null
-    });
-    return await newPlant.save();
-  };
-
+  throw new HttpError(404, "Messages with its users not found.")
 }

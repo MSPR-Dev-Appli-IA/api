@@ -2,28 +2,33 @@ import { Router } from "express";
 import  {requireAuth} from "../middleware/AuthMiddleware";
 
 import {acceptRequest, newRequest, refuseRequest, removeRequest} from "../controllers/request.controller";
-import {RequestMiddleware} from "../middleware/RequestMiddleware";
-import {PlantSittingController} from "../controllers/plantSitting.controller";
-import {PlantSittingMiddleware} from "../middleware/PlantSittingMiddleware";
-import {PlantMiddleware} from "../middleware/PlantMiddleware";
+import {areYouThePlantOwner} from "../middleware/PlantMiddleware";
+import {
+    areThePlantSittingStillAvailable,
+    areThePlantSittingStillAvailableFromTheRequest,
+    areyouThePlantSittingOwnerFromTheRequest
+} from "../middleware/PlantSittingMiddleware";
+import {areyouTheRequestOwner} from "../middleware/RequestMiddleware";
+import {
+    getOnePlantSitting,
+    getPlantSitting,
+    newPlantSitting, removePlantSitting,
+    updatePlantSitting
+} from "../controllers/plantSitting.controller";
 
 const router = Router();
-const requestMiddleware = new RequestMiddleware()
-const plantSittingMiddleware = new PlantSittingMiddleware()
-const plantMiddleware = new PlantMiddleware();
-const plantSittingController = new PlantSittingController()
 
-router.get("/", requireAuth, plantSittingController.getAll);
-router.post("/", requireAuth, plantMiddleware.areYouThePlantOwner, plantSittingController.create);
-router.put("/", requireAuth, plantSittingController.update);
+router.get("/", requireAuth, getPlantSitting);
+router.post("/", requireAuth, areYouThePlantOwner, newPlantSitting);
+router.put("/", requireAuth, updatePlantSitting);
 
-router.post("/accept",  requireAuth, plantSittingMiddleware.areyouThePlantSittingOwnerFromTheRequest, plantSittingMiddleware.areThePlantSittingStillAvailableFromTheRequest, acceptRequest);
-router.post("/refuse",  requireAuth, plantSittingMiddleware.areyouThePlantSittingOwnerFromTheRequest, plantSittingMiddleware.areThePlantSittingStillAvailableFromTheRequest, refuseRequest);
+router.post("/accept",  requireAuth, areyouThePlantSittingOwnerFromTheRequest, areThePlantSittingStillAvailableFromTheRequest, acceptRequest);
+router.post("/refuse",  requireAuth, areyouThePlantSittingOwnerFromTheRequest, areThePlantSittingStillAvailableFromTheRequest, refuseRequest);
 
-router.post("/sendRequest",  requireAuth, plantSittingMiddleware.areThePlantSittingStillAvailable, newRequest);
-router.delete("/deleteRequest/:requestId", requireAuth, requestMiddleware.areyouTheRequestOwner, plantSittingMiddleware.areThePlantSittingStillAvailable, removeRequest);
+router.post("/sendRequest",  requireAuth, areThePlantSittingStillAvailable, newRequest);
+router.delete("/deleteRequest/:requestId", requireAuth, areyouTheRequestOwner, areThePlantSittingStillAvailable, removeRequest);
 
-router.get("/:plantSittingId", requireAuth, plantSittingController.getOne);
-router.delete("/:plantSittingId", requireAuth, plantMiddleware.areYouThePlantOwner, plantSittingController.delete);
+router.get("/:plantSittingId", requireAuth, getOnePlantSitting);
+router.delete("/:plantSittingId", requireAuth, areYouThePlantOwner, removePlantSitting);
 
 export default router;

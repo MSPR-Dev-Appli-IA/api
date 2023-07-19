@@ -3,7 +3,7 @@ import {Request} from "express";
 import {addressService} from "./addressService";
 import {findOnePlant} from "../../queries/plant.queries";
 import {
-    createPlantSitting, findOnePlantSitting,
+    createPlantSitting, getOnePlantSittingById,
     updatePlantSittingWithPlantSittingsId
 } from "../../queries/plantSitting.queries";
 import {HttpError} from "../HttpError";
@@ -22,7 +22,7 @@ export class PlantSittingService {
     }
 
     async update(req: Request) {
-        const plantSitting = await findOnePlantSitting(req.body.plantSittingId)
+        const plantSitting = await getOnePlantSittingById(req.body.plantSittingId)
 
         req.body._id = plantSitting._id
         req.body.plant = await findOnePlant(req.body.plantId)

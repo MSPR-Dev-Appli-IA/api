@@ -2,7 +2,7 @@
 import { NextFunction, Request, Response } from "express";
 import {
     findPlantSittingsNotTakenAndNotBegin,
-    findOnePlantSitting,
+    getOnePlantSittingById,
     deletePlantSittingWithPlantSittingId
 } from "../queries/plantSitting.queries";
 import {plantSittingValidation, updateplantSittingValidation} from "../database/validation/plantSitting.validation";
@@ -34,12 +34,7 @@ export const getPlantSitting = async (req: Request, res: Response, __: NextFunct
                         x: item.address.location.x,
                         y: item.address.location.y
                     },
-                    plantInfo: {
-                        _id: plantInfo._id,
-                        name: plantInfo.name,
-                        images: plantInfo.images,
-                        species : plantInfo.species
-                    }
+                    plantInfo: {plantInfo}
                 })
             }
 
@@ -57,7 +52,7 @@ export const getPlantSitting = async (req: Request, res: Response, __: NextFunct
 export const getOnePlantSitting = async (req: Request, res: Response, __: NextFunction) => {
     try {
         const plantSittingId = req.params.plantSittingId;
-        const plantSitting = await findOnePlantSitting(plantSittingId)
+        const plantSitting = await getOnePlantSittingById(plantSittingId)
         if (plantSitting) {
             res.status(200).send({
                 _id: plantSitting._id,
@@ -129,7 +124,7 @@ export const updatePlantSitting = async (req: Request, res: Response, __: NextFu
 export const removePlantSitting = async (req: Request, res: Response, __: NextFunction) => {
     try {
         const plantSittingId = req.params.plantSittingId;
-        const plantSitting = await findOnePlantSitting(plantSittingId)
+        const plantSitting = await getOnePlantSittingById(plantSittingId)
         if (plantSitting) {
             await deletePlantSittingWithPlantSittingId(new mongoose.Types.ObjectId(plantSittingId.trim()))
             res.status(200).send({
