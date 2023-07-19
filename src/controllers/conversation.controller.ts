@@ -1,37 +1,28 @@
 import {NextFunction, Request, Response} from "express";
 import {API_HOSTNAME, return400or500Errors} from "../utils";
-import {findRequestByUserId, findWaitingRequestForPlantSittingByUserId} from "../queries/request.queries";
 import {findUserPerId} from "../queries/user.queries";
 import {
-    createMessageForRequest,
+    createMessageForRequest, getAllMessageByBookerId,
     getLastMessage,
     getMessagesFor
 } from "../queries/message.queries";
 import {messageValidation} from "../database/validation/message.validation";
-
-const whoIsRequester =  async (req: Request) =>{
-    // If a User is a requester
-    const requests = await findRequestByUserId(req.user._id.toString())
-    // If a User is a plantSittingOwner with request in pending status
-    if(!requests.length){
-        return await findWaitingRequestForPlantSittingByUserId(req.user._id.toString())
-    }
-    return requests
-}
+import {getOneRequestById} from "../queries/request.queries";
 
 export class ConversationController{
+
     public async index (req: Request, res: Response, __: NextFunction){
         try{
-            const requests = await whoIsRequester(req)
-
+            const message = await getAllMessageByBookerId(req.user._id.toString())
             const result: any[] = []
 
-            for(let i = 0; i < requests.length; i++){
-                const userInfo = await findUserPerId(requests[i].booker._id.toString())
-                const lastMessage = await getLastMessage(requests[i]._id.toString())
+            for(let i = 0; i < message.length; i++){
+                const request = await getOneRequestById(message[i].request._id.toString())
+                const userInfo = await findUserPerId(message[i].receiver._id.toString())
+                const lastMessage = await getLastMessage(message[i].request._id.toString())
 
                 result.push({
-                    requestId: requests[i]._id.toString(),
+                    requestId: request._id.toString(),
                     userInfo: {
                         userName: userInfo.username,
                         avatar: API_HOSTNAME + userInfo.image?.path
