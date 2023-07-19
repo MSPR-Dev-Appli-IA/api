@@ -1279,6 +1279,522 @@ protocols: [HTTPS]
                 }
 
 
+
+  /sendRequest:
+    post:
+      description: Make a plant sitting request.
+      securedBy: [ jwtUser, jwtBotanist ]
+      body:
+        application/json:
+          type: object
+          example: |
+            {
+              "plantSittingId": "64a962f926153a1772e1ed13"
+            }
+      responses:
+        200:
+          description: Make a plant sitting request.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "message": "Request sent."
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": [
+                    "plantSittingId"
+                  ],
+                  "message": [
+                    "\"plantSittingId\" is required"
+                  ]
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: PlantSitting not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["You have not made a reservation or this request no longer exists."]
+                }
+        500:
+          description: An error was occurred
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["You have not made a reservation or this request no longer exists."]
+                }
+
+
+  /accept:
+    post:
+      description: Accept an plant sitting request.
+      securedBy: [ jwtUser, jwtBotanist ]
+      body:
+        application/json:
+          type: object
+          example: |
+            {
+              "requestId": "64afb5c8c3e3b20b6ba3fb07"
+            }
+      responses:
+        200:
+          description: Accept an plant sitting request.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "message": "Request accepted."
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": [
+                    "requestId"
+                  ],
+                  "message": [
+                    "\"requestId\" is required"
+                  ]
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: Request not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Request Not found."]
+                }
+        500:
+          description: An error was occurred
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["You have not made a reservation or this request no longer exists."]
+                }
+
+
+  /refuse:
+    post:
+      description: Refused an plant sitting request.
+      securedBy: [ jwtUser, jwtBotanist ]
+      body:
+        application/json:
+          type: object
+          example: |
+            {
+              "requestId": "64afb5c8c3e3b20b6ba3fb07"
+            }
+      responses:
+        200:
+          description: Refused an plant sitting request.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "message": "Request refused."
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": [
+                    "requestId"
+                  ],
+                  "message": [
+                    "\"requestId\" is required"
+                  ]
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: Request not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Request Not found."]
+                }
+        500:
+          description: An error was occurred
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["You have not made a reservation or this request no longer exists."]
+                }
+
+
+  /deleteRequest/{requestId}:
+    delete:
+      description: Delete an request.
+      securedBy: [ jwtUser, jwtBotanist ]
+      responses:
+        200:
+          description: Successful suppression
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "type": "success",
+                  "message": "Request deleted"
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: Request not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Request not found"]
+                }
+        500:
+          description: An error was occurred
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+
+
+
+
+/message:
+  /plantSitting/{requestId}:
+    post:
+      description: Send Message.
+      securedBy: [ jwtUser, jwtBotanist ]
+      body:
+        application/json:
+          type: object
+          example: |
+            {
+              "requestId": "64a962f926153a1772e1ed13",
+              "content": "Test"
+            }
+      responses:
+        200:
+          description: Send Message.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "message": "Message sent."
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": [
+                    "requestId"
+                  ],
+                  "message": [
+                    "\"requestId\" is required"
+                  ]
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: Request not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Request not found."]
+                }
+        500:
+          description: An error was occurred
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["You have not made a reservation or this request no longer exists."]
+                }
+
+  /plantSitting/image/{requestId}:
+    post:
+      description: Add image to an message
+      securedBy: [ jwtBotanist ]
+      body:
+        multipart/form-data:
+          properties:
+            file:
+              type: file
+              fileTypes: [ '*/*' ]
+            speciesId:
+              type: string
+      responses:
+        200:
+          description: Successful upload image
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "message": "Image sent"
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["file"],
+                  "message": ["The file attribute is not found"]
+                }
+        404:
+          description: Request not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Request not Found"]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
+  /advice/{requestId}:
+    post:
+      description: Send Message to an Advice.
+      securedBy: [ jwtUser, jwtBotanist ]
+      body:
+        application/json:
+          type: object
+          example: |
+            {
+              "requestId": "64a962f926153a1772e1ed13",
+              "content": "Test"
+            }
+      responses:
+        200:
+          description: Send Message to an Advice.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "message": "Message sent."
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": [
+                    "requestId"
+                  ],
+                  "message": [
+                    "\"requestId\" is required"
+                  ]
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        404:
+          description: Request not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Request not found."]
+                }
+        500:
+          description: An error was occurred
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["You have not made a reservation or this request no longer exists."]
+                }
+  /advice/image/{adviceId}:
+    post:
+      description: Add image to an Advice
+      securedBy: [ jwtBotanist ]
+      body:
+        multipart/form-data:
+          properties:
+            file:
+              type: file
+              fileTypes: [ '*/*' ]
+            speciesId:
+              type: string
+      responses:
+        200:
+          description: Successful upload image
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "status": "success",
+                  "message": "Image sent"
+                }
+        401:
+          description: Bad token.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  field: ["error"],
+                  message: ["Bad token. You must to logged in before."]
+                }
+        400:
+          description: Error with the passed parameters.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["file"],
+                  "message": ["The file attribute is not found"]
+                }
+        404:
+          description: Advice not found.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["Advice not Found"]
+                }
+        500:
+          description: An error was occurred.
+          body:
+            application/json:
+              type: object
+              example: |
+                {
+                  "field": ["error"],
+                  "message": ["An error was occurred. Please contact us"]
+                }
 /address:
   /:
     post:
