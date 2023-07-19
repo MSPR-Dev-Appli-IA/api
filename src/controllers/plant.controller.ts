@@ -39,12 +39,7 @@ export const getMyPlants = async (req: Request, res: Response, _: NextFunction) 
         if (plants) {
             const result: any[] = []
             plants.forEach(item => {
-                result.push({
-                    _id: item._id,
-                    name: item.name,
-                    plantInfo: API_HOSTNAME + "/api" + API_VERSION + "/plant/" + item._id,
-                    speciesInfo: API_HOSTNAME + "/api" + API_VERSION + "/species/" + item.species._id
-                })
+                result.push(item)
             })
 
             res.status(200).json({ result });
