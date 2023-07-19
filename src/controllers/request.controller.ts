@@ -79,7 +79,7 @@ export const acceptRequest = async (req: Request, res: Response, __: NextFunctio
     try {
         await defaultRequestValidation.validateAsync(req.body, {abortEarly: false})
 
-        await requestService.accept(req.body.requestId)
+        await requestService.accept(req.user._id.toString(), req.body.requestId)
 
         res.status(200).send({
             "status": "success",

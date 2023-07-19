@@ -6,7 +6,7 @@ const schema = mongoose.Schema;
 const requestSchema = new mongoose.Schema<IRequest>({
     created_at : { type: Date, default: Date.now },
     status: { type: String, required: true,default: "Pending"},
-    booker: { type: schema.Types.ObjectId, ref: "User", required: true, unique: true }
+    booker: { type: schema.Types.ObjectId, ref: "User", required: true }
 });
 
 

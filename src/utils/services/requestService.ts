@@ -4,8 +4,8 @@ import {
 import {Request} from "express";
 import {
     getOnePlantSittingById,
-    getAllPlantSittingExceptRequestId, findOnePlantSittinWithRequest, linkPlantSittingToRequest, rollBack,
-    setTakenPlantSittingTrue
+    getAllPlantSittingExceptRequestId, linkPlantSittingToRequest, rollBack,
+    setTakenPlantSittingTrue, getOnePlantSittingByRequestId
 } from "../../queries/plantSitting.queries";
 import {
     createMessageForRequest, deleteMessageWithMessageId,
@@ -34,23 +34,43 @@ export class RequestService{
         )
     }
 
-    public async accept(requestId: string) {
+    public async accept(userId: string, requestId: string) {
 
-        const plantSitting = await findOnePlantSittinWithRequest(requestId)
+        const plantSitting = await getOnePlantSittingByRequestId(requestId)
+
+        const requestInfo = await getOneRequestById(requestId)
+
 
         await setStatutRequestToAccept(requestId)
-        await this.setOtherRequestForThisPlantSittingToRefuse(plantSitting._id.toString(), requestId)
+        await this.setOtherRequestForThisPlantSittingToRefuse(userId, plantSitting._id.toString(), requestId)
 
         await setTakenPlantSittingTrue(plantSitting._id.toString())
+
+        await createMessageForRequest(
+            userId,
+            requestInfo.booker._id.toString(),
+            requestId,
+            "Bonjour, votre demande de gardiennage à été accepté."
+        )
     }
 
-    private async setOtherRequestForThisPlantSittingToRefuse(plantSittingId: string, requestId: string) {
+    private async setOtherRequestForThisPlantSittingToRefuse(userId: string, plantSittingId: string, requestId: string) {
 
         const temp = await getAllPlantSittingExceptRequestId(plantSittingId, requestId)
 
         for(let i = 0; i < temp[0].requests.length; i++){
             if(temp[0].requests.length !== 0){
+                const sender = userId
+                const receiver = temp[0].requests[i].booker._id.toString()
+
                 await setStatutRequestToRefuse(temp[0].requests[i]._id.toString())
+
+                await createMessageForRequest(
+                    sender,
+                    receiver,
+                    temp[0].requests[i]._id.toString(),
+                    "Bonjour, malheuresement ma demande de guardiennage n'est plus disponible."
+                )
             }
         }
     }

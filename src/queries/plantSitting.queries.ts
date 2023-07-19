@@ -185,7 +185,7 @@ export const rollBack = async (requestId: string) => {
                 ownerInfo.user._id.toString(),
                 newRequestInfo.booker._id.toString(),
                 currentPlantSitting.requests[i]._id.toString(),
-                "Bonjour, la demande de guardiennage situé au " + requestInfo.booker.username + " est de nouveau disponible. " +
+                "Bonjour, la demande de guardiennage de " + requestInfo.booker.username + " est de nouveau disponible. " +
                 "Vous recevrez un second message si vous avez été sélectionné."
             )
         }
