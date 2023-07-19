@@ -1,6 +1,6 @@
 # Node latest LTS 16.14.2 with alpine
 # (a lightweight distribution)
-FROM node:16.14.2-alpine
+FROM node:18.16.1-alpine
 LABEL maintainer="Calendz. <https://calendz.app/>"
 
 # add some required packages

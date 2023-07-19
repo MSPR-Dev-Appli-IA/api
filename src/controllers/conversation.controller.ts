@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {API_HOSTNAME, return400or500Errors} from "../utils";
+import {return400or500Errors} from "../utils";
 import {findUserPerId} from "../queries/user.queries";
 import {
     createMessageForRequest, getAllMessageByBookerId,
@@ -8,6 +8,7 @@ import {
 } from "../queries/message.queries";
 import {messageValidation} from "../database/validation/message.validation";
 import {getOneRequestById} from "../queries/request.queries";
+import {API_HOSTNAME} from "../environments/env";
 
 export class ConversationController{
 

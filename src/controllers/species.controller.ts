@@ -12,7 +12,7 @@ import {
     getSpeciesValidation,
 
 } from "../database/validation/species.validation";
-import { API_HOSTNAME, API_VERSION } from "../utils";
+import {API_HOSTNAME, API_VERSION} from "../environments/env";
 
 const limit: number = 5
 

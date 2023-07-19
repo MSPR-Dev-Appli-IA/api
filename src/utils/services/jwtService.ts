@@ -1,6 +1,7 @@
 
 import jwt, {JwtPayload} from "jsonwebtoken";
 import {UserjwtToken} from "../../interfaces";
+import {JWTKEY} from "../../environments/env";
 
 export class JwtService{
     createJwtToken({ user, id }:UserjwtToken) {
@@ -9,12 +10,12 @@ export class JwtService{
                 sub: id || user?._id.toString(),
                 exp: Math.floor(Date.now() / 1000) + 900,
             },
-            process.env.JWTKEY
+            JWTKEY
         );
     }
 
     async checkExpirationToken(token: string) {
-        const tokenDecoded = jwt.verify(token, process.env.JWTKEY, {ignoreExpiration: true}) as JwtPayload;
+        const tokenDecoded = jwt.verify(token, JWTKEY, {ignoreExpiration: true}) as JwtPayload;
         const tokenExp = tokenDecoded.exp;
         const tokenUserId = tokenDecoded.sub
         const nowInSec = Math.floor(Date.now() / 1000);

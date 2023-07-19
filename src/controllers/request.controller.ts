@@ -1,10 +1,11 @@
 import {NextFunction, Request, Response} from "express";
 import {createRequestValidation, defaultRequestValidation} from "../database/validation/requests.validation";
-import {API_HOSTNAME, return400or500Errors} from "../utils";
-import {RequestService} from "../utils/services/requestService";
+import {return400or500Errors} from "../utils";
 import {findUserPerId} from "../queries/user.queries";
 import {getAllMessageByBookerId} from "../queries/message.queries";
 import {findWaitingRequestForPlantSittingByUserId} from "../queries/request.queries";
+import {RequestService} from "../utils/services/requestService";
+import {API_HOSTNAME} from "../environments/env";
 
 const requestService = new RequestService();
 

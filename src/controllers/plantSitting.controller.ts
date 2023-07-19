@@ -7,9 +7,10 @@ import {
 } from "../queries/plantSitting.queries";
 import {plantSittingValidation, updateplantSittingValidation} from "../database/validation/plantSitting.validation";
 import mongoose from 'mongoose';
-import {API_HOSTNAME, API_VERSION, return400or500Errors} from "../utils";
+import {return400or500Errors} from "../utils";
 import {findOnePlant} from "../queries/plant.queries";
 import {PlantSittingService} from "../utils/services/plantSittingService"
+import {API_HOSTNAME, API_VERSION} from "../environments/env";
 
 const plantSittingService = new PlantSittingService()
 

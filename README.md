@@ -33,7 +33,7 @@ Cf. [Release section](https://github.com/MSPR-Dev-Appli-IA/api/releases)
 
 ### Environment Variables
 
-To run this project, you will need to add the following environment variables into your tomcat service
+To run this project, you will need to add the following environment variables into your file : `src/environments/env.ts`
 
 | Name             | Type   | Description                                                                                                                 |
 |------------------|--------|-----------------------------------------------------------------------------------------------------------------------------|

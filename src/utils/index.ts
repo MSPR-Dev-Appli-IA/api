@@ -2,10 +2,7 @@ import {Response} from "express";
 import {ValidationError} from "joi";
 import {HttpError} from "./HttpError";
 import {JwtError} from "./services/jwtService";
-
-const API_HOSTNAME = (process.env.API_HOSTNAME) ? process.env.API_HOSTNAME : ""
-const API_VERSION = (process.env.API_VERSION) ? process.env.API_VERSION : ""
-const JWT_TIME = (process.env.JWT_TIME) ? process.env.JWT_TIME : 60*15
+import {NODE_ENV} from "../environments/env";
 
 function return400or500Errors(error: any, res: Response) {
     const field: any[] = [];
@@ -42,7 +39,7 @@ function return400or500Errors(error: any, res: Response) {
             });
             return ;
         }
-    }else if(process.env.NODE_ENV === "dev"){
+    }else if(NODE_ENV === "dev"){
         res.status(500).send({
             field: ["error"],
             message: {
@@ -60,4 +57,4 @@ function return400or500Errors(error: any, res: Response) {
     }
 }
 
-export {API_HOSTNAME, API_VERSION, JWT_TIME, return400or500Errors};
+export {return400or500Errors};
