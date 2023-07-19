@@ -3,6 +3,7 @@
 
 ### dotenv ###
 .env
+src/environments/env.ts
 
 # End of https://www.toptal.com/developers/gitignore/api/dotenv
 # Created by https://www.toptal.com/developers/gitignore/api/windows,macos,intellij,visualstudiocode,node

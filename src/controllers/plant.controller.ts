@@ -17,9 +17,10 @@ import {
     getOneOfMyPlantValidation,
     plantValidation
 } from "../database/validation/plant.validation"
-import { speciesService } from "../services/speciesService";
+import { speciesService } from "../utils/services/speciesService";
 import * as fs from 'fs';
-import { API_HOSTNAME, API_VERSION, return400or500Errors } from "../utils";
+import { return400or500Errors } from "../utils";
+import {API_HOSTNAME, API_VERSION} from "../environments/env";
 
 const limit: number = 5
 

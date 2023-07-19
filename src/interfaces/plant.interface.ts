@@ -1,5 +1,6 @@
 import { Document  } from "mongoose";
 import { IImage,IUser,ISpecies,IPlantSitting } from "./";
+import { IAdvice } from "./advice.interface";
 
 export interface IPlant extends Document{
     name : String
@@ -8,6 +9,7 @@ export interface IPlant extends Document{
     species :ISpecies
     created_at:Date
     plantSittings : IPlantSitting[]
+    advices : IAdvice[]
 }
 
 export interface PlantForm {

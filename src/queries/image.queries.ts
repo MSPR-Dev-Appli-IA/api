@@ -1,5 +1,6 @@
 import {Image} from '../database/models/image.model'
-import { ImageForm } from '../interfaces';
+import {IImage, ImageForm} from '../interfaces';
+import {HttpError} from "../utils/HttpError";
 
 export const createImage= async (image :ImageForm) => {
       const newImage  = new Image({
@@ -9,8 +10,12 @@ export const createImage= async (image :ImageForm) => {
 
   };
 
-  export const getImageById= async (imageId :String) => {
-    return Image.findOne({_id: imageId}).exec();
+  export const getImageById= async (imageId :String): Promise<IImage> => {
+    const temp = await Image.findOne({_id: imageId}).exec();
+    if(temp){
+        return temp;
+    }
+    throw new HttpError(404, "Image not found.")
   };
 
 

@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import {JwtService} from "../services/jwtService";
-import {UserService} from "../services/userService";
 import {JwtPayload} from "jsonwebtoken";
-import {return401Errors} from "../utils";
+import {JwtService} from "../utils/services/jwtService";
+import {UserService} from "../utils/services/userService";
+import {return400or500Errors} from "../utils";
 
 const jwtService = new JwtService();
 const userService = new UserService();
@@ -23,7 +23,7 @@ export const extractUserFromToken = async (req:Request, res:Response, next:NextF
       next();
 
     } catch (error) {
-      return401Errors(error, res)
+      return400or500Errors(error, res)
     }
   } else {
     next();

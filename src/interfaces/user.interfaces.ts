@@ -1,7 +1,9 @@
 
 
 import { Document ,Model } from "mongoose";
-import { Types } from 'mongoose';
+
+import { IRole } from "./role.interfaces";
+import { IImage } from "./image.interface";
 
 
 export interface IUserLocal{
@@ -15,11 +17,11 @@ export interface  IUser extends Document {
     username: string,
     firstname:string,
     lastname:string,
-    role: Types.ObjectId;
+    role: IRole;
     created_at:Date,
     deleted_at:null|Date
     local: IUserLocal
-    image: Types.ObjectId|null;
+    image: IImage|null;
 
     comparePassword(password:string):boolean
     

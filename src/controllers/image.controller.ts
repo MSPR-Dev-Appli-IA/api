@@ -1,4 +1,5 @@
-import { createImage } from "../queries/image.queries";
+import {createImage} from "../queries/image.queries";
+
 
 export const newImage = async (file:Express.Multer.File) => {
 

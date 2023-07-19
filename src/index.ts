@@ -57,6 +57,4 @@ app.get('*', (_:Request, res:Response) => {
     res.sendFile(join(__dirname, '../index.html'));
 })
 
-if (process.env.NODE_ENV !== 'test') {
-    app.listen(8000);
-}
+app.listen(8000);

@@ -26,8 +26,8 @@ jobs:
         run: npm ci
       - name: Export Secrets
         run: export API_KEY="${{ secrets.API_KEY }}" && eexport DATABASE_URL=\"mongodb://${{ secrets.DB_USER_STAGE }}:${{ secrets.DB_PASSWD_STAGE }}@${{ secrets.DB_HOST }}:${{ secrets.DB_PORT_STAGE }}/?authMechanism=DEFAULT\"
-      - name: Create .env for test
-        run: echo "JWTKEY=$API_KEY" >> .env && echo "" >> .env
+      - name: Create env.ts for test
+        run: echo "JWTKEY=$API_KEY" >> env.ts && echo "" >> env.ts
 
   coverage:
     name: Test with Node.js ${{ matrix.node-version }}

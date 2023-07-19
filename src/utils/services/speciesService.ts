@@ -1,15 +1,18 @@
-const axios = require('axios');
-const { findOneSpeciesByName, createSpecies } = require('../queries/species.queries');
-import * as fs from 'fs';
+import {ISpecies} from "../../interfaces";
 
-import { ISpecies } from '../interfaces';
+const axios = require('axios');
+const { findOneSpeciesByName, createSpecies } = require('../../queries/species.queries');
+import * as fs from 'fs';
+import {PLANT_KEY, PLANT_URL} from "../../environments/env";
+
+
 
 export class speciesService {
 
   async getSpeciesFromImage(fileName: String): Promise<ISpecies | null> {
 
-    const token = process.env.PLANT_KEY
-    const url = process.env.PLANT_URL+ "?details=url,description,edible_parts,propagation_methods,image&language=fr"
+    const token = PLANT_KEY
+    const url = PLANT_URL+ "?details=url,description,edible_parts,propagation_methods,image&language=fr"
     const myFile = fs.readFileSync("public/image/" + fileName, {encoding:'base64'}) 
     
 

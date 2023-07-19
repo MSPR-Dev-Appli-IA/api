@@ -1,29 +1,54 @@
-import { NextFunction, Request, Response } from "express";
-import { getOnePlantSittingById } from "../queries/plantSitting.queries";
-import { getOnePlantById } from "../queries/plant.queries";
-import mongoose from 'mongoose';
+import {NextFunction, Request, Response} from "express";
+import {return400or500Errors} from "../utils";
+import {HttpError} from "../utils/HttpError";
+import {getOnePlantSittingById, getOnePlantSittingByRequestId} from "../queries/plantSitting.queries";
+import {findOnePlant} from "../queries/plant.queries";
 
-export const areyouThePlantSittingOwner = async (req: Request, res: Response, next: NextFunction) => {
+
+export const areyouThePlantSittingOwnerFromTheRequest = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const plantSittingId = req.params.plantSittingId
-        const plantSitting = await getOnePlantSittingById(new mongoose.Types.ObjectId(plantSittingId.trim()))
-        if (plantSitting ) {
-            const plant = await getOnePlantById(plantSitting.plant._id.toString())
-            if (plant){
-                if (req.user._id.equals(plant.user._id)) {
-                    next()
-                } else {
-                    res.status(404).send({ message: "Your are not allowed" });
-                }
-            }
-           
+        const myPlantSittingInfo = await getOnePlantSittingByRequestId(req.body.requestId)
+        const userInfo = await findOnePlant(myPlantSittingInfo.plant._id.toString())
+
+        if (req.user._id.toString() == userInfo.user._id.toString()) {
+            next()
+            return;
+        }
+
+        throw new HttpError(401, "You are not authorized to access this conversation. Because you aren't the plant sitting owner.")
+
+    } catch (error) {
+        return400or500Errors(error, res)
+    }
+}
+
+export const areThePlantSittingStillAvailable = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const plantSittingInfo = await getOnePlantSittingById(req.body.plantSittingId)
+
+        if (!plantSittingInfo.is_taken && Date.now() < plantSittingInfo.end_at.getTime()) {
+            next()
+            return;
+        }
+        throw new HttpError(401, "This plant sitting are not available. Because it's ended or already taken.")
+
+    } catch (error) {
+        return400or500Errors(error, res);
+    }
+}
+
+export const areThePlantSittingStillAvailableFromTheRequest = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const plantSittingInfo = await getOnePlantSittingByRequestId(req.body.requestId)
+
+        if (!plantSittingInfo.is_taken && Date.now() < plantSittingInfo.end_at.getTime()) {
+            next()
+            return;
         } else {
-            res.status(404).send({ message: "Erreur" });
+            throw new HttpError(401, "This plant sitting are not available from this request.")
         }
 
     } catch (error) {
-        
-        res.status(404).send({ message: error });
+        return400or500Errors(error, res)
     }
-};
-
+}
